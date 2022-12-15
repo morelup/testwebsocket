@@ -171,7 +171,7 @@ fetch('https://api.monday.com/v2', {
     },
   }),
 })
-  .then((res) => io.to(msg.channel).emit('defect submitted',res);)
+  .then((res) => io.to(msg.channel).emit('defect submitted',res))
   .then((result) => console.log(result));
 }
 
