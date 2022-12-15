@@ -139,7 +139,7 @@ io.on('connection', socket => {
 	});
 	socket.on('defect', msg => {
 		createDefect(msg);
-		console.log("leave message sent for "+msg.callid);
+		console.log("defect message sent for "+msg.callid);
 	});
 });
 
@@ -149,13 +149,7 @@ io.on('connection', socket => {
 
 function createDefect(msg) {
 try{
-fetch('https://api.monday.com/v2', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-	'Authorization': mondayAuthKey
-  },
-  body: JSON.stringify({
+	var body = JSON.stringify({
     query: `mutation ($group_id: String, $name: String, $column_values: JSON) {
     create_item (
 			board_id: $board_id, 
@@ -172,7 +166,15 @@ fetch('https://api.monday.com/v2', {
 	 column_values: "{\"text\" : \""+msg.callid+"\",\"text6\" : \""+msg.uuid+"\"}",
 	 name: msg.name
     },
-  }),
+  });
+  console.log(body);
+fetch('https://api.monday.com/v2', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+	'Authorization': mondayAuthKey
+  },
+  body: body,
 })
   .then((res) => io.to(msg.channel).emit('defect submitted',res))
   .then((result) => console.log(result));
