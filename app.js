@@ -19,7 +19,7 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const url = require('url');
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 var mysql      = require('mysql');
 const io = require('socket.io')(server, {
