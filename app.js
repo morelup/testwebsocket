@@ -19,7 +19,7 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const url = require('url');
-const fetch = require('node-fetch');
+const fetch = import('node-fetch');
 console.log("FINDME"+process.version);
 
 var mysql      = require('mysql');
@@ -149,7 +149,7 @@ io.on('connection', socket => {
 
 function createDefect(msg) {
 try{
-fetch.fetch('https://api.monday.com/v2', {
+fetch('https://api.monday.com/v2', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
