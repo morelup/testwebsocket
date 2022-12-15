@@ -20,6 +20,7 @@ const app = express();
 const server = require('http').Server(app);
 const url = require('url');
 const fetch = require('node-fetch');
+console.log("FINDME"+process.version);
 
 var mysql      = require('mysql');
 const io = require('socket.io')(server, {
