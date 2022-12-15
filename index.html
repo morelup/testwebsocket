@@ -82,6 +82,7 @@
 							<th>Time</th>
 							<th>CallID</th>
 							<th>UUID</th>
+							<th>name</th>
 							<th>Submit</th>
 							</tr>
 						<tbody>
@@ -147,11 +148,12 @@ function logMessage(msg)
 	var cell2 = row.insertCell(1);
 	var cell3 = row.insertCell(2);
 	var cell4 = row.insertCell(3);
+	var cell5 = row.insertCell(4);
 	cell1.innerHTML = timeConverter(msg.timestamp);
 	cell2.innerHTML = msg.node_values.XSIP_x_five9callid;
 	cell3.innerHTML = msg.uuid;
-	//cell3.innerHTML = "<input type=\"text\" id=\""+msg.node_values.XSIP_x_five9callid+"-text\" />";
-	cell4.innerHTML = "<button onclick=\"createDefect('"+msg.node_values.XSIP_x_five9callid+"')\">Submit Defect</button>";
+	cell4.innerHTML = "<input type=\"text\" id=\""+msg.node_values.XSIP_x_five9callid+"-text\" />";
+	cell5.innerHTML = "<button onclick=\"createDefect('"+msg.node_values.XSIP_x_five9callid+"')\">Submit Defect</button>";
 	records[msg.node_values.XSIP_x_five9callid] = msg;
 }
 function debugMessage()
