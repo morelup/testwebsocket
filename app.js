@@ -147,8 +147,8 @@ io.on('connection', socket => {
 
 
 function createDefect(msg) {
-
-fetch('https://api.monday.com/v2', {
+try{
+fetch.fetch('https://api.monday.com/v2', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -175,6 +175,10 @@ fetch('https://api.monday.com/v2', {
 })
   .then((res) => io.to(msg.channel).emit('defect submitted',res))
   .then((result) => console.log(result));
+} catch (error) {
+	console.log(error);
+}
+	
 }
 
 
