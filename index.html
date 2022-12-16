@@ -164,12 +164,10 @@ function logMessage(msg)
 	}
 	records[callID+uuid] = {};
 	msg.forEach(loopLogItem);
-	
-	
-	
-	if(XSIP_x_five9callid in msg[0].node_values)
-	records[msg.node_values.XSIP_x_five9callid] = msg;
 	var uniqueID = callID+uuid;
+	
+	
+	
 	
 	
 	console.log(msg);
