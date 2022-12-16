@@ -91,21 +91,30 @@ app.use(express.static(__dirname + '/public'));
 
 app.use(express.json());
 app.post('/', function requestHandler(req, res) {
-	console.log("newpostmessage");
-    console.log("Message body: "+ JSON.stringify(req.body));
-    console.log("Message body0: "+ JSON.stringify(req.body[0]));
 	const queryObject = url.parse(req.url, true).query;
+	const ifDebug = "debug" in queryObject;
+	if (ifDebug) console.log("newpostmessage");
+    if (ifDebug) console.log("Message body: "+ JSON.stringify(req.body));
+    if (ifDebug) console.log("Message body0: "+ JSON.stringify(req.body[0]));
+	
+	
 	var node_type = req.body[0].node_type;
-	console.log("start_node "+node_type);
-	if(node_type == "start_node" && "project" in queryObject)
+	if (ifDebug) console.log("start_node "+node_type);
+	if( "project" in queryObject)
 	{
 		var group_id = req.body[0].group_id;
 		var instance_id = req.body[0].instance_id;
 		var ANI = req.body[0].node_values.XSIP_x_five9ani;
 		//var CallID = req.body[0].node_values.XSIP_x_five9callid;
 		//var uuid = req.body[0].uuid;
-		io.to(queryObject.project+ANI).emit('chat message',req.body[0]);
-		console.log("sending message to "+queryObject.project+ANI);
+		
+		
+		if (io.sockets.adapter.rooms.get(queryObject.project+ANI).size > 0)
+		{
+			io.to(queryObject.project+ANI).emit('chat message', req.body);
+			if (ifDebug) console.log("sending message to "+queryObject.project+ANI);
+		}
+		
 		//var post = {Interaction_VCC_ID:req.body[0].node_values.XSIP_x_five9callid, 
 		//			Interaction_UUID:req.body[0].uuid, 
 		//			Interaction_ANI:req.body[0].node_values.XSIP_x_five9ani, 

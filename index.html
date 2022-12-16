@@ -101,6 +101,7 @@
 		
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="js/jquery.json-editor.js" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 <script>
 function GetURLParameter(sParam) {
@@ -123,8 +124,7 @@ function timeConverter(UNIX_timestamp){
 	timeZoneName: 'short'
   });
 }
-
-const debug = GetURLParameter("debug");
+const fullLog = GetURLParameter("fullLog");
 const project = GetURLParameter("project");
 const debugmenu = document.getElementById('debugmenu');
 const ani = document.getElementById('ani');
@@ -133,15 +133,45 @@ const listening = document.getElementById('listening');
 var oldvalue = "";
 var records = {};
 
-if(debug != "null")
+if(GetURLParameter("debug") != "null")
 {
 	new bootstrap.Collapse(debugmenu);
 }
 
 
+function loopLogItem(msg) {
+  var callID = (!msg[0].node_values.XSIP_x_five9callid ) ? "" : msg[0].node_values.XSIP_x_five9callid;
+  var uuid = (!msg[0].uuid ) ? "" : msg[0].uuid;
+  records[callID+uuid][msg.node_order] = msg;
+}
 
 function logMessage(msg)
 {
+	console.log("Call Information Recieved");
+	var callID = (!msg[0].node_values.XSIP_x_five9callid ) ? "" : msg[0].node_values.XSIP_x_five9callid;
+	var uuid = (!msg[0].uuid ) ? "" : msg[0].uuid;
+	
+	if(callID == "" && uuid == "")
+	{
+		console.log("Invalid call recieved");
+		return;
+	}
+	if (callID+uuid in records)
+	{
+		msg.forEach(loopLogItem);
+		console.log("Call Update");
+		return;
+	}
+	records[callID+uuid] = {};
+	msg.forEach(loopLogItem);
+	
+	
+	
+	if(XSIP_x_five9callid in msg[0].node_values)
+	records[msg.node_values.XSIP_x_five9callid] = msg;
+	var uniqueID = callID+uuid;
+	
+	
 	console.log(msg);
 	var row = logs.insertRow();
 	var cell1 = row.insertCell(0);
@@ -149,12 +179,12 @@ function logMessage(msg)
 	var cell3 = row.insertCell(2);
 	var cell4 = row.insertCell(3);
 	var cell5 = row.insertCell(4);
-	cell1.innerHTML = timeConverter(msg.timestamp);
-	cell2.innerHTML = msg.node_values.XSIP_x_five9callid;
-	cell3.innerHTML = msg.uuid;
-	cell4.innerHTML = "<input type=\"text\" id=\""+msg.node_values.XSIP_x_five9callid+"-text\" />";
-	cell5.innerHTML = "<button onclick=\"createDefect('"+msg.node_values.XSIP_x_five9callid+"')\">Submit Defect</button>";
-	records[msg.node_values.XSIP_x_five9callid] = msg;
+	cell1.innerHTML = timeConverter(msg[0].timestamp);
+	cell2.innerHTML = callID;
+	cell3.innerHTML = uuid;
+	cell4.innerHTML = "<input type=\"text\" id=\""+uniqueID+"-text\" />";
+	cell5.innerHTML = "<button onclick=\"createDefect('"+uniqueID+"')\">Submit Defect</button>";
+	
 }
 function debugMessage()
 {
@@ -168,6 +198,7 @@ const socket = io("wss://test-orelup-aia.ue.r.appspot.com", {
 socket.on('chat message', function(msg){
     logMessage(msg);
   });
+  
 socket.on('defect submitted', function(msg){
     console.log("defect submitted for" + msg);
   });
