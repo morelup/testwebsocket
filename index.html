@@ -28,6 +28,27 @@
 
 </head>
 <body>
+	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		  </div>
+		  <div class="modal-body">
+			<pre id="json-display"></pre>
+
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary">Save changes</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	
+	
+	
 	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
 	  <a class="navbar-brand col-md-2 col-lg-2 me-0 px-3" href="#">Company name</a>
 	  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,18 +73,7 @@
 				<div class="form-group">
 					<label for="testPayload">Payload</label>
 					<textarea type="email" class="form-control" id="testPayload" aria-describedby="testPayloadHelp" placeholder="Enter email">
-						{
-							"group_id": 268,
-							"instance_id": 38445,
-							"node_type": "start_node",
-							"node_values": {
-								"XSIP_x_five9ani": "2195521234",
-								"XSIP_x_five9callid": "examplecallid"
-							},
-							"timestamp": "1671069098956",
-							"uuid": "example uuid",
-							"node_order": 1
-						}
+						[{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643693","node_name":"Disconnect","node_type":"disconnect","node_values":{"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bK5f05.c0ece73.0;i=4713fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0c11f605","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"460073133_128831108@208.69.29.36","XSIP_cseq":"268403 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=579.839b79e5>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007260","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_five9dnis":"8558195944","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001308","XSIP_x_five9sessionid":"C52F146F28234EFDBE74ACC30B00D9D3","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1670618626135","uuid":"395072d4-7b53-42b4-9be8-d5eb8c8b5035","node_order":7,"time_taken":"0.001s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643719","node_name":"Set Call Hangup","node_type":"variable","node_values":{"vcc_routeType":"Hangup","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bK5f05.c0ece73.0;i=4713fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0c11f605","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"460073133_128831108@208.69.29.36","XSIP_cseq":"268403 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=579.839b79e5>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007260","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_five9dnis":"8558195944","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001308","XSIP_x_five9sessionid":"C52F146F28234EFDBE74ACC30B00D9D3","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1670618626135","uuid":"395072d4-7b53-42b4-9be8-d5eb8c8b5035","node_order":8,"time_taken":"0s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643721","node_name":"Go Write Session Data","node_type":"goto","node_values":{"next_node_id":3643723,"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bK5f05.c0ece73.0;i=4713fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0c11f605","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"460073133_128831108@208.69.29.36","XSIP_cseq":"268403 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=579.839b79e5>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007260","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_five9dnis":"8558195944","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001308","XSIP_x_five9sessionid":"C52F146F28234EFDBE74ACC30B00D9D3","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1670618626136","uuid":"395072d4-7b53-42b4-9be8-d5eb8c8b5035","node_order":9,"time_taken":"0.001s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643723","node_name":"Write Session Data","node_type":"data_store","node_values":{"form_data":{"data_store_id":20685,"query_condition":[],"row_limit":1,"order_by":{"column":"","sortBy":""},"document_id":"","operation_name":"insert","document_rules":{"vcc_call_id":"300000000001308","ani":"2195521234","iisn":"777112899917","accountid":"268","region":"AMERICA","pop":"VIR","vcc_ani":"2195521234","vcc_dnis":"8558195944","vcc_sessionid":"C52F146F28234EFDBE74ACC30B00D9D3","routetype":"Hangup","routevalue":"EMPTY","routereason":"EMPTY","_task_id":38445,"_uuid":"395072d4-7b53-42b4-9be8-d5eb8c8b5035","_timestamp":"1670618626137"}},"api_response":{"response_code":200,"response":"Data Inserted","succeeded":1,"failed":0,"ignored":0,"additional_info":{"_id":["63939e02a76d2b0e4a0099b9"]}},"new_row_id":{"row_id":"63939e02a76d2b0e4a0099b9"},"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bK5f05.c0ece73.0;i=4713fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0c11f605","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"460073133_128831108@208.69.29.36","XSIP_cseq":"268403 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=579.839b79e5>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007260","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_five9dnis":"8558195944","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001308","XSIP_x_five9sessionid":"C52F146F28234EFDBE74ACC30B00D9D3","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1670618626209","uuid":"395072d4-7b53-42b4-9be8-d5eb8c8b5035","node_order":10,"time_taken":"0.073s"}]
 					</textarea>
 					<small id="testPayloadHelp" class="form-text text-muted">Paste a submission node here.</small>
 					<button onclick="debugMessage()" >submit</button>
@@ -130,6 +140,13 @@ const debugmenu = document.getElementById('debugmenu');
 const ani = document.getElementById('ani');
 const logs = document.getElementById('logs');
 const listening = document.getElementById('listening');
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+  keyboard: false
+});
+var editor =new JsonEditor('#json-display', getJson());
+
+
+
 var oldvalue = "";
 var records = {};
 
@@ -205,6 +222,16 @@ socket.on('defect submitted', function(msg){
   
   
 function createDefect(callid) {
+
+editor.load(records[callID]);
+
+myModal.show();
+
+
+
+
+
+return;
 var msg = {
 board_id:3646541815,
 group_id: "topics",
