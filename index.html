@@ -140,8 +140,8 @@ if(GetURLParameter("debug") != "null")
 
 
 function loopLogItem(msg) {
-  var callID = (!msg[0].node_values.XSIP_x_five9callid ) ? "" : msg[0].node_values.XSIP_x_five9callid;
-  var uuid = (!msg[0].uuid ) ? "" : msg[0].uuid;
+  var callID = (!msg.node_values.XSIP_x_five9callid ) ? "" : msg.node_values.XSIP_x_five9callid;
+  var uuid = (!msg.uuid ) ? "" : msg.uuid;
   records[callID+uuid][msg.node_order] = msg;
 }
 
