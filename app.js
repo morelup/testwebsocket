@@ -41,7 +41,7 @@ const firebase = require('firebase-admin');
 const firebaseConfig = {
   apiKey: "AIzaSyB_C4Ojo-6VNNwUzbIy_JQbKGRj6QBquUw",
   authDomain: "test-orelup-aia.firebaseapp.com",
-  databaseURL: "https://test-orelup-aia-default-rtdb.firebaseio.com",
+  databaseURL: "localhost",
   projectId: "test-orelup-aia",
   storageBucket: "test-orelup-aia.appspot.com",
   messagingSenderId: "564770775641",
