@@ -189,7 +189,7 @@ function logMessage(msg)
 		console.log("Call Update");
 		return;
 	}
-	records[callID+uuid] = {};
+	if (!(callID+uuid in records))records[callID+uuid] = {};
 	msg.forEach(loopLogItem);
 	var uniqueID = callID+uuid;
 	var row = logs.insertRow();
