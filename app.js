@@ -101,15 +101,19 @@ function beginListeningDay(dateprovided)//listen for new logs
 {
 	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').on('child_added', (snapshot) => {
 	
-	var node_type = snapshot.node_type;
-	var payload = new Array();;
-	var logItem = snapshot.val();
-	var ANI = snapshot.val().node_values.XSIP_x_five9ani;
+	var ANI = (!snapshot.val().node_values.XSIP_x_five9ani) ? "ERROR" : snapshot.val().node_values.XSIP_x_five9ani;
 	
 	
-	if (io.sockets.adapter.rooms.get(ANI).size > 0)
+	if(ANI != "ERROR")
 	{
-		io.to(ANI).emit('us6 message', payload);
+		var node_type = (!snapshot.val().node_type) ? "ERROR" : snapshot.val().node_type;
+		var payload = new Array();;
+		var logItem = snapshot.val();
+		payload.push(logItem);
+		if (io.sockets.adapter.rooms.get(ANI).size > 0)
+		{
+			io.to(ANI).emit('us6 message', payload);
+		}
 	}
 		
 	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').child(snapshot.key).remove();
@@ -180,33 +184,29 @@ app.post('/', function requestHandler(req, res) {
     if (ifDebug) console.log("Message body: "+ JSON.stringify(req.body));
     if (ifDebug) console.log("Message body0: "+ JSON.stringify(req.body[0]));
 	
-	
-	var node_type = req.body[0].node_type;
+	var node_type = (!req.node_type) ? "ERROR" : req.node_type;
 	if (ifDebug) console.log("first_node "+node_type);
-	if( "project" in queryObject)
+	if (node_type == "ERROR") console.log("first_node "+JSON.stringify(req));
+	var ANI = (!req.body[0].node_values.XSIP_x_five9ani) ? "ERROR" : req.body[0].node_values.XSIP_x_five9ani;
+	
+	//var CallID = req.body[0].node_values.XSIP_x_five9callid;
+	//var uuid = req.body[0].uuid;
+	
+	
+	if (io.sockets.adapter.rooms.get(ANI).size > 0)
 	{
-		var group_id = req.body[0].group_id;
-		var instance_id = req.body[0].instance_id;
-		var ANI = req.body[0].node_values.XSIP_x_five9ani;
-		//var CallID = req.body[0].node_values.XSIP_x_five9callid;
-		//var uuid = req.body[0].uuid;
-		
-		
-		if (io.sockets.adapter.rooms.get(ANI).size > 0)
-		{
-			io.to(ANI).emit('us7 message', req.body);
-			if (ifDebug) console.log("sending message to "+queryObject.project+ANI);
-		}
-		
-		//var post = {Interaction_VCC_ID:req.body[0].node_values.XSIP_x_five9callid, 
-		//			Interaction_UUID:req.body[0].uuid, 
-		//			Interaction_ANI:req.body[0].node_values.XSIP_x_five9ani, 
-		//			Interaction_Domain:queryObject.project};
-		//var query = connection.query('INSERT INTO Interaction SET ?', post, function (error, results, fields) {
-		//  if (error) throw error;
-		//  console.log(results.insertId)
-		//});
+		io.to(ANI).emit('us7 message', req.body);
+		if (ifDebug) console.log("sending message to "+ANI);
 	}
+	
+	//var post = {Interaction_VCC_ID:req.body[0].node_values.XSIP_x_five9callid, 
+	//			Interaction_UUID:req.body[0].uuid, 
+	//			Interaction_ANI:req.body[0].node_values.XSIP_x_five9ani, 
+	//			Interaction_Domain:queryObject.project};
+	//var query = connection.query('INSERT INTO Interaction SET ?', post, function (error, results, fields) {
+	//  if (error) throw error;
+	//  console.log(results.insertId)
+	//});
 	
 	res.send(req.body);
 });
