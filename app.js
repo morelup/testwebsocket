@@ -104,7 +104,7 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 {
 	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+"/logs/hold").set("{'hold':''}");
 	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+'/logs').on('child_added', (snapshot) => {
-		if(snapshot.key) == 'hold') return;
+		if(snapshot.key == 'hold') return;
 		var ANI = (!snapshot.val().node_values.XSIP_x_five9ani) ? "ERROR" : snapshot.val().node_values.XSIP_x_five9ani;
 		var node_type = (!snapshot.val().node_type) ? "ERROR" : snapshot.val().node_type;
 		console.log(snapshot.key+" - "+node_type);
