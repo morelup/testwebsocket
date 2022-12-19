@@ -47,8 +47,8 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase
   // WARNING: Do not print the secret in a production environment - this
   // snippet is showing how to access the secret material.
   firebase.initializeApp(payload);
-  firebase.database().ref('nodelog/17665_235/December_2022').on('child_added', (snapshot) => {
-	console.log(snapshot.keys);
+  firebase.database().ref('nodelog/17665_235/December_2022').on('child_added', (snapshot,context) => {
+	console.log(context);
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	});
