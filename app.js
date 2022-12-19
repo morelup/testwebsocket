@@ -22,7 +22,7 @@ const url = require('url');
 const fetch = require('node-fetch');
 
 // The Firebase Admin SDK to access Firestore.
-const firebase = require('firebase');
+const firebase = require('firebase-admin');
 const firebaseConfig = {
   apiKey: "AIzaSyB_C4Ojo-6VNNwUzbIy_JQbKGRj6QBquUw",
   authDomain: "test-orelup-aia.firebaseapp.com",
@@ -33,11 +33,32 @@ const firebaseConfig = {
   appId: "1:564770775641:web:eb24cf739dec18657d0748",
   measurementId: "G-C5WBNR2SFP"
 };
-firebase.initializeApp(firebaseConfig);
-firebase.on('child_added', function(snapshot) {
-			console.log(JSON.stringify(snapshot));
-        });
+initializeFirebase() 
 
+		
+		
+async function initializeFirebase() {
+var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase/versions/latest";
+  const [version] = await client.accessSecretVersion({
+    name: secretName,
+  });
+  // Extract the payload as a string.
+  const payload = JSON.parse(version.payload.data.toString());
+  // WARNING: Do not print the secret in a production environment - this
+  // snippet is showing how to access the secret material.
+  firebase.initializeApp(payload);
+  DatabaseReference ref = FirebaseDatabase
+		.getInstance()
+		.getReference("/public_resource");
+	ref.addListenerForSingleValueEvent(new ValueEventListener() {
+		@Override
+		public void onDataChange(DataSnapshot dataSnapshot) {
+			String res = dataSnapshot.getValue();
+			System.out.println(res);
+		}
+	});
+  return ;
+};
 
 
 
