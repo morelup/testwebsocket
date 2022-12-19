@@ -77,25 +77,24 @@ function beginListeningDay(dateprovided)//listen for new logs
 {
 	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').on('child_added', (snapshot) => {
 	var node_type = snapshot.node_type;
-	if( "project" in queryObject)
+	var payload = new Array();;
+	var logItem = snapshot.val();
+	var ANI = req.body[0].node_values.XSIP_x_five9ani;
+	//var CallID = req.body[0].node_values.XSIP_x_five9callid;
+	//var uuid = req.body[0].uuid;
+	
+	
+	if (io.sockets.adapter.rooms.get(ANI).size > 0)
 	{
-		var payload = new Array();;
-		var logItem = snapshot.val();
-		var ANI = req.body[0].node_values.XSIP_x_five9ani;
-		//var CallID = req.body[0].node_values.XSIP_x_five9callid;
-		//var uuid = req.body[0].uuid;
-		
-		
-		if (io.sockets.adapter.rooms.get(ANI).size > 0)
-		{
-			io.to(ANI).emit('us6 message', payload);
-		}
-		
+		io.to(ANI).emit('us6 message', payload);
 	}
+		
+	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').child(snapshot.key).remove();
+	
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	}
-	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').child(snapshot.key).remove();
+
 	);
 }
 
