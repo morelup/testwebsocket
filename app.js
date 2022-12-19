@@ -50,13 +50,10 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase
   DatabaseReference ref = FirebaseDatabase
 		.getInstance()
 		.getReference("/public_resource");
-	ref.addListenerForSingleValueEvent(new ValueEventListener() {
-		@Override
-		public void onDataChange(DataSnapshot dataSnapshot) {
-			String res = dataSnapshot.getValue();
-			System.out.println(res);
+	firebase.database().ref('/nodelog').on('child_added', function(postSnapshot) {
+			System.out.println(postSnapshot);
 		}
-	});
+	);
   return ;
 };
 
