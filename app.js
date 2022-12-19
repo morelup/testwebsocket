@@ -206,7 +206,9 @@ app.post('/', function requestHandler(req, res) {
 			io.to(ANI).emit('us7 message', req.body);
 			if (ifDebug) console.log("sending message to "+ANI);
 		}
-	}
+	} catch (error) {
+			console.log(error);
+		}
 	
 	//var post = {Interaction_VCC_ID:req.body[0].node_values.XSIP_x_five9callid, 
 	//			Interaction_UUID:req.body[0].uuid, 
