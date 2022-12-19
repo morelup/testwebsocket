@@ -108,16 +108,16 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 	
 	if(ANI != "ERROR")
 	{
-		var node_type = (!snapshot.val().node_type) ? "ERROR" : snapshot.val().node_type;
-		var payload = new Array();;
-		var logItem = snapshot.val();
-		payload.push(logItem);
 		try{
-		if(ANI in io.sockets.adapter.rooms)
-		if (io.sockets.adapter.rooms.get(ANI).size > 0)
-		{
-			io.to(ANI).emit('us6 message', payload);
-		}
+			var node_type = (!snapshot.val().node_type) ? "ERROR" : snapshot.val().node_type;
+			var payload = new Array();
+			var logItem = snapshot.val();
+			payload.push(logItem);
+			
+			if (io.sockets.adapter.rooms.has(ANI))
+			{
+				io.to(ANI).emit('us6 message', payload);
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -200,16 +200,10 @@ app.post('/', function requestHandler(req, res) {
 	//var uuid = req.body[0].uuid;
 	
 	try{
-		if(ANI in io.sockets.adapter.rooms)
+		if (io.sockets.adapter.rooms.has(ANI))
 		{
-			if (io.sockets.adapter.rooms.get(ANI).size > 0)
-			{
-				io.to(ANI).emit('us7 message', req.body);
-				if (ifDebug) console.log("sending message to "+ANI);
-			}
-		}
-		else{
-			console.log(io.sockets.adapter.rooms);
+			io.to(ANI).emit('us7 message', req.body);
+			if (ifDebug) console.log("sending message to "+ANI);
 		}
 	} catch (error) {
 			console.log(error);
