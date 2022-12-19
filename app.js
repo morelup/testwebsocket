@@ -94,7 +94,7 @@ function beginListeningMonth(domainProvided,monthProvided)//listen for new days
 {
 	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided).on('child_added', (snapshot) => {
 	console.log(snapshot.key);
-	beginListeningDay(snapshot.key);
+	beginListeningDay(domainProvided,monthProvided,snapshot.key);
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	});
