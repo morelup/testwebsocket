@@ -167,7 +167,7 @@ function loopLogItem(msg) {
 	records[callID+uuid][msg.node_order] = msg;
   }else
   {
-	records[callID+uuid][Object.keys(records).length].push(msg);
+	records[callID+uuid][Object.keys(records).length]= msg;
   }
 }
 
