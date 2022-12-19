@@ -112,9 +112,13 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 		var payload = new Array();;
 		var logItem = snapshot.val();
 		payload.push(logItem);
+		try{
 		if (io.sockets.adapter.rooms.get(ANI).size > 0)
 		{
 			io.to(ANI).emit('us6 message', payload);
+		}
+		} catch (error) {
+			console.log(error);
 		}
 	}
 		
