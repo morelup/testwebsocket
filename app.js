@@ -201,10 +201,15 @@ app.post('/', function requestHandler(req, res) {
 	
 	try{
 		if(ANI in io.sockets.adapter.rooms)
-		if (io.sockets.adapter.rooms.get(ANI).size > 0)
 		{
-			io.to(ANI).emit('us7 message', req.body);
-			if (ifDebug) console.log("sending message to "+ANI);
+			if (io.sockets.adapter.rooms.get(ANI).size > 0)
+			{
+				io.to(ANI).emit('us7 message', req.body);
+				if (ifDebug) console.log("sending message to "+ANI);
+			}
+		}
+		else{
+			console.log(io.sockets.adapter.rooms);
 		}
 	} catch (error) {
 			console.log(error);
