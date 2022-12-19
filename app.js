@@ -20,7 +20,11 @@ const app = express();
 const server = require('http').Server(app);
 const url = require('url');
 const fetch = require('node-fetch');
-var firebase = require('firebase-tools')
+// The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
+const functions = require('firebase-functions');
+
+// The Firebase Admin SDK to access Firestore.
+const firebase = require('firebase-admin');
 const firebaseConfig = {
   apiKey: "AIzaSyB_C4Ojo-6VNNwUzbIy_JQbKGRj6QBquUw",
   authDomain: "test-orelup-aia.firebaseapp.com",
@@ -31,8 +35,7 @@ const firebaseConfig = {
   appId: "1:564770775641:web:eb24cf739dec18657d0748",
   measurementId: "G-C5WBNR2SFP"
 };
-firebase.initializeApp(firebaseConfig)
-let database = firebase.database()
+firebase.initializeApp(firebaseConfig);
 firebase.on('child_added', function(snapshot) {
 			console.log(JSON.stringify(snapshot));
         });
