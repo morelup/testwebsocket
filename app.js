@@ -22,7 +22,7 @@ const url = require('url');
 const fetch = require('node-fetch');
 
 // The Firebase Admin SDK to access Firestore.
-const firebase = require('firebase-admin');
+const firebase = require('firebase');
 const firebaseConfig = {
   apiKey: "AIzaSyB_C4Ojo-6VNNwUzbIy_JQbKGRj6QBquUw",
   authDomain: "test-orelup-aia.firebaseapp.com",
