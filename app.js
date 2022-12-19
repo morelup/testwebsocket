@@ -229,6 +229,7 @@ app.post('/', function requestHandler(req, res) {
 
 app.get('/', (req, res) => {
   console.log("app directory "+__dirname);
+  console.log(io.sockets.adapter.rooms);
   res.sendFile(__dirname + '/index.html');
 
 });
