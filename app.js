@@ -188,7 +188,7 @@ app.post('/', function requestHandler(req, res) {
 	
 	var node_type = (!req.node_type) ? "ERROR" : req.node_type;
 	if (ifDebug) console.log("first_node "+node_type);
-	if (node_type == "ERROR") console.log("first_node "+JSON.stringify(req));
+	if (node_type == "ERROR") console.log("first_node "+JSON.stringify(req.body));
 	var ANI = (!req.body[0].node_values.XSIP_x_five9ani) ? "ERROR" : req.body[0].node_values.XSIP_x_five9ani;
 	
 	//var CallID = req.body[0].node_values.XSIP_x_five9callid;
