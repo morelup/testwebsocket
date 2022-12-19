@@ -110,6 +110,7 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 	
 	if(ANI != "ERROR")
 	{
+		console.log("phone number found");
 		try{
 			var node_type = (!snapshot.val().node_type) ? "ERROR" : snapshot.val().node_type;
 			var payload = new Array();
@@ -118,6 +119,7 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 			
 			if (io.sockets.adapter.rooms.has(ANI))
 			{
+				console.log("room found:" + ANI);
 				io.to(ANI).emit('us6 message', payload);
 			}
 		} catch (error) {
