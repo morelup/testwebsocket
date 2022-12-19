@@ -85,23 +85,23 @@ function beginListeningDomain(domainProvided)//listen for new months
 {
 	firebase.database().ref('nodelog/'+domainProvided).on('child_added', (snapshot) => {
 	console.log(snapshot.key);
-	beginListeningMonth(snapshot.key);
+	beginListeningMonth(domainProvided,snapshot.key);
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	});
 }
-function beginListeningMonth(dateprovided)//listen for new days 
+function beginListeningMonth(domainProvided,monthProvided)//listen for new days 
 {
-	firebase.database().ref('nodelog/17665_235/December_2022').on('child_added', (snapshot) => {
+	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided).on('child_added', (snapshot) => {
 	console.log(snapshot.key);
 	beginListeningDay(snapshot.key);
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	});
 }
-function beginListeningDay(dateprovided)//listen for new logs
+function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen for new logs
 {
-	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').on('child_added', (snapshot) => {
+	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+'/logs').on('child_added', (snapshot) => {
 	
 	var ANI = (!snapshot.val().node_values.XSIP_x_five9ani) ? "ERROR" : snapshot.val().node_values.XSIP_x_five9ani;
 	console.log(snapshot.key);
@@ -118,7 +118,7 @@ function beginListeningDay(dateprovided)//listen for new logs
 		}
 	}
 		
-	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').child(snapshot.key).remove();
+	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+'/logs').child(snapshot.key).remove();
 	
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
