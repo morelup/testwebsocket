@@ -128,7 +128,7 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 			}
 		}
 			
-		//firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+'/logs').child(snapshot.key).remove();
+		firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+'/logs').child(snapshot.key).remove();
 		
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
