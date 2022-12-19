@@ -89,12 +89,12 @@ function beginListeningDay(dateprovided)//listen for new logs
 	}
 		
 	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').child(snapshot.key).remove();
-	
+	*/
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	}
 
-	);*/
+	);
 }
 
 
