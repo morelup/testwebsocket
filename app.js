@@ -41,7 +41,7 @@ const firebase = require('firebase-admin');
 const firebaseConfig = {
   apiKey: "AIzaSyB_C4Ojo-6VNNwUzbIy_JQbKGRj6QBquUw",
   authDomain: "test-orelup-aia.firebaseapp.com",
-  databaseURL: "localhost",
+  databaseURL: "https://test-orelup-aia-default-rtdb.firebaseio.com",
   projectId: "test-orelup-aia",
   storageBucket: "test-orelup-aia.appspot.com",
   messagingSenderId: "564770775641",
@@ -230,6 +230,10 @@ app.post('/', function requestHandler(req, res) {
 app.get('/', (req, res) => {
   console.log("app directory "+__dirname);
   console.log(io.sockets.adapter.rooms);
+  if("2195521234" in io.sockets.adapter.rooms)
+  {
+	  console.log("roomfound");
+  }
   res.sendFile(__dirname + '/index.html');
 
 });
