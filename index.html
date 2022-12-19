@@ -209,7 +209,7 @@ function debugMessage()
 	logMessage(JSON.parse(document.getElementById('testPayload').value));
 }
 
-const socket = io("wss://localhost", {
+const socket = io({
   reconnectionDelayMax: 10000
 });
 
