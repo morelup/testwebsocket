@@ -16,7 +16,8 @@
     "supertest": "^6.0.0",
 	"mysql": "^2.18.1",
 	"@google-cloud/secret-manager":"^4.1.4",
-	"node-fetch": "^2.0.0"
+	"node-fetch": "^2.0.0",
+	"firebase":"^9.15.0"
   },
   "devDependencies": {
     "mocha": "^9.0.0",
