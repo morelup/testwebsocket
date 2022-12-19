@@ -222,7 +222,7 @@ io.on('connection', socket => {
 	if(bRunFirstSocket)
 	{
 		bRunFirstSocket = false;
-		initializeFirebase();//start firebase listener
+		initializeFirebase();//start firebase listener, needs to be delayed for race condition.  Wait till first socket connection
 	}
 	
 	//socket.on('chat message', msg => {io.emit('chat message', msg);});
