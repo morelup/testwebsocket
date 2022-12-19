@@ -230,8 +230,8 @@ app.post('/', function requestHandler(req, res) {
 app.get('/', (req, res) => {
   console.log("app directory "+__dirname);
   console.log(io.sockets.adapter.rooms);
-  console.log(io.sockets.adapter.rooms.get("2195521234"));
-  if("2195521234" in io.sockets.adapter.rooms)
+  console.log(io.sockets.adapter.rooms.has("2195521234" ));
+  if(io.sockets.adapter.rooms.has("2195521234" ))
   {
 	  console.log("roomfound");
   }
