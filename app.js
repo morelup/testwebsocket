@@ -20,7 +20,7 @@ const app = express();
 const server = require('http').Server(app);
 const url = require('url');
 const fetch = require('node-fetch');
-var firebase = require('firebase')
+var firebase = require('firebase-tools')
 const firebaseConfig = {
   apiKey: "AIzaSyB_C4Ojo-6VNNwUzbIy_JQbKGRj6QBquUw",
   authDomain: "test-orelup-aia.firebaseapp.com",
