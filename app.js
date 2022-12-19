@@ -113,6 +113,7 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 		var logItem = snapshot.val();
 		payload.push(logItem);
 		try{
+		if(ANI in io.sockets.adapter.rooms)
 		if (io.sockets.adapter.rooms.get(ANI).size > 0)
 		{
 			io.to(ANI).emit('us6 message', payload);
@@ -198,11 +199,13 @@ app.post('/', function requestHandler(req, res) {
 	//var CallID = req.body[0].node_values.XSIP_x_five9callid;
 	//var uuid = req.body[0].uuid;
 	
-	
-	if (io.sockets.adapter.rooms.get(ANI).size > 0)
-	{
-		io.to(ANI).emit('us7 message', req.body);
-		if (ifDebug) console.log("sending message to "+ANI);
+	try{
+		if(ANI in io.sockets.adapter.rooms)
+		if (io.sockets.adapter.rooms.get(ANI).size > 0)
+		{
+			io.to(ANI).emit('us7 message', req.body);
+			if (ifDebug) console.log("sending message to "+ANI);
+		}
 	}
 	
 	//var post = {Interaction_VCC_ID:req.body[0].node_values.XSIP_x_five9callid, 
