@@ -219,7 +219,6 @@ app.get('/', (req, res) => {
 
 io.on('connection', socket => {
 	//actions to perform after socket has been connected.
-	initializeFirebase();//start firebase listener
 	
 	
 	
@@ -292,3 +291,4 @@ if (module === require.main) {
 // [END appengine_websockets_app]
 
 module.exports = server;
+initializeFirebase();//start firebase listener
