@@ -76,6 +76,7 @@ function beginListeningMonth(dateprovided)//listen for new days
 function beginListeningDay(dateprovided)//listen for new logs
 {
 	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').on('child_added', (snapshot) => {
+	/*
 	var node_type = snapshot.node_type;
 	var payload = new Array();;
 	var logItem = snapshot.val();
@@ -93,7 +94,7 @@ function beginListeningDay(dateprovided)//listen for new logs
 	  console.log('The read failed: ' + errorObject.name);
 	}
 
-	);
+	);*/
 }
 
 
