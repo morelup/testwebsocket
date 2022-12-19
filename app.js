@@ -33,7 +33,7 @@ const firebaseConfig = {
   appId: "1:564770775641:web:eb24cf739dec18657d0748",
   measurementId: "G-C5WBNR2SFP"
 };
-initializeFirebase() 
+
 
 		
 		
@@ -78,7 +78,7 @@ var connection = mysql.createConnection({
   password : ""
 });
 accessMYSQLCred();
-
+initializeFirebase();
 async function accessSecret(name) {
 var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/"+name+"/versions/latest";
   const [version] = await client.accessSecretVersion({
