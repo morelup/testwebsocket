@@ -160,7 +160,14 @@ if(GetURLParameter("debug") != "null")
 function loopLogItem(msg) {
   var callID = (!msg.node_values.XSIP_x_five9callid ) ? "" : msg.node_values.XSIP_x_five9callid;
   var uuid = (!msg.uuid ) ? "" : msg.uuid;
-  records[callID+uuid][msg.node_order] = msg;
+  var node_order = (!msg.node_order) ? "" : msg.node_order;
+  if(node_order != "")
+  {
+	records[callID+uuid][msg.node_order] = msg;
+  }else
+  {
+	records[callID+uuid].push(msg);
+  }
 }
 
 function logMessage(msg)
@@ -183,11 +190,6 @@ function logMessage(msg)
 	records[callID+uuid] = {};
 	msg.forEach(loopLogItem);
 	var uniqueID = callID+uuid;
-	
-	
-	
-	
-	
 	console.log(msg);
 	var row = logs.insertRow();
 	var cell1 = row.insertCell(0);
@@ -211,7 +213,10 @@ const socket = io("wss://test-orelup-aia.ue.r.appspot.com", {
   reconnectionDelayMax: 10000
 });
 
-socket.on('chat message', function(msg){
+socket.on('us7 message', function(msg){
+    logMessage(msg);
+  });
+socket.on('us6 message', function(msg){
     logMessage(msg);
   });
   
@@ -272,10 +277,10 @@ function assignANI() {
 listening.innerHTML = "Listening to: "+ani.value;
 listening.classList.add("bg-success");
 listening.classList.remove("bg-danger");
-console.log("Joining: "+project+ani.value);
+console.log("Joining: "+ani.value);
 socket.emit('leave', oldvalue);
-socket.emit('join', project+ani.value);
-oldvalue = project+ani.value;
+socket.emit('join', ani.value);
+oldvalue = ani.value;
 }
 	</script>  
   
