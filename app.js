@@ -31,7 +31,7 @@ var connection = mysql.createConnection({
 const mondayAuthKey = accessSecret("MondayAuthKey");
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
-
+var bRunFirstSocket = true;
 
 
 
@@ -219,8 +219,11 @@ app.get('/', (req, res) => {
 
 io.on('connection', socket => {
 	//actions to perform after socket has been connected.
-	
-	
+	if(bRunFirstSocket)
+	{
+		bRunFirstSocket = false;
+		initializeFirebase();//start firebase listener
+	}
 	
 	//socket.on('chat message', msg => {io.emit('chat message', msg);});
 	socket.on('join', msg => {
@@ -291,4 +294,3 @@ if (module === require.main) {
 // [END appengine_websockets_app]
 
 module.exports = server;
-initializeFirebase();//start firebase listener
