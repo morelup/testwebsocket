@@ -102,7 +102,7 @@ function beginListeningMonth(domainProvided,monthProvided)//listen for new days
 }
 function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen for new logs
 {
-	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided).set("hold");
+	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided).set("{'hold':''}");
 	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+'/logs').on('child_added', (snapshot) => {
 	var ANI = (!snapshot.val().node_values.XSIP_x_five9ani) ? "ERROR" : snapshot.val().node_values.XSIP_x_five9ani;
 	var node_type = (!snapshot.val().node_type) ? "ERROR" : snapshot.val().node_type;
