@@ -209,7 +209,7 @@ function debugMessage()
 	logMessage(JSON.parse(document.getElementById('testPayload').value));
 }
 
-const socket = io("wss://test-orelup-aia.ue.r.appspot.com", {
+const socket = io("wss://localhost", {
   reconnectionDelayMax: 10000
 });
 
