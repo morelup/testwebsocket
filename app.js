@@ -59,7 +59,7 @@ const io = require('socket.io')(server, {
 });
 
 
-		
+var activeListeners = new Array();		
 		
 async function initializeFirebase() {
 var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase/versions/latest";
@@ -74,7 +74,7 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase
   //listen for new domains
   firebase.database().ref('nodelog').on('child_added', (snapshot,context) => {
 	console.log(snapshot.key);
-	beginListeningDomain(snapshot.key);
+		beginListeningDomain(snapshot.key);
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	});
@@ -84,7 +84,8 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase
 function beginListeningDomain(domainProvided)//listen for new months
 {
 	firebase.database().ref('nodelog/'+domainProvided).on('child_added', (snapshot) => {
-	console.log(snapshot.key);
+		
+		console.log(snapshot.key);
 	beginListeningMonth(domainProvided,snapshot.key);
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
@@ -101,10 +102,11 @@ function beginListeningMonth(domainProvided,monthProvided)//listen for new days
 }
 function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen for new logs
 {
+	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided).child("hold").add();
 	firebase.database().ref('nodelog/'+domainProvided+'/'+monthProvided+'/'+dateprovided+'/logs').on('child_added', (snapshot) => {
-	
 	var ANI = (!snapshot.val().node_values.XSIP_x_five9ani) ? "ERROR" : snapshot.val().node_values.XSIP_x_five9ani;
-	console.log(snapshot.key);
+	var node_type = (!snapshot.val().node_type) ? "ERROR" : snapshot.val().node_type;
+	console.log(snapshot.key+" - "+node_type);
 	
 	if(ANI != "ERROR")
 	{
@@ -223,12 +225,6 @@ app.post('/', function requestHandler(req, res) {
 
 app.get('/', (req, res) => {
   console.log("app directory "+__dirname);
-  console.log(io.sockets.adapter.rooms);
-  console.log(io.sockets.adapter.rooms.has("2195521234" ));
-  if(io.sockets.adapter.rooms.has("2195521234" ))
-  {
-	  console.log("roomfound");
-  }
   res.sendFile(__dirname + '/index.html');
 
 });
