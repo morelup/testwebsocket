@@ -223,6 +223,12 @@ socket.on('us6 message', function(msg){
 socket.on('defect submitted', function(msg){
     console.log("defect submitted for" + msg);
   });
+socket.on('connect', function() {
+		console.log("Connected to websocket");
+		socket.on('disconnected', function() {
+			console.log("Disconnected from websocket");
+        });
+	});
   
 function getJson() {
   try {

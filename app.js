@@ -20,6 +20,21 @@ const app = express();
 const server = require('http').Server(app);
 const url = require('url');
 const fetch = require('node-fetch');
+const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
+const client = new SecretManagerServiceClient();
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : "",
+  user     : "",
+  password : ""
+});
+const mondayAuthKey = accessSecret("MondayAuthKey");
+app.use(express.static(__dirname + '/public'));
+app.use(express.json());
+
+
+
+
 
 // The Firebase Admin SDK to access Firestore.
 const firebase = require('firebase-admin');
@@ -33,6 +48,15 @@ const firebaseConfig = {
   appId: "1:564770775641:web:eb24cf739dec18657d0748",
   measurementId: "G-C5WBNR2SFP"
 };
+console.log("FINDME"+process.version);
+
+
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "https://www.orelup.org",
+    methods: ["GET", "POST"]
+  }
+});
 
 
 		
@@ -76,7 +100,7 @@ function beginListeningMonth(dateprovided)//listen for new days
 function beginListeningDay(dateprovided)//listen for new logs
 {
 	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').on('child_added', (snapshot) => {
-	/*
+	
 	var node_type = snapshot.node_type;
 	var payload = new Array();;
 	var logItem = snapshot.val();
@@ -89,7 +113,7 @@ function beginListeningDay(dateprovided)//listen for new logs
 	}
 		
 	firebase.database().ref('nodelog/17665_235/December_2022/'+dateprovided+'/logs').child(snapshot.key).remove();
-	*/
+	
 	}, (errorObject) => {
 	  console.log('The read failed: ' + errorObject.name);
 	}
@@ -98,26 +122,11 @@ function beginListeningDay(dateprovided)//listen for new logs
 }
 
 
-console.log("FINDME"+process.version);
-
-var mysql      = require('mysql');
-const io = require('socket.io')(server, {
-  cors: {
-    origin: "https://www.orelup.org",
-    methods: ["GET", "POST"]
-  }
-});
-const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
-
-// Instantiates a client
-const client = new SecretManagerServiceClient();
 
 
-var connection = mysql.createConnection({
-  host     : "",
-  user     : "",
-  password : ""
-});
+
+
+
 accessMYSQLCred();
 async function accessSecret(name) {
 var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/"+name+"/versions/latest";
@@ -161,12 +170,9 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/MYSQL_HO
 	console.log(pass.payload.data.toString());
 };
 
-const mondayAuthKey = accessSecret("MondayAuthKey");
 
 
-app.use(express.static(__dirname + '/public'));
 
-app.use(express.json());
 app.post('/', function requestHandler(req, res) {
 	const queryObject = url.parse(req.url, true).query;
 	const ifDebug = "debug" in queryObject;
@@ -205,13 +211,6 @@ app.post('/', function requestHandler(req, res) {
 	res.send(req.body);
 });
 
-
-
-
-
-
-
-
 app.get('/', (req, res) => {
   console.log("app directory "+__dirname);
   res.sendFile(__dirname + '/index.html');
@@ -219,7 +218,12 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', socket => {
-  //socket.on('chat message', msg => {io.emit('chat message', msg);});
+	//actions to perform after socket has been connected.
+	initializeFirebase();//start firebase listener
+	
+	
+	
+	//socket.on('chat message', msg => {io.emit('chat message', msg);});
 	socket.on('join', msg => {
 		socket.join(msg);
 		console.log("join message sent for "+msg);
@@ -288,4 +292,3 @@ if (module === require.main) {
 // [END appengine_websockets_app]
 
 module.exports = server;
-initializeFirebase();//start firebase listener
