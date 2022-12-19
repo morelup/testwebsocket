@@ -158,6 +158,7 @@ if(GetURLParameter("debug") != "null")
 
 
 function loopLogItem(msg) {
+  console.log(msg);
   var callID = (!msg.node_values.XSIP_x_five9callid ) ? "" : msg.node_values.XSIP_x_five9callid;
   var uuid = (!msg.uuid ) ? "" : msg.uuid;
   var node_order = (!msg.node_order) ? "" : msg.node_order;
@@ -166,7 +167,7 @@ function loopLogItem(msg) {
 	records[callID+uuid][msg.node_order] = msg;
   }else
   {
-	records[callID+uuid].push(msg);
+	records[callID+uuid][Object.keys(records).length].push(msg);
   }
 }
 
@@ -191,7 +192,6 @@ function logMessage(msg)
 	records[callID+uuid] = {};
 	msg.forEach(loopLogItem);
 	var uniqueID = callID+uuid;
-	console.log(msg);
 	var row = logs.insertRow();
 	var cell1 = row.insertCell(0);
 	var cell2 = row.insertCell(1);
