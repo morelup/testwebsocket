@@ -48,7 +48,7 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase
   // snippet is showing how to access the secret material.
   firebase.initializeApp(payload);
   firebase.database().ref('/nodelog').on('child_added', function(postSnapshot) {
-			System.out.println(postSnapshot);
+			console.log(postSnapshot);
 		}
 	);
   return ;
