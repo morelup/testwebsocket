@@ -79,9 +79,7 @@ function beginListeningDay(dateprovided)//listen for new logs
 	var node_type = snapshot.node_type;
 	var payload = new Array();;
 	var logItem = snapshot.val();
-	var ANI = req.body[0].node_values.XSIP_x_five9ani;
-	//var CallID = req.body[0].node_values.XSIP_x_five9callid;
-	//var uuid = req.body[0].uuid;
+	var ANI = snapshot.val().node_values.XSIP_x_five9ani;
 	
 	
 	if (io.sockets.adapter.rooms.get(ANI).size > 0)
