@@ -28,7 +28,7 @@
 
 </head>
 <body>
-	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade modal-dialog modal-dialog-scrollable" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog modal-xl">
 		<div class="modal-content">
 		  <div class="modal-header">
@@ -167,7 +167,7 @@ function loopLogItem(msg) {
 	records[callID+uuid][msg.node_order] = msg;
   }else
   {
-	records[callID+uuid][Object.keys(records).length]= msg;
+	records[callID+uuid][Object.keys(records[callID+uuid]).length]= msg;
   }
 }
 
@@ -189,8 +189,11 @@ function logMessage(msg)
 		console.log("Call Update");
 		return;
 	}
-	if (!(callID+uuid in records))records[callID+uuid] = {};
-	msg.forEach(loopLogItem);
+	else
+	{
+		records[callID+uuid] = {};
+		msg.forEach(loopLogItem);
+	}
 	var uniqueID = callID+uuid;
 	var row = logs.insertRow();
 	var cell1 = row.insertCell(0);
@@ -226,9 +229,11 @@ socket.on('defect submitted', function(msg){
   });
 socket.on('connect', function() {
 		console.log("Connected to websocket");
-		socket.on('disconnected', function() {
-			console.log("Disconnected from websocket");
-        });
+		if(oldvalue != "")
+		{
+			console.log("Rejoining: "+ani.value);
+			socket.emit('join', ani.value);
+		}
 	});
   
 function getJson() {
