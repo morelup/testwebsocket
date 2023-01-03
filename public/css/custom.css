@@ -8,6 +8,11 @@ body {
   vertical-align: text-bottom;
 }
 
+
+
+
+
+
 /*
  * Sidebar
  */
@@ -155,4 +160,16 @@ body {
 .asside-heading {
   font-size: .75rem;
   text-transform: uppercase;
+}
+.accordion-header button{
+  padding-top: 0px;
+  padding-bottom: 0px;
+  
+}
+.accordion-header td {
+  border-bottom: none;
+  padding: 0px;
+}
+td.hiddentile {
+  padding: 0px;
 }

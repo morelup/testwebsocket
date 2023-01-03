@@ -1,0 +1,557 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=760">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+	
+	
+
+    <title>Five9 UAT Tool</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+ 
+	<link rel="stylesheet" type="text/css" href="css/custom.css" />
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		  </div>
+		  <div class="modal-body">
+			<pre id="json-display"></pre>
+
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	
+	
+	
+	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+	  <a class="navbar-brand col-md-2 col-lg-2 me-0 px-3" href="#">Company name</a>
+	  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <input class="form-control form-control-dark   " name="ani" id="ani" title="This is the number for the device you are calling from, not the number you are dialing to." type="text" placeholder="Your phone number" aria-label="Search">
+	  <div class="navbar-nav col-md-2 col-lg-2">
+		<div class="nav-item text-nowrap">
+		  <button class="btn btn-dark px-3" onclick="assignANI()" >Assign ANI</button>
+		</div>
+	  </div>
+	</header>
+<div class="container-fluid">
+	<div class="row">
+		<!--sidebar-->
+		<div id="sidebarMenu" class="col-md-2 col-lg-2 d-md-block bg-light sidebar collapse">
+			<div class="bg-danger text-white mx-auto text-center" >
+				<div id="listening">Not Listening to any ANI</div>
+			</div>
+			<div id = "debugmenu" class = "collapse">
+				<h6>Debug Menu</h6>
+				<div class="form-group">
+					<label for="testPayload">Payload</label>
+					<textarea type="email" class="form-control" id="testPayload" aria-describedby="testPayloadHelp" placeholder="Enter email">
+						[{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643691","node_name":"Start Node","node_type":"start_node","node_values":{"variables":{"sys":{"ANI":"2195521234","DNIS":"777112899917","UUID":"9c4277d8-92c0-4059-bb41-c7459863806f","CALL_START_TIME":1671734124556,"REGION":"AMERICA","POP":"VIR","ServiceProviderName":"Five9 Demo","ServiceProviderId":24,"AccountName":"PS Shared","AccountId":268,"TaskName":"Orelup UAT Test","TaskId":38445,"TypeDetected":"voice","DOMAIN_ID":"","CurrentTaskId":38445,"CurrentTaskName":"Orelup UAT Test"}},"ANI":"2195521234","DNIS":"777112899917","instance_name":"Orelup UAT Test","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734124653","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":1,"time_taken":"0.094s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643699","node_name":"README","node_type":"comment","node_values":{"node_comment":"This task template is intended to be used in a Studio 7 behind VCC architecture.\n\nVariables sent from VCC admin as SIP headers are received by XSIP_sip_header variables in the task. These exist implicitly - do not define them. The incoming SIP-Header name is converted to lower case; dashes (-) converted to underscores (_). You must know this convention to reference the variables.\n\nCalls must return to VCC using \"go to\" 'End Session'. This assures a SIP Header node is used to return SIP headers to VCC based on selected Studio variables. Allowing a call to terminate in any other way will omit returning the headers and omit writing the call tracking data store record used for Studio operational reporting.\n\nIf the caller disconnects, VCC will disconnect the Studio leg. In this case, the in-place 'Disconnect' handler will fire and write the call tracking record. If this data is needed by VCC, they must be sourced from the VCC via datastore search by Five9 Call ID using query module.","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734124653","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":2,"time_taken":"0s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3769601","node_name":"integration_853684","node_type":"integration","node_values":{"request":{"url":"https:\/\/www.orelup.org","http_method":"POST","fetch_timeout":"30","authentications":{"auth_type":"basic","useAuthProfile":true,"selected_AuthProfile":467,"selected_VariableAuthProfile":null,"useVariableAuthProfile":false,"testAuthProfileName":"","username":"asdf","password":"youshouldntseethis"},"ssl":{"ssl_cert":"","ssl_cert_pwd":"","ssl_key":"","ssl_key_pwd":""}},"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734124828","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":3,"time_taken":"0.175s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3780127","node_name":"integration_874727","node_type":"integration","node_values":{"request":{"url":"http:\/\/www.orelup.org","http_method":"POST","fetch_timeout":"30","headers":{"Content-Type":"text\/plain"},"ssl":{"ssl_cert":"","ssl_cert_pwd":"","ssl_key":"","ssl_key_pwd":""},"body":"{\"somestuff\":\"yada\"}"},"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734124919","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":4,"time_taken":"0.091s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3780129","node_name":"form_825727","node_type":"open_form","node_values":{"nlp_response":{"rootws.response.data\/queryResult\/fulfillmentText":"yes","0\/0\/allRequiredParamsPresent":"true","0\/0\/fulfillmentText":"yes"},"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734129638","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":5,"time_taken":"4.719s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3780133","node_name":"cloud_stt_827727","node_type":"cloud_stt","node_values":{"json_response":{"data":{"raw_transcribe":"I'm going to say a bunch of words and I wonder what it'll do","confidence_score":"0.85"}},"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734136354","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":6,"time_taken":"6.716s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643701","node_name":"Log VCC Call Details","node_type":"data_store","node_values":{"form_data":{"data_store_id":828,"query_condition":[],"row_limit":1,"order_by":{"column":"","sortBy":""},"document_id":"","operation_name":"insert","document_rules":{"event":"log_vcc_call_details","param1":"Five9 ANI: 2195521234, Five9 DNIS: 8558195944, Five9 SessionID: 5559C8AC9B4948AE86AA9862E17A27AB, Five9 Call ID: 300000000001440","_task_id":38445,"_uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","_timestamp":"1671734136355"}},"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734136357","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":7,"time_taken":"0.002s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643703","node_name":"To Do Start Call Flow Here","node_type":"comment","node_values":{"node_comment":"Start your customer-specific IVA here. The next 2 promts are added to demonstrate prompt queuing and how you can use it to fill the gaps and will need to be updated or removed based on your needs.","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734136358","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":8,"time_taken":"0.001s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643705","node_name":"Play Static Prompt","node_type":"prompt","node_values":{"prompt_text":"Welcome to your IVA. While this static prompt is being played the next dynamic prompt with variable is being built and queued.","audio_url":"https:\/\/studio7-api.vir.inferencecommunications.com\/storage\/tts_cache\/en-US-Wavenet-A\/be\/99\/65\/be996552bb536a6183e5d135269360fe.wav","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734136426","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":9,"time_taken":"0.068s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643739","node_name":"menu_289673","node_type":"menu","node_values":{"json_response":["{\"input_mode\":\"speech\",\"confidence\":\"0.99\",\"input\":\"1\",\"interpretation\":[{\"sub_menu_answer\":{\"child_id\":\"3643725\",\"dtmf\":\"1\"}}],\"status\":\"000\",\"utterance\":\"\"}"],"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148324","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":10,"time_taken":"11.897s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643725","node_name":"Play Dynamic Prompt","node_type":"prompt","node_values":{"prompt_text":"I have you calling from 2195521234and while this prompt is being played the subsequent background processing nodes are executed.","audio_url":"https:\/\/studio7-api.vir.inferencecommunications.com\/storage\/tts_cache\/en-US-Wavenet-A\/0f\/da\/b7\/0fdab72c8b1ce5debc81f0be613a1b14.wav","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148407","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":11,"time_taken":"0.082s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643707","node_name":"README Release to VCC","node_type":"comment","node_values":{"node_comment":"Whether the IVA ends the call session (self-service) or the caller will be transferred to a human, the final IVA node in the call path must \"go to\" the 'End Session' node.\n\nNOTE1:  THE TRANSFER NODE IS NOT SUPPORTED IN A VCC ENVIRONMENT.\n\nNOTE2:  SEE SPECIAL NOTE IN THE DISCONNECT HANDLER","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148407","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":12,"time_taken":"0s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643717","node_name":"Go End Session","node_type":"goto","node_values":{"next_node_id":3643709,"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148408","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":13,"time_taken":"0s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643709","node_name":"End Session","node_type":"comment","node_values":{"node_comment":"This is the point to \"go to\" in order to release back to VCC as required.\n\nEnding in this canvas will assure the minimum of SIP headers are set, though please inspect the list and add to this template's headers per your application requirements. Jumping here also assures data store call tracking records are written on the Studio side.","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148408","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":14,"time_taken":"0s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643711","node_name":"Set VCC attributes","node_type":"hangup_header","node_values":{"X-task_uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","X-task_region":"AMERICA","X-task_pop":"VIR","X-task_id":"38445","X-route_type":"EMPTY","X-route_value":"EMPTY","X-route_reason":"EMPTY","X-task_account_id":"268","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148483","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":15,"time_taken":"0.075s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643713","node_name":"Record Post Call Data","node_type":"comment","node_values":{"node_comment":"All call flow paths must log post call data to the datastore including the Disconnect Handler.","task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148484","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":16,"time_taken":"0s"},{"cust_name":"AMERICA","group_id":268,"instance_id":38445,"node_id":"3643723","node_name":"Write Session Data","node_type":"data_store","node_values":{"form_data":{"data_store_id":20685,"query_condition":[],"row_limit":1,"order_by":{"column":"","sortBy":""},"document_id":"","operation_name":"insert","document_rules":{"vcc_call_id":"300000000001440","ani":"2195521234","iisn":"777112899917","accountid":"268","region":"AMERICA","pop":"VIR","vcc_ani":"2195521234","vcc_dnis":"8558195944","vcc_sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","routetype":"EMPTY","routevalue":"EMPTY","routereason":"EMPTY","_task_id":38445,"_uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","_timestamp":"1671734148485"}},"api_response":{"response_code":200,"response":"Data Inserted","succeeded":1,"failed":0,"ignored":0,"additional_info":{"_id":["63a4a38455e7ba4b80047505"]}},"new_row_id":{"row_id":"63a4a38455e7ba4b80047505"},"task_name":"Orelup UAT Test","XSIP_via":"SIP\/2.0\/UDP 199.189.191.98:5188;branch=z9hG4bKcfab.85c525c1.0;i=f924fb11","XSIP_from":"<sip:2195521234@208.69.29.36>;tag=gK0e18fb1f","XSIP_to":"<sip:777112899917@199.189.191.98>","XSIP_call_id":"353280901_41922933@208.69.29.36","XSIP_cseq":"120128 INVITE","XSIP_max_forwards":"68","XSIP_allow":"INVITE,ACK,CANCEL,BYE,REGISTER,REFER,INFO,SUBSCRIBE,NOTIFY,PRACK,UPDATE,OPTIONS,MESSAGE,PUBLISH","XSIP_accept":"application\/sdp, application\/isup, application\/dtmf, application\/dtmf-relay, multipart\/mixed","XSIP_contact":"<sip:199.189.191.98:5188;did=d94.3ed071e1>","XSIP_p_asserted_identity":"<sip:2195521234@208.69.29.36:5061>","XSIP_allow_events":"talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer","XSIP_five9_sbc_info":"call;tenant_id=127763;participant_id=300000000007642","XSIP_five9_info":"ITSP-call;grp=pvt_trk_inference_studio7","XSIP_x_environment":"Stage","XSIP_x_five9dnis":"8558195944","XSIP_x_api_environment":"Stage","XSIP_x_five9ani":"2195521234","XSIP_x_five9callid":"300000000001440","XSIP_x_five9sessionid":"5559C8AC9B4948AE86AA9862E17A27AB","XSIP_x_uui":"true","XSIP_x_fs_support":"update_display,send_info","XSIP_p_origination_id":"127763","XSIP_supported":"timer,100rel,precondition,replaces","XSIP_session_expires":"1800","XSIP_min_se":"90","XSIP_content_length":"494","XSIP_content_disposition":"session; handling=required","XSIP_content_type":"application\/sdp"},"timestamp":"1671734148560","uuid":"9c4277d8-92c0-4059-bb41-c7459863806f","node_order":17,"time_taken":"0.076s"}]
+					</textarea>
+					<small id="testPayloadHelp" class="form-text text-muted">Paste a submission node here.</small>
+					<button onclick="debugMessage()" >submit</button>
+				</div>
+			</div>
+		</div>
+		
+		<!--main table-->
+		<main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 pt-4">
+			<div >
+				<div class="accordion" id="CallTable">
+				</div>					
+					
+					
+					
+			</div>
+		</main>
+	</div>
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+	  <div class="offcanvas-header">
+		<h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	  </div>
+	  <div class="offcanvas-body">
+		<div class="row" id="offCanvasRow1"></div>
+		<div class="row" id="offCanvasRow2"></div>
+		<div class="row" id="offCanvasRow3"></div>
+		<div class="row" id="offCanvasRow4"></div>
+		<div class="row">
+			<div class="col-lg-12">
+				<pre id="json-displayOffCanvas"></pre>
+			</div>
+		</div>
+	  </div>
+	</div>
+		</div>
+		
+		
+		
+		
+		
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="js/jquery.json-editor.min.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+<script>
+function GetURLParameter(sParam) {
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+	return "null";
+}
+function dateTimeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp*1);
+  return a.toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+	timeZoneName: 'short'
+  });
+}
+function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp*1);
+  return a.toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+	timeStyle: 'medium'
+  });
+}
+const fullLog = GetURLParameter("fullLog");
+const project = GetURLParameter("project");
+const debugmenu = document.getElementById('debugmenu');
+const ani = document.getElementById('ani');
+const calltable = document.getElementById('CallTable');
+const listening = document.getElementById('listening');
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+  keyboard: false
+});
+var jsonObject = {};
+var editor =new JsonEditor('#json-display', getJson());
+var editorOffCanvas =new JsonEditor('#json-displayOffCanvas', getJson());
+
+
+var oldvalue = "";
+var records = {};
+if(GetURLParameter("debug") != "null")
+{
+	new bootstrap.Collapse(debugmenu);
+}
+
+
+function loopLogItem(msg) {
+	var callID = (!msg.node_values.XSIP_x_five9callid ) ? "" : msg.node_values.XSIP_x_five9callid;
+	var uuid = (!msg.uuid ) ? "" : msg.uuid;
+	var record = records[callID+uuid];
+	var node_order = (!msg.node_order) ? "" : msg.node_order;
+	var index = 0;
+	if(node_order != "")
+	{
+		index = msg.node_order;
+	}else
+	{
+		index = Object.keys(record.raw).length;
+	}
+	record.raw[index] = msg;
+  
+	if("prompt_text" in msg.node_values)
+	{
+		var description = (!msg.node_values.prompt_text ) ? "" : msg.node_values.prompt_text;
+		Summary(record,msg,index,description);
+	}
+	if("json_response" in msg.node_values)
+	{
+		try{
+		
+			function loop_responses(value)
+			{
+				Summary(record,msg,index,JSON.parse(value).input);
+			
+			}
+			if(Array.isArray(msg.node_values.json_response))
+			{
+				msg.node_values.json_response.forEach(loop_responses);
+			}
+			else
+			{
+				if("input" in msg.node_values.json_response)
+				{
+					Summary(record,msg,index,msg.node_values.json_response.input);
+				}
+				else
+				{
+					Summary(record,msg,index,msg.node_values.json_response.data.raw_transcribe);
+				}
+			}
+		}
+		catch (ex) {
+			console.error('Wrong JSON Format: ' + msg.node_values.json_response);
+		}
+		
+		
+	}
+	
+	
+  
+ 
+}
+
+
+
+
+function logMessage(msg)
+{
+	console.log("Call Information Recieved");
+	console.log(msg);
+	var callID = (!msg[0].node_values.XSIP_x_five9callid ) ? "" : msg[0].node_values.XSIP_x_five9callid;
+	var uuid = (!msg[0].uuid ) ? "" : msg[0].uuid;
+	
+	if(callID == "" && uuid == "")
+	{
+		console.log("Invalid call recieved");
+		return;
+	}
+	if (callID+uuid in records)
+	{
+		msg.forEach(loopLogItem);
+		console.log("Call Update");
+		return;
+	}
+	
+	
+	records[callID+uuid] = new Record(callID,uuid,msg[0].timestamp)//timeConverter(msg[0].timestamp)
+	
+	
+	
+	
+	msg.forEach(loopLogItem);
+	
+	
+	
+	
+}
+
+
+
+
+function debugMessage()
+{
+	logMessage(JSON.parse(document.getElementById('testPayload').value));
+}
+function getJson() {
+  try {
+    return jsonObject;
+  }catch (ex) {
+    alert('Wrong JSON Format: ' + ex);
+  }
+}
+function showRawLog(uniqueID){
+	jsonObject = records[uniqueID].raw;
+	editor.load(getJson());
+	myModal.show();
+	return;
+}
+function showOffCanvas(value){
+	editorOffCanvas.load(value);
+	return;
+}
+
+
+//objects
+function Record(callID,uuid,timestamp)
+{
+	this.raw = {};
+	this.summary = new Array();
+	this.issue = new Issue();
+	this.info = new Info(callID,uuid,timestamp);
+}
+function Issue()
+{
+	this.exists = false;
+}
+function Info(callID,uuid,timestamp)
+{
+	this.uniqueID=callID+uuid;
+	this.callID=callID;
+	this.UUID=uuid;
+	this.timestamp=timestamp;
+	
+	
+	//createcallitem
+	var callItemContainer = document.createElement("div");
+	this.callItem = callItemContainer;
+	callItemContainer.classList.add("accordion-item");
+	
+	//itemheader
+	var callItemHeader = document.createElement("div");
+	callItemHeader.classList.add("accordion-header");
+	callItemHeader.id="CallItem-"+this.uniqueID;
+	callItemContainer.appendChild(callItemHeader);
+	var callItemButton = document.createElement("button");
+	callItemButton.classList.add("accordion-button","collapsed");
+	callItemButton.type="button";
+	callItemButton.setAttribute("data-bs-toggle","collapse");
+	callItemButton.setAttribute("data-bs-target","#CallItemLog-"+this.uniqueID);
+	callItemButton.setAttribute("aria-expanded","true");
+	callItemButton.setAttribute("aria-controls","CallItemLog-"+this.uniqueID);
+	callItemHeader.appendChild(callItemButton);
+	var CallItemTable = document.createElement("Table");
+	CallItemTable.classList.add("table");
+	callItemButton.appendChild(CallItemTable);
+	var CallItemTableHeader = CallItemTable.createTHead();
+	var HeaderRow = CallItemTableHeader.insertRow();
+	var HeaderCell1 = document.createElement("th");
+	var HeaderCell2 = document.createElement("th");
+	var HeaderCell3 = document.createElement("th");
+	HeaderCell1.innerHTML = "Time(ET)";
+	HeaderCell2.innerHTML = "VCC Call ID";
+	HeaderCell3.innerHTML = "Studio UUID";
+	HeaderRow.appendChild(HeaderCell1);
+	HeaderRow.appendChild(HeaderCell2);
+	HeaderRow.appendChild(HeaderCell3);
+	
+	var CallItemTableBody = CallItemTable.createTBody();
+	var row = CallItemTableBody.insertRow();
+	row.classList.add("no-bottom-border");
+	var cell1 = row.insertCell(0);
+	var cell2 = row.insertCell(1);
+	var cell3 = row.insertCell(2);
+	cell1.innerHTML = dateTimeConverter(this.timestamp);
+	cell2.innerHTML = this.callID;
+	cell3.innerHTML = this.UUID;
+	
+	//createsubitem view
+	var CallDetail = document.createElement("div");
+	CallDetail.classList.add("accordion-collapse","collapse");
+	CallDetail.id="CallItemLog-"+this.uniqueID;
+	CallDetail.setAttribute("aria-labelledby","CallItem-"+this.uniqueID);
+	callItemContainer.appendChild(CallDetail);
+	var CallDetailBody = document.createElement("div");
+	CallDetailBody.classList.add("accordion-body");
+	CallDetail.appendChild(CallDetailBody);
+	var Row = document.createElement("div");//row 1
+	Row.classList.add("row");
+	CallDetailBody.appendChild(Row);
+	var CallJSONButton = document.createElement("button");
+	CallJSONButton.setAttribute("onclick","showRawLog('"+this.uniqueID+"')");
+	CallJSONButton.innerHTML = "See Log";
+	CallJSONButton.type="button";
+	CallJSONButton.classList.add("btn","btn-info","col-2");
+	Row.appendChild(CallJSONButton);
+	Row = document.createElement("div");//row 2
+	Row.classList.add("row");
+	CallDetailBody.appendChild(Row);
+	
+	
+	//create subitem table
+	var SummaryTable = document.createElement("Table");
+	this.callDetail  = SummaryTable; //Summary Table Record
+	Row.appendChild(SummaryTable);
+	SummaryTable.classList.add("table");
+	var SummaryTableHeader = SummaryTable.createTHead();
+	var HeaderRow = SummaryTableHeader.insertRow();
+	var HeaderCell1 = document.createElement("th");
+	var HeaderCell2 = document.createElement("th");
+	var HeaderCell3 = document.createElement("th");
+	HeaderCell1.innerHTML = "Time(ET)";
+	HeaderCell2.innerHTML = "Node Name";
+	HeaderCell3.innerHTML = "Behavior";
+	HeaderRow.appendChild(HeaderCell1);
+	HeaderRow.appendChild(HeaderCell2);
+	HeaderRow.appendChild(HeaderCell3);
+	var SummaryTableBody = SummaryTable.createTBody();
+	this.summaryTableBody = SummaryTableBody;
+	calltable.appendChild(this.callItem);
+}
+function updateOffCanvas(record,index)
+{
+	
+	var temp = JSON.stringify(records[record].raw[index]);
+	showOffCanvas(JSON.parse(temp));
+}
+
+function Summary(record,msg,index,description)
+{
+	
+	var row = record.info.summaryTableBody.insertRow();
+	console.log(record.summary.length);
+	console.log(record.info.uniqueID);
+	this.row = row;
+	this.msg = msg;
+	this.issue = new Issue();
+	record.summary.push(this);
+	
+	row.classList.add("clickable");
+	row.setAttribute("data-bs-toggle","offcanvas");
+	row.setAttribute("data-bs-target","#offcanvasRight");
+	row.setAttribute("aria-controls","offcanvasRight");
+	row.setAttribute("onclick","updateOffCanvas(\""+record.info.uniqueID+"\",\""+index+"\")");
+	var cell1 = row.insertCell(0);
+	var cell2 = row.insertCell(1);
+	var cell3 = row.insertCell(2);
+	cell1.innerHTML = timeConverter(msg.timestamp);
+	cell2.innerHTML = (!msg.node_name ) ? msg_nodeType : msg.node_name;;
+	cell3.innerHTML = description;
+}
+
+
+
+/*
+const socket = io({
+  reconnectionDelayMax: 10000
+});
+
+socket.on('us7 message', function(msg){
+    logMessage(msg);
+  });
+socket.on('us6 message', function(msg){
+    logMessage(msg);
+  });
+  
+socket.on('defect submitted', function(msg){
+    console.log("defect submitted for" + msg);
+  });
+socket.on('connect', function() {
+		console.log("Connected to websocket");
+		if(oldvalue != "")
+		{
+			console.log("Rejoining: "+ani.value);
+			socket.emit('join', ani.value);
+		}
+	});
+  
+
+
+  
+  
+function createDefect(uniqueID) {
+jsonObject = records[uniqueID].raw;
+editor.load(getJson());
+
+myModal.show();
+
+
+
+
+
+return;
+var msg = {
+board_id:3646541815,
+group_id: "topics",
+callid:callid,
+uuid:records[callid].uuid,
+name:document.getElementById(callid+'-text').value,
+channel:oldvalue
+};
+
+socket.emit('defect', msg);
+
+}
+
+
+ani.addEventListener("keypress", function(event) {
+  // If the user presses the "Enter" key on the keyboard
+  if (event.key === "Enter") {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    assignANI();
+  }
+});
+
+
+
+
+
+function assignANI() {
+listening.innerHTML = "Listening to: "+ani.value;
+listening.classList.add("bg-success");
+listening.classList.remove("bg-danger");
+console.log("Joining: "+ani.value);
+socket.emit('leave', oldvalue);
+socket.emit('join', ani.value);
+oldvalue = ani.value;
+}*/
+	</script>  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    
+	
+  </body>
+</html>
