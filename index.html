@@ -424,7 +424,7 @@ function Summary(record,msg,index,description,image)
 	cell1.innerHTML = timeConverter(msg.timestamp);
 	cell2.innerHTML = (!msg.node_name ) ? msg_nodeType : msg.node_name;;
 	cell3.innerHTML = description;
-	cellImage.innerHTML = '"<img src="'.image.'">';
+	cellImage.innerHTML = '<img src="'+image+'">';
 }
 
 
