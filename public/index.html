@@ -186,7 +186,7 @@ function loopLogItem(msg) {
 	if("prompt_text" in msg.node_values)
 	{
 		var description = (!msg.node_values.prompt_text ) ? "" : msg.node_values.prompt_text;
-		Summary(record,msg,index,description);
+		Summary(record,msg,index,description,"https://us7.studioportal.io/icons/prompt.svg");
 	}
 	if("json_response" in msg.node_values)
 	{
@@ -194,7 +194,7 @@ function loopLogItem(msg) {
 		
 			function loop_responses(value)
 			{
-				Summary(record,msg,index,JSON.parse(value).input);
+				Summary(record,msg,index,JSON.parse(value).input,"https://us7.studioportal.io/icons/prompt_recorder.svg");
 			
 			}
 			if(Array.isArray(msg.node_values.json_response))
@@ -205,11 +205,11 @@ function loopLogItem(msg) {
 			{
 				if("input" in msg.node_values.json_response)
 				{
-					Summary(record,msg,index,msg.node_values.json_response.input);
+					Summary(record,msg,index,msg.node_values.json_response.input,"https://us7.studioportal.io/icons/prompt_recorder.svg");
 				}
 				else
 				{
-					Summary(record,msg,index,msg.node_values.json_response.data.raw_transcribe);
+					Summary(record,msg,index,msg.node_values.json_response.data.raw_transcribe,"https://us7.studioportal.io/icons/prompt_recorder.svg");
 				}
 			}
 		}
@@ -381,12 +381,14 @@ function Info(callID,uuid,timestamp)
 	var HeaderRow = SummaryTableHeader.insertRow();
 	var HeaderCell1 = document.createElement("th");
 	var HeaderCell2 = document.createElement("th");
+	var HeaderCellempty = document.createElement("th");
 	var HeaderCell3 = document.createElement("th");
 	HeaderCell1.innerHTML = "Time(ET)";
 	HeaderCell2.innerHTML = "Node Name";
 	HeaderCell3.innerHTML = "Behavior";
 	HeaderRow.appendChild(HeaderCell1);
 	HeaderRow.appendChild(HeaderCell2);
+	HeaderRow.appendChild(HeaderCellempty);
 	HeaderRow.appendChild(HeaderCell3);
 	var SummaryTableBody = SummaryTable.createTBody();
 	this.summaryTableBody = SummaryTableBody;
@@ -399,7 +401,7 @@ function updateOffCanvas(record,index)
 	showOffCanvas(JSON.parse(temp));
 }
 
-function Summary(record,msg,index,description)
+function Summary(record,msg,index,description,image)
 {
 	
 	var row = record.info.summaryTableBody.insertRow();
@@ -417,10 +419,12 @@ function Summary(record,msg,index,description)
 	row.setAttribute("onclick","updateOffCanvas(\""+record.info.uniqueID+"\",\""+index+"\")");
 	var cell1 = row.insertCell(0);
 	var cell2 = row.insertCell(1);
-	var cell3 = row.insertCell(2);
+	var cellImage = row.insertCell(2);
+	var cell3 = row.insertCell(3);
 	cell1.innerHTML = timeConverter(msg.timestamp);
 	cell2.innerHTML = (!msg.node_name ) ? msg_nodeType : msg.node_name;;
 	cell3.innerHTML = description;
+	cellImage.innerHTML = '<img src="'+image+'">';
 }
 
 
