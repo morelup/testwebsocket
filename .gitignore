@@ -104,4 +104,3 @@ dist
 .tern-port
 config.env
 config.yaml
-public/index.html
