@@ -194,7 +194,16 @@ function loopLogItem(msg) {
 		
 			function loop_responses(value)
 			{
-				Summary(record,msg,index,JSON.parse(value).input,"https://us7.studioportal.io/icons/prompt_recorder.svg");
+				var parsedInput = JSON.parse(value)
+				var image = "https://us7.studioportal.io/icons/prompt_recorder.svg";
+				if("input_mode" in parsedInput)
+				{
+					if (parsedInput.input_mode == "dtmf")
+					{
+						image = "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
+					}
+				}
+				Summary(record,msg,index,parsedInput.input,image);
 			
 			}
 			if(Array.isArray(msg.node_values.json_response))
@@ -203,13 +212,22 @@ function loopLogItem(msg) {
 			}
 			else
 			{
+				var image = "https://us7.studioportal.io/icons/prompt_recorder.svg";
+				if("input_mode" in msg.node_values.json_response)
+				{
+					if (msg.node_values.json_response.input_mode == "dtmf")
+					{
+						image = "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
+					}
+				}
+				
 				if("input" in msg.node_values.json_response)
 				{
-					Summary(record,msg,index,msg.node_values.json_response.input,"https://us7.studioportal.io/icons/prompt_recorder.svg");
+					Summary(record,msg,index,msg.node_values.json_response.input,image);
 				}
 				else
 				{
-					Summary(record,msg,index,msg.node_values.json_response.data.raw_transcribe,"https://us7.studioportal.io/icons/prompt_recorder.svg");
+					Summary(record,msg,index,msg.node_values.json_response.data.raw_transcribe,image);
 				}
 			}
 		}
