@@ -245,10 +245,15 @@ function timeConverter(UNIX_timestamp){
 }
 const fullLog = GetURLParameter("fullLog");
 const project = GetURLParameter("project");
+const board = {id:GetURLParameter("board")};
+const subItemBoard = {id:board.id};
+
 const debugmenu = document.getElementById('debugmenu');
 const ani = document.getElementById('ani');
 const calltable = document.getElementById('CallTable');
 const listening = document.getElementById('listening');
+
+
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
   keyboard: false
 });
@@ -266,6 +271,7 @@ var editorOffCanvas =new JsonEditor('#json-displayOffCanvas', getJson());
 
 var oldvalue = "";
 var records = {};
+
 if(GetURLParameter("debug") != "null")
 {
 	new bootstrap.Collapse(debugmenu);
@@ -618,6 +624,8 @@ function Summary(record,msg,index,description,image)
 
 
 
+
+//socket info
 const socket = io({
   reconnectionDelayMax: 10000
 });
@@ -628,7 +636,16 @@ socket.on('us7 message', function(msg){
 socket.on('us6 message', function(msg){
     logMessage(msg);
   });
-  
+
+socket.on('boardData', function(msg){
+	console.log(JSON.Stringify(msg));
+    board.data = msg;
+  });
+socket.on('subItemBoardData', function(msg){
+	console.log(JSON.Stringify(msg));
+	subItemBoard.id = msg.data.boards.id;
+    subItemBoard.data = msg;
+  });
 socket.on('defect submitted', function(msg){
     console.log("defect submitted for" + msg);
   });
@@ -638,6 +655,10 @@ socket.on('connect', function() {
 		{
 			console.log("Rejoining: "+ani.value);
 			socket.emit('join', ani.value);
+			if(GetURLParameter("board") != "null")
+			{
+				socket.emit('connect_boarddata', GetURLParameter("board"));
+			}
 		}
 	});
   
@@ -646,28 +667,28 @@ socket.on('connect', function() {
   
   
 function createDefect(uniqueID) {
-jsonObject = records[uniqueID].raw;
-editor.load(getJson());
-myModal.show();
+	//this.uniqueID=callID+uuid;
+	//this.callID=callID;
+	//this.UUID=uuid;
+	//this.timestamp=timestamp;
+	
+	
+	if(board.id != "null")
+	{
+		var msg = {
+		board_id:board.id,
+		item:"testvalue",
+		subitem:records[uniqueID].info.UUID,
+		callid:records[uniqueID].info.callID,
+		expected:"expected test value",
+		actual:"actual test value",
+		timestamp:records[uniqueID].info.timestamp,
+		ani:ani.value,
+		notes:"testNote"
+		};
 
-
-
-
-
-return;
-
-
-var msg = {
-board_id:3646541815,
-group_id: "topics",
-callid:callid,
-uuid:records[callid].uuid,
-name:document.getElementById(callid+'-text').value,
-channel:oldvalue
-};
-
-socket.emit('defect', msg);
-
+		socket.emit('defect', msg);
+	}
 }
 
 

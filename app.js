@@ -22,6 +22,7 @@ const url = require('url');
 const fetch = require('node-fetch');
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
+const boards = new Array();
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : "",
@@ -58,7 +59,7 @@ const io = require('socket.io')(server, {
   }
 });
 
-
+//firebase stuffs
 var activeListeners = new Array();		
 		
 async function initializeFirebase() {
@@ -118,6 +119,11 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 				var logItem = snapshot.val();
 				payload.push(logItem);
 				
+				if (io.sockets.adapter.rooms.has(ANI))
+				{
+					console.log("room found:" + ANI);
+					io.to(ANI).emit('us6 message', payload);
+				}
 				if (io.sockets.adapter.rooms.has(ANI))
 				{
 					console.log("room found:" + ANI);
@@ -253,46 +259,130 @@ io.on('connection', socket => {
 		createDefect(msg);
 		console.log("defect message sent for "+msg.callid);
 	});
+	socket.on('connect_boarddata', msg => {
+		boardInfo(msg);
+		console.log("boardData "+msg);
+	});
 });
 
 
-
+function boardInfo(msg){
+	try{
+		var body = JSON.stringify({
+		query: `query {
+		  boards (ids: [${msg}]) {
+			name
+			state
+			board_folder_id
+			id
+			columns {
+					title
+					type
+					id
+					settings_str 
+				}  
+			
+			groups  {
+					title
+				}
+		  }
+		}
+		`,
+			variables: {
+			},
+		  });
+		fetch('https://api.monday.com/v2', {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': mondayAuthKey
+		  },
+		  body: body,
+		})
+	  .then(res) 
+		=> {
+			io.to(msg.channel).emit('boardData',res)
+			var subtaskInfo = JSON.parse(res.boards[0].columns[1].settings_str);
+			
+			
+			
+			var body2 = JSON.stringify({
+			query: `query {
+			  boards (ids: [${subtaskInfo.boardIds}]) {
+				name
+				state
+				board_folder_id
+				id
+				columns {
+						title
+						type
+						id
+						settings_str 
+					}  
+				
+				groups  {
+						title
+					}
+			  }
+			}
+			`,
+				variables: {
+				},
+			  });
+			fetch('https://api.monday.com/v2', {
+			  method: 'POST',
+			  headers: {
+				'Content-Type': 'application/json',
+				'Authorization': mondayAuthKey
+			  },
+			  body: body2,
+			}).then(res2) => io.to(msg.channel).emit('subItemBoardData',res2)
+			
+			
+			
+			
+		}
+	  
+	} catch (error) {
+		console.log(error);
+	}	
+}
 
 
 function createDefect(msg) {
-try{
-	var body = JSON.stringify({
-    query: `mutation ($group_id: String, $name: String, $column_values: JSON) {
-    create_item (
-			board_id: $board_id, 
-			group_id: $group_id, 
-			item_name: $name, 
-			column_values: $column_values) {
-        id
+	try{
+		var body = JSON.stringify({
+		query: `mutation ($group_id: String, $name: String, $column_values: JSON) {
+		create_item (
+				board_id: $board_id, 
+				group_id: $group_id, 
+				item_name: $name, 
+				column_values: $column_values) {
+			id
+			}
 		}
+		`,
+			variables: {
+			 board_id: msg.board_id,
+			 group_id: msg.group_id,
+			 column_values: "{\"text\" : \""+msg.callid+"\",\"text6\" : \""+msg.uuid+"\"}",
+			 name: msg.name
+			},
+		  });
+		  console.log(body);
+		fetch('https://api.monday.com/v2', {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': mondayAuthKey
+		  },
+		  body: body,
+		})
+	  .then((res) => io.to(msg.channel).emit('defect submitted',res))
+	  .then((result) => console.log(result));
+	} catch (error) {
+		console.log(error);
 	}
-	`,
-    variables: {
-	 board_id: msg.board_id,
-	 group_id: msg.group_id,
-	 column_values: "{\"text\" : \""+msg.callid+"\",\"text6\" : \""+msg.uuid+"\"}",
-	 name: msg.name
-    },
-  });
-  console.log(body);
-fetch('https://api.monday.com/v2', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-	'Authorization': mondayAuthKey
-  },
-  body: body,
-})
-  .then((res) => io.to(msg.channel).emit('defect submitted',res))
-  .then((result) => console.log(result));
-} catch (error) {
-	console.log(error);
-}
 	
 }
 
