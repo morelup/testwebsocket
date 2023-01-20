@@ -127,6 +127,7 @@ function boardInfo2(msg){
 		}).then(res => res.text())
 		.then(result => {
 			var parentBoard = JSON.parse(result);
+			console.log(result);
 			if (parentBoard.data.boards.length == 0)
 			{
 				return parentBoard;
