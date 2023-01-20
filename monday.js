@@ -90,3 +90,6 @@ function boardInfo(msg,socket){
 		console.log(error);
 	}	
 }
+
+
+module.exports = { boardInfo};
