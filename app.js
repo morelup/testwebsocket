@@ -300,7 +300,7 @@ function boardInfo(msg){
 		  body: body,
 		}).then(res => res.text())
 		.then(result => {
-			console.log(result);
+			
 			if (result.size == 0)
 			{
 				return;
@@ -333,6 +333,7 @@ function boardInfo(msg){
 				variables: {
 				},
 			  });
+			  console.log("submitting subtask");
 			fetch('https://api.monday.com/v2', {
 			  method: 'POST',
 			  headers: {
@@ -341,7 +342,9 @@ function boardInfo(msg){
 			  },
 			  body: body2,
 			}).then(res2 => res2.text())
-			.then(result2 => io.to(msg.channel).emit('subItemBoardData',result2))
+			.then(result2 => {
+				console.log(result2);
+				io.to(msg.channel).emit('subItemBoardData',result2)})
 			
 			
 			
