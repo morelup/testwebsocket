@@ -130,14 +130,14 @@ function boardInfo2(msg){
 			console.log(result);
 			if (parentBoard.data.boards.length == 0)
 			{
-				return parentBoard;
+				return Promise.resolve(parentBoard);
 			}
 			
 			
 			boards[parentBoard.id] = {
 				data:parentBoard
 				};
-			return parentBoard;
+			return Promise.resolve(parentBoard);
 			
 			
 			
@@ -149,7 +149,7 @@ function boardInfo2(msg){
 	  
 	} catch (error) {
 		console.log(error);
-	}	
+	}
 }
 
 
