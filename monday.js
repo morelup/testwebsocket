@@ -1,7 +1,7 @@
 
 var authKey = "";
 const boards = {};
-function authKeySet(value){console.log(value);authKey = value}
+function authKeySet(value){authKey = value}
 
 function boardInfo(msg,socket){
 	try{
@@ -127,7 +127,7 @@ function boardInfo2(msg){
 		}).then(res => res.text())
 		.then(result => {
 			var parentBoard = JSON.parse(result);
-
+console.log("ok");
 			if (parentBoard.data.boards.length == 0)
 			{
 				return parentBoard;

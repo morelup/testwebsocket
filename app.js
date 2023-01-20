@@ -265,6 +265,7 @@ io.on('connection', socket => {
 	socket.on('connect_boarddata', msg => {
 		monday.boardInfo2(msg).then(parentBoard => {
 		console.log(parentBoard);
+		console.log("returned");
 		if (parentBoard.data.boards.length == 0)
 		{
 			socket.emit('boardData',parentBoard);
