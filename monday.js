@@ -1,7 +1,7 @@
 
 var authKey = "";
 const boards = {};
-
+function authKeySet(value){authKey = value}
 
 function boardInfo(msg,socket){
 	try{
@@ -183,4 +183,4 @@ function createDefect(msg) {
 	
 }
 
-module.exports = { boardInfo2,authKey,boards};
+module.exports = { boardInfo2,authKeySet,boards};
