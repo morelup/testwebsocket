@@ -29,7 +29,9 @@ var connection = mysql.createConnection({
   user     : "",
   password : ""
 });
-const mondayAuthKey = accessSecret("MondayAuthKey");
+var mondayAuthKey = "";
+
+accessSecret("MondayAuthKey").then(result => mondayAuthKey = result)
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 var bRunFirstSocket = true;
@@ -291,12 +293,12 @@ function boardInfo(msg){
 			variables: {
 			},
 		  });
-		  console.log(mondayAuthKey.value);
+		  console.log(mondayAuthKey);
 		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
-			'Authorization': mondayAuthKey.value
+			'Authorization': mondayAuthKey
 		  },
 		  body: body,
 		}).then(res => {
@@ -337,7 +339,7 @@ function boardInfo(msg){
 			  method: 'POST',
 			  headers: {
 				'Content-Type': 'application/json',
-				'Authorization': mondayAuthKey.value
+				'Authorization': mondayAuthKey
 			  },
 			  body: body2,
 			}).then(res2 => io.to(msg.channel).emit('subItemBoardData',res2))
