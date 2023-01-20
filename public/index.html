@@ -638,13 +638,13 @@ socket.on('us6 message', function(msg){
   });
 
 socket.on('boardData', function(msg){
-	console.log(JSON.stringify(msg));
-    board.data = msg;
+	console.log(msg);
+    board.data = JSON.parse(msg).data;
   });
 socket.on('subItemBoardData', function(msg){
-	console.log(JSON.stringify(msg));
-	subItemBoard.id = msg.data.boards.id;
-    subItemBoard.data = msg;
+	console.log(msg);
+    subItemBoard.data = JSON.parse(msg).data;
+	subItemBoard.id = subItemBoard.data.boards.id;
   });
 socket.on('defect submitted', function(msg){
     console.log("defect submitted for" + msg);
