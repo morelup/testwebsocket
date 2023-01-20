@@ -269,6 +269,7 @@ io.on('connection', socket => {
 
 
 function boardInfo(msg){
+	console.log(msg.channel);
 	try{
 		var body = JSON.stringify({
 		query: `query {
