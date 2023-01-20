@@ -291,21 +291,22 @@ function boardInfo(msg){
 		}
 		`});
 		  console.log(mondayAuthKey);
-		fetch('https://ene37dtkd1z4b.x.pipedream.net/', {
+		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
 			'Authorization': mondayAuthKey
 		  },
 		  body: body,
-		}).then(res => {
-			console.log(JSON.stringify(res));
-			if (res.size == 0)
+		}).then(res => res.text())
+		.then(result => {
+			console.log(JSON.stringify(result));
+			if (result.size == 0)
 			{
 				return;
 			}
-			io.to(msg.channel).emit('boardData',res);			
-			var subtaskInfo = JSON.parse(res.data.boards[0].columns[1].settings_str);
+			io.to(msg.channel).emit('boardData',result);			
+			var subtaskInfo = JSON.parse(result.data.boards[0].columns[1].settings_str);
 			
 			
 			
@@ -339,7 +340,8 @@ function boardInfo(msg){
 				'Authorization': mondayAuthKey
 			  },
 			  body: body2,
-			}).then(res2 => io.to(msg.channel).emit('subItemBoardData',res2))
+			}).then(res2 => res2.text())
+			.then(result2 => io.to(msg.channel).emit('subItemBoardData',result2))
 			
 			
 			
