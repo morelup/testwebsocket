@@ -300,7 +300,7 @@ function boardInfo(msg){
 		  body: body,
 		}).then(res => res.text())
 		.then(result => {
-			console.log(JSON.stringify(result));
+			console.log(result);
 			if (result.size == 0)
 			{
 				return;
