@@ -287,11 +287,8 @@ function boardInfo(msg){
 				}
 		  }
 		}
-		`,
-			variables: {
-			},
-		  });
-		console.log(body);  
+		`);
+		console.log(mondayAuthKey);  
 		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
