@@ -655,10 +655,10 @@ socket.on('connect', function() {
 		{
 			console.log("Rejoining: "+ani.value);
 			socket.emit('join', ani.value);
-			if(GetURLParameter("board") != "null")
-			{
-				socket.emit('connect_boarddata', GetURLParameter("board"));
-			}
+		}
+		if(GetURLParameter("board") != "null")
+		{
+			socket.emit('connect_boarddata', GetURLParameter("board"));
 		}
 	});
   
