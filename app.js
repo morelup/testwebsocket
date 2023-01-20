@@ -291,6 +291,7 @@ function boardInfo(msg){
 			variables: {
 			},
 		  });
+		console.log(body);  
 		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
@@ -300,8 +301,11 @@ function boardInfo(msg){
 		  body: body,
 		}).then(res => {
 			console.log(JSON.stringify(res));
-			io.to(msg.channel).emit('boardData',res);
-			
+			if (res.size == 0)
+			{
+				return;
+			}
+			io.to(msg.channel).emit('boardData',res);			
 			var subtaskInfo = JSON.parse(res.data.boards[0].columns[1].settings_str);
 			
 			
