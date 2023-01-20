@@ -61,7 +61,7 @@ const io = require('socket.io')(server, {
 
 //firebase stuffs
 var activeListeners = new Array();		
-		
+/*		
 async function initializeFirebase() {
 var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/Firebase/versions/latest";
   const [version] = await client.accessSecretVersion({
@@ -142,7 +142,7 @@ function beginListeningDay(domainProvided,monthProvided,dateprovided)//listen fo
 
 	);
 }
-
+*/
 
 
 
