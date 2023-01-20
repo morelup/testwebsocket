@@ -268,7 +268,7 @@ io.on('connection', socket => {
 
 function boardInfo(msg){
 	try{
-		var body = JSON.stringify({
+		var body = 
 		query: `query {
 		  boards (ids: [${msg}]) {
 			name
@@ -287,7 +287,7 @@ function boardInfo(msg){
 				}
 		  }
 		}
-		`);
+		`;
 		console.log(mondayAuthKey);  
 		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
