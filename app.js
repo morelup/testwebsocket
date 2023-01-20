@@ -298,7 +298,7 @@ function boardInfo(msg){
 			'Authorization': mondayAuthKey
 		  },
 		  body: body,
-		}).then(res) => {
+		}).then(res => {
 			io.to(msg.channel).emit('boardData',res)
 			var subtaskInfo = JSON.parse(res.boards[0].columns[1].settings_str);
 			
@@ -334,12 +334,12 @@ function boardInfo(msg){
 				'Authorization': mondayAuthKey
 			  },
 			  body: body2,
-			}).then(res2) => io.to(msg.channel).emit('subItemBoardData',res2)
+			}).then(res2 => io.to(msg.channel).emit('subItemBoardData',res2))
 			
 			
 			
 			
-		}
+		})
 	  
 	} catch (error) {
 		console.log(error);
