@@ -117,8 +117,7 @@ function boardInfo2(msg){
 		  }
 		}
 		`});
-		console.log(authKey);
-		return fetch('https://api.monday.com/v2', {
+		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
@@ -126,11 +125,31 @@ function boardInfo2(msg){
 		  },
 		  body: body,
 		}).then(res => res.text())
-		
+		.then(result => {
+			var parentBoard = JSON.parse(result);
+
+			if (parentBoard.data.boards.length == 0)
+			{
+				return parentBoard;
+			}
+			
+			
+			boards[parentBoard.id] = {
+				data:parentBoard
+				};
+			return parentBoard;
+			
+			
+			
+			
+			
+			
+			
+		})
 	  
 	} catch (error) {
 		console.log(error);
-	}
+	}	
 }
 
 
@@ -171,7 +190,7 @@ function createDefect(msg) {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
-			'Authorization': authKey
+			'Authorization': mondayAuthKey
 		  },
 		  body: body,
 		})
