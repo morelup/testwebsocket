@@ -306,7 +306,7 @@ function boardInfo(msg){
 				return;
 			}
 			io.to(msg.channel).emit('boardData',result);			
-			var subtaskInfo = JSON.parse(result.data.boards[0].columns[1].settings_str);
+			var subtaskInfo = result.data.boards[0].columns[1].settings_str;
 			
 			
 			
