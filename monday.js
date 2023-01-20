@@ -117,6 +117,7 @@ function boardInfo2(msg){
 		  }
 		}
 		`});
+		console.log(authKey);
 		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
@@ -170,7 +171,7 @@ function createDefect(msg) {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
-			'Authorization': mondayAuthKey
+			'Authorization': authKey
 		  },
 		  body: body,
 		})
