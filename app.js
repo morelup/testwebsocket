@@ -399,4 +399,4 @@ if (module === require.main) {
 // [END appengine_websockets_app]
 
 module.exports = server;
-initializeFirebase();//start firebase listener, needs to be delayed for race condition.  Wait till first socket connection
+//initializeFirebase();//start firebase listener, needs to be delayed for race condition.  Wait till first socket connection
