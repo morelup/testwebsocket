@@ -32,7 +32,7 @@ var connection = mysql.createConnection({
   password : ""
 });
 
-accessSecret("MondayAuthKey").then(result => monday.authKey = result);
+accessSecret("MondayAuthKey").then(result => {console.log(result);monday.authKeySet(result)});
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 var bRunFirstSocket = true;
