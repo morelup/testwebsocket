@@ -263,7 +263,8 @@ io.on('connection', socket => {
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
-		var parentBoard = monday.boardInfo2(msg);
+		monday.boardInfo2(msg).then(parentBoard => {
+		
 		if (parentBoard.data.boards.length == 0)
 		{
 			socket.emit('boardData',parentBoard);
@@ -274,6 +275,7 @@ io.on('connection', socket => {
 		socket.emit('subItemBoardData',parentBoard);
 		
 		console.log("boardData "+msg);
+		};
 	});
 });
 
