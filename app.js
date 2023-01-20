@@ -23,7 +23,7 @@ const fetch = require('node-fetch');
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
 const boards = {};
-const monday = require('monday.js');
+const monday = require('./monday.js');
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : "",
