@@ -275,7 +275,7 @@ io.on('connection', socket => {
 		socket.emit('subItemBoardData',parentBoard);
 		
 		console.log("boardData "+msg);
-		};
+		});
 	});
 });
 
