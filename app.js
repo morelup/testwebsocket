@@ -23,6 +23,7 @@ const fetch = require('node-fetch');
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
 const boards = {};
+const monday = require('monday.js');
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : "",
@@ -262,106 +263,26 @@ io.on('connection', socket => {
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
-		boardInfo(msg,socket);
+		monday.boardInfo(msg,socket);
 		console.log("boardData "+msg);
 	});
 });
 
 
-function boardInfo(msg,socket){
-	try{
-		var body = JSON.stringify({
-		query: `query {
-		  boards (ids: [${msg}]) {
-			name
-			state
-			board_folder_id
-			id
-			columns {
-					title
-					type
-					id
-					settings_str 
-				}  
-			
-			groups  {
-					title
-				}
-		  }
-		}
-		`});
-		fetch('https://api.monday.com/v2', {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json',
-			'Authorization': mondayAuthKey
-		  },
-		  body: body,
-		}).then(res => res.text())
-		.then(result => {
-			
-			if (result.size == 0)
-			{
-				return;
-			}
-			
-
-			var parentBoard = JSON.parse(result);
-			boards[parentBoard.id] = parentBoard;
-			var subtaskInfo = JSON.parse(parentBoard.data.boards[0].columns[1].settings_str);
-			socket.emit('boardData',parentBoard);
-			
-			
-			var body2 = JSON.stringify({
-			query: `query {
-			  boards (ids: [${subtaskInfo.boardIds}]) {
-				name
-				state
-				board_folder_id
-				id
-				columns {
-						title
-						type
-						id
-						settings_str 
-					}  
-				
-				groups  {
-						title
-					}
-			  }
-			}
-			`,
-				variables: {
-				},
-			  });
-			  console.log("submitting subtask");
-			fetch('https://api.monday.com/v2', {
-			  method: 'POST',
-			  headers: {
-				'Content-Type': 'application/json',
-				'Authorization': mondayAuthKey
-			  },
-			  body: body2,
-			}).then(res2 => res2.text())
-			.then(result2 => {
-				var subitemBoard = JSON.parse(result2);
-				boards[subitemBoard.id] = subitemBoard;
-				socket.emit('subItemBoardData',subitemBoard)})
-			
-			
-			
-			
-		})
-	  
-	} catch (error) {
-		console.log(error);
-	}	
-}
-
 
 function createDefect(msg) {
 	try{
+		/*
+		Name
+		Status
+		Reported By
+		Reported Date
+		Expected Behavior
+		Actual Behavior
+		*/
+		
+		
+		
 		var body = JSON.stringify({
 		query: `mutation ($group_id: String, $name: String, $column_values: JSON) {
 		create_item (
