@@ -22,7 +22,7 @@ const url = require('url');
 const fetch = require('node-fetch');
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
-const boards = new Array();
+const boards = {};
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : "",
@@ -290,7 +290,6 @@ function boardInfo(msg,socket){
 		  }
 		}
 		`});
-		  console.log(mondayAuthKey);
 		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
@@ -305,9 +304,12 @@ function boardInfo(msg,socket){
 			{
 				return;
 			}
-			socket.emit('boardData',result);			
-			var subtaskInfo = JSON.parse(JSON.parse(result).data.boards[0].columns[1].settings_str);
 			
+
+			var parentBoard = JSON.parse(result);
+			boards[parentBoard.id] = parentBoard;
+			var subtaskInfo = JSON.parse(parentBoard.data.boards[0].columns[1].settings_str);
+			socket.emit('boardData',parentBoard);
 			
 			
 			var body2 = JSON.stringify({
@@ -342,9 +344,9 @@ function boardInfo(msg,socket){
 			  },
 			  body: body2,
 			}).then(res2 => res2.text())
-			.then(result2 => {
-				console.log(result2);
-				socket.emit('subItemBoardData',result2)})
+				var subitemBoard = JSON.parse(result2);
+				boards[subitemBoard.id] = subitemBoard;
+				socket.emit('subItemBoardData',subitemBoard)})
 			
 			
 			
