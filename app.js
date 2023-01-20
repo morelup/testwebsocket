@@ -291,11 +291,12 @@ function boardInfo(msg){
 			variables: {
 			},
 		  });
-		fetch('https://ene37dtkd1z4b.x.pipedream.net/', {
+		  console.log(mondayAuthKey.value);
+		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
-			'Authorization': mondayAuthKey
+			'Authorization': mondayAuthKey.value
 		  },
 		  body: body,
 		}).then(res => {
@@ -336,7 +337,7 @@ function boardInfo(msg){
 			  method: 'POST',
 			  headers: {
 				'Content-Type': 'application/json',
-				'Authorization': mondayAuthKey
+				'Authorization': mondayAuthKey.value
 			  },
 			  body: body2,
 			}).then(res2 => io.to(msg.channel).emit('subItemBoardData',res2))
