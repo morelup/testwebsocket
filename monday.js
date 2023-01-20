@@ -1,7 +1,7 @@
 
 var authKey = "";
 const boards = {};
-function authKeySet(value){authKey = value}
+function authKeySet(value){console.log(value);authKey = value}
 
 function boardInfo(msg,socket){
 	try{
