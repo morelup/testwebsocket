@@ -1,4 +1,8 @@
 
+var authKey = "";
+const boards = {};
+
+
 function boardInfo(msg,socket){
 	try{
 		var body = JSON.stringify({
@@ -25,7 +29,7 @@ function boardInfo(msg,socket){
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
-			'Authorization': mondayAuthKey
+			'Authorization': authKey
 		  },
 		  body: body,
 		}).then(res => res.text())
@@ -71,7 +75,7 @@ function boardInfo(msg,socket){
 			  method: 'POST',
 			  headers: {
 				'Content-Type': 'application/json',
-				'Authorization': mondayAuthKey
+				'Authorization': authKey
 			  },
 			  body: body2,
 			}).then(res2 => res2.text())
@@ -91,5 +95,110 @@ function boardInfo(msg,socket){
 	}	
 }
 
+function boardInfo2(msg){
+	try{
+		var body = JSON.stringify({
+		query: `query {
+		  boards (ids: [${msg}]) {
+			name
+			state
+			board_folder_id
+			id
+			columns {
+					title
+					type
+					id
+					settings_str 
+				}  
+			
+			groups  {
+					title
+				}
+		  }
+		}
+		`});
+		fetch('https://api.monday.com/v2', {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': authKey
+		  },
+		  body: body,
+		}).then(res => res.text())
+		.then(result => {
+			var parentBoard = JSON.parse(result);
+			if (parentBoard.data.boards.length == 0)
+			{
+				return parentBoard;
+			}
+			
+			
+			boards[parentBoard.id] = {
+				data:parentBoard
+				};
+			return parentBoard;
+			
+			
+			
+			
+			
+			
+			
+		})
+	  
+	} catch (error) {
+		console.log(error);
+	}	
+}
 
-module.exports = { boardInfo};
+
+
+function createDefect(msg) {
+	try{
+		/*
+		Name
+		Status
+		Reported By
+		Reported Date
+		Expected Behavior
+		Actual Behavior
+		*/
+		
+		
+		
+		var body = JSON.stringify({
+		query: `mutation ($group_id: String, $name: String, $column_values: JSON) {
+		create_item (
+				board_id: $board_id, 
+				group_id: $group_id, 
+				item_name: $name, 
+				column_values: $column_values) {
+			id
+			}
+		}
+		`,
+			variables: {
+			 board_id: msg.board_id,
+			 group_id: msg.group_id,
+			 column_values: "{\"text\" : \""+msg.callid+"\",\"text6\" : \""+msg.uuid+"\"}",
+			 name: msg.name
+			},
+		  });
+		  console.log(body);
+		fetch('https://api.monday.com/v2', {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': mondayAuthKey
+		  },
+		  body: body,
+		})
+	  .then((res) => io.to(msg.channel).emit('defect submitted',res))
+	  .then((result) => console.log(result));
+	} catch (error) {
+		console.log(error);
+	}
+	
+}
+
+module.exports = { boardInfo,authKey,boards};

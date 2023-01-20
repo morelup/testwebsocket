@@ -22,17 +22,17 @@ const url = require('url');
 const fetch = require('node-fetch');
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
-const boards = {};
+
 const monday = require('./monday.js');
+
 var mysql      = require('mysql');
 var connection = mysql.createConnection({
   host     : "",
   user     : "",
   password : ""
 });
-var mondayAuthKey = "";
 
-accessSecret("MondayAuthKey").then(result => mondayAuthKey = result)
+accessSecret("MondayAuthKey").then(result => monday.authKey = result);
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 var bRunFirstSocket = true;
@@ -263,60 +263,23 @@ io.on('connection', socket => {
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
-		monday.boardInfo(msg,socket);
+		var parentBoard = monday.boardInfo2(msg);
+		if (parentBoard.data.boards.length == 0)
+		{
+			socket.emit('boardData',parentBoard);
+			return;
+		}
+		socket.emit('boardData',parentBoard);
+		var subtaskBoard = monday.boardInfo2(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds);
+		socket.emit('subItemBoardData',parentBoard);
+		
 		console.log("boardData "+msg);
 	});
 });
 
 
 
-function createDefect(msg) {
-	try{
-		/*
-		Name
-		Status
-		Reported By
-		Reported Date
-		Expected Behavior
-		Actual Behavior
-		*/
-		
-		
-		
-		var body = JSON.stringify({
-		query: `mutation ($group_id: String, $name: String, $column_values: JSON) {
-		create_item (
-				board_id: $board_id, 
-				group_id: $group_id, 
-				item_name: $name, 
-				column_values: $column_values) {
-			id
-			}
-		}
-		`,
-			variables: {
-			 board_id: msg.board_id,
-			 group_id: msg.group_id,
-			 column_values: "{\"text\" : \""+msg.callid+"\",\"text6\" : \""+msg.uuid+"\"}",
-			 name: msg.name
-			},
-		  });
-		  console.log(body);
-		fetch('https://api.monday.com/v2', {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json',
-			'Authorization': mondayAuthKey
-		  },
-		  body: body,
-		})
-	  .then((res) => io.to(msg.channel).emit('defect submitted',res))
-	  .then((result) => console.log(result));
-	} catch (error) {
-		console.log(error);
-	}
-	
-}
+
 
 
 
