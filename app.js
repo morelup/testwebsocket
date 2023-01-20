@@ -289,7 +289,7 @@ function boardInfo(msg){
 				}
 		  }
 		}
-		`);
+		`});
 		  console.log(mondayAuthKey);
 		fetch('https://api.monday.com/v2', {
 		  method: 'POST',
