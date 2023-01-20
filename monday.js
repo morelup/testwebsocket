@@ -117,7 +117,7 @@ function boardInfo2(msg){
 		  }
 		}
 		`});
-		fetch('https://api.monday.com/v2', {
+		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
@@ -125,27 +125,11 @@ function boardInfo2(msg){
 		  },
 		  body: body,
 		}).then(res => res.text())
-		.then(result => {
-			var parentBoard = JSON.parse(result);
-console.log("ok");
-			if (parentBoard.data.boards.length == 0)
-			{
-				return parentBoard;
-			}
-			
-			
-			boards[parentBoard.id] = {
-				data:parentBoard
-				};
-			return parentBoard;
 			
 			
 			
 			
 			
-			
-			
-		})
 	  
 	} catch (error) {
 		console.log(error);
@@ -202,4 +186,4 @@ function createDefect(msg) {
 	
 }
 
-module.exports = { boardInfo2,authKeySet,boards};
+module.exports = { boardInfo2,authKeySet};
