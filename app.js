@@ -262,14 +262,13 @@ io.on('connection', socket => {
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
-		boardInfo(msg);
+		boardInfo(msg,socket);
 		console.log("boardData "+msg);
 	});
 });
 
 
-function boardInfo(msg){
-	console.log(msg.channel);
+function boardInfo(msg,socket){
 	try{
 		var body = JSON.stringify({
 		query: `query {
@@ -306,7 +305,7 @@ function boardInfo(msg){
 			{
 				return;
 			}
-			io.to(msg.channel).emit('boardData',result);			
+			socket.emit('boardData',result);			
 			var subtaskInfo = JSON.parse(JSON.parse(result).data.boards[0].columns[1].settings_str);
 			
 			
@@ -345,7 +344,7 @@ function boardInfo(msg){
 			}).then(res2 => res2.text())
 			.then(result2 => {
 				console.log(result2);
-				io.to(msg.channel).emit('subItemBoardData',result2)})
+				socket.emit('subItemBoardData',result2)})
 			
 			
 			
