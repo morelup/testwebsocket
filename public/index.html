@@ -642,7 +642,7 @@ socket.on('boardData', function(msg){
   });
 socket.on('subItemBoardData', function(msg){
     subItemBoard.data = msg.data;
-	subItemBoard.id = subItemBoard.data.boards.id;
+	subItemBoard.id = subItemBoard.data.boards[0].id;
   });
 socket.on('defect submitted', function(msg){
     console.log("defect submitted for" + msg);
