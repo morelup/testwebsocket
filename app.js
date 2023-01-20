@@ -344,6 +344,7 @@ function boardInfo(msg,socket){
 			  },
 			  body: body2,
 			}).then(res2 => res2.text())
+			.then(result2 => {
 				var subitemBoard = JSON.parse(result2);
 				boards[subitemBoard.id] = subitemBoard;
 				socket.emit('subItemBoardData',subitemBoard)})
