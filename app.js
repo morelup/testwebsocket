@@ -299,8 +299,7 @@ function boardInfo(msg){
 		  },
 		  body: body,
 		})
-	  .then(res) 
-		=> {
+	  .then(res) => {
 			io.to(msg.channel).emit('boardData',res)
 			var subtaskInfo = JSON.parse(res.boards[0].columns[1].settings_str);
 			
