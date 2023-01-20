@@ -201,4 +201,4 @@ function createDefect(msg) {
 	
 }
 
-module.exports = { boardInfo,authKey,boards};
+module.exports = { boardInfo2,authKey,boards};
