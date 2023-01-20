@@ -22,7 +22,7 @@ const url = require('url');
 const fetch = require('node-fetch');
 const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
-
+const boards {};
 const monday = require('./monday.js');
 
 var mysql      = require('mysql');
@@ -263,8 +263,15 @@ io.on('connection', socket => {
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
-		monday.boardInfo2(msg).then(parentBoard => {
-		console.log(parentBoard);
+		monday.boardInfo2(msg).then(result => {
+		var parentBoard = JSON.parse(result);
+		if (parentBoard.data.boards.length == 0)
+		{
+			return;
+		}
+		boards[parentBoard.id] = {
+		data:parentBoard
+		};	
 		console.log("returned");
 		if (parentBoard.data.boards.length == 0)
 		{
@@ -272,8 +279,8 @@ io.on('connection', socket => {
 			return;
 		}
 		socket.emit('boardData',parentBoard);
-		var subtaskBoard = monday.boardInfo2(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds);
-		socket.emit('subItemBoardData',parentBoard);
+		//var subtaskBoard = monday.boardInfo2(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds);
+		//socket.emit('subItemBoardData',parentBoard);
 		
 		console.log("boardData "+msg);
 		});
