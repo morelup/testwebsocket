@@ -293,7 +293,7 @@ function connect_boarddata(socket,msg)
 		
 		monday.boardInfo(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds).then(result2 => {
 			var subitemBoard = JSON.parse(result2);
-			if (!(monday.confirmParentColumns(subitemBoard)))
+			if (!(monday.confirmSubitemColumns(subitemBoard)))
 			{
 				socket.emit('boardNotFound',"Subitem columns not correct");
 				return;
