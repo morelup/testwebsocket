@@ -553,7 +553,9 @@ function Info(callID,uuid,timestamp)
 	
 	
 	var ManualSubmitLog = document.createElement("button");//submit monday
+	console.log("check board " + board.exists);
 	if(board.exists){
+		
 		ManualSubmitLog.setAttribute("onclick","testSubmission('"+this.uniqueID+"')");
 	}
 	else{
