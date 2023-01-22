@@ -262,6 +262,10 @@ io.on('connection', socket => {
 		console.log('create_defect');
 		console.log(JSON.stringify(msg));
 		console.log('create_defect_1');
+		console.log(JSON.stringify(boards));
+		console.log('create_defect_2');
+		console.log(JSON.stringify(boards[msg.board]));
+		console.log('create_defect_3');
 		console.log(JSON.stringify(boards[msg.board].parentBoard));
 		monday.createDefect(boards[msg.board].parentBoard,msg);
 	});
