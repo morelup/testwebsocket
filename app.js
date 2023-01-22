@@ -259,7 +259,7 @@ io.on('connection', socket => {
 		console.log("leave message sent for "+msg);
 	});
 	socket.on('create_defect', msg => {
-		monday.createDefect(boards[msg.board],msg);
+		monday.createDefect(boards[msg.board].parentBoard,msg);
 	});
 	socket.on('create_defect_subitem', msg => {
 		createSubitem(msg.board,msg);
