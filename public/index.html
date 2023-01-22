@@ -245,8 +245,8 @@ function timeConverter(UNIX_timestamp){
 }
 const fullLog = GetURLParameter("fullLog");
 const project = GetURLParameter("project");
-const board = {id:GetURLParameter("board")};
-const subItemBoard = {id:board.id};
+const board = {id:GetURLParameter("board"),
+				exists:false};
 
 const debugmenu = document.getElementById('debugmenu');
 const ani = document.getElementById('ani');
@@ -552,12 +552,12 @@ function Info(callID,uuid,timestamp)
 	Row.appendChild(CallJSONButton);
 	
 	
-	var CallJSONButton = document.createElement("button");//submit monday
-	CallJSONButton.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
-	CallJSONButton.innerHTML = "Submit to UAT Log";
-	CallJSONButton.type="button";
-	CallJSONButton.classList.add("btn","btn-info","col-2");
-	Row.appendChild(CallJSONButton);
+	var ManualSubmitLog = document.createElement("button");//submit monday
+	ManualSubmitLog.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
+	ManualSubmitLog.innerHTML = "Submit to UAT Log";
+	ManualSubmitLog.type="button";
+	ManualSubmitLog.classList.add("btn","btn-info","col-2");
+	Row.appendChild(ManualSubmitLog);
 	
 	
 	
@@ -659,9 +659,22 @@ socket.on('connect', function() {
 			socket.emit('connect_boarddata', GetURLParameter("board"));
 		}
 	});
+socket.on('boardNotFound', function(msg){
+    console.log("defect submitted for" + msg);
+	board.exists=false;
+  });
   
+socket.on('boardFound', function(msg){
+	board.exists=true;
+	board.parentBoard = msg.parentBoard;
+	board.subitemBoard = msg.subitemBoard
+    console.log("Board Found");
+  });
 
-
+function testSubmission(uniqueID)
+{
+	
+}
   
   
 function createDefect(uniqueID) {
