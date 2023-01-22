@@ -118,7 +118,7 @@ function createDefect(board,msg) {
 		var columns = getBoardColumns(board);
 		
 		var column_values = {
-			[columns["Reported By"]]:parseInt(msg["reported_by"]),
+			[columns["Reported By"]]:msg["reported_by"],
 			[columns["Reported Date"]]:DateTimeNow(),
 			[columns["Expected Behavior"]]:msg["expected"],
 			[columns["Actual Behavior"]]:msg["actual"]
@@ -137,7 +137,7 @@ function createDefect(board,msg) {
 		}
 		`,
 			variables: {
-			 board_id: getBoardID(board),
+			 board_id: parseInt(getBoardID(board)),
 			 group_id: getGroupID(board),
 			 column_values: JSON.stringify(column_values),
 			 name: msg.name
