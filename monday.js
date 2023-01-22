@@ -49,16 +49,25 @@ function getBoardColumns(board){
 function confirmParentColumns(board)
 {
 	var columns = getBoardColumns(board);
+	console.log(JSON.stringify(columns));
 	if(!('Reported Date' in columns))
-	{return false;}
+	{console.log('Reported Date Fail');
+		return false;}
 	if(!('Expected Behavior' in columns))
-	{return false;}
+	{console.log('Expected Behavior Fail');
+		return false;}
 	if(!('Actual Behavior' in columns))
-	{return false;}
+	{
+		console.log('Actual Behavior Fail');
+		return false;}
 	if(!('Subitems' in columns))
-	{return false;}
+	{
+		console.log('Subitems Fail');
+		return false;}
 	if(!('Status' in columns))
-	{return false;}
+	{
+		console.log('Status Fail');
+		return false;}
 	return true;
 }
 function confirmSubitemColumns(board)
