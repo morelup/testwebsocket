@@ -310,7 +310,7 @@ function connect_boarddata(socket,msg)
 			parentBoard:parentBoard,
 			subitemBoard:subitemBoard
 			};
-			boards[parentBoard.id] = response;
+			boards[parentBoard.data.boards[0].id] = response;
 			socket.emit('boardFound',response);
 			return;
 		})
