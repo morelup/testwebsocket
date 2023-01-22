@@ -259,8 +259,7 @@ io.on('connection', socket => {
 		console.log("leave message sent for "+msg);
 	});
 	socket.on('create_defect', msg => {
-		createDefect(msg.board,msg);
-		console.log("defect message sent for "+msg.callid);
+		monday.createDefect(msg.board,msg);
 	});
 	socket.on('create_defect_subitem', msg => {
 		createSubitem(msg.board,msg);
@@ -285,7 +284,7 @@ function connect_boarddata(socket,msg)
 			socket.emit('boardNotFound',"No Parent Board Found");
 			return;
 		}
-		if (confirmParentColumns(parentBoard))
+		if (monday.confirmParentColumns(parentBoard))
 		{
 			socket.emit('boardNotFound',"Parent columns not correct");
 			return;
@@ -294,7 +293,7 @@ function connect_boarddata(socket,msg)
 		
 		monday.boardInfo(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds).then(result2 => {
 			var subitemBoard = JSON.parse(result2);
-			if (confirmParentColumns(subitemBoard))
+			if (monday.confirmParentColumns(subitemBoard))
 			{
 				socket.emit('boardNotFound',"Subitem columns not correct");
 				return;
