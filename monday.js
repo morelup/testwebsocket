@@ -1,101 +1,9 @@
 
 var authKey = "";
-const boards = {};
 function authKeySet(value){authKey = value}
 
-function boardInfo(msg,socket){
-	try{
-		var body = JSON.stringify({
-		query: `query {
-		  boards (ids: [${msg}]) {
-			name
-			state
-			board_folder_id
-			id
-			columns {
-					title
-					type
-					id
-					settings_str 
-				}  
-			
-			groups  {
-					title
-				}
-		  }
-		}
-		`});
-		fetch('https://api.monday.com/v2', {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json',
-			'Authorization': authKey
-		  },
-		  body: body,
-		}).then(res => res.text())
-		.then(result => {
-			var parentBoard = JSON.parse(result);
-			if (parentBoard.data.boards.length == 0)
-			{
-				socket.emit('boardData',parentBoard);
-				return;
-			}
-			boards[parentBoard.id] = {
-				data:parentBoard
-				};
-			var subtaskInfo = JSON.parse(parentBoard.data.boards[0].columns[1].settings_str);
-			socket.emit('boardData',parentBoard);
-			
-			
-			var body2 = JSON.stringify({
-			query: `query {
-			  boards (ids: [${subtaskInfo.boardIds}]) {
-				name
-				state
-				board_folder_id
-				id
-				columns {
-						title
-						type
-						id
-						settings_str 
-					}  
-				
-				groups  {
-						title
-					}
-			  }
-			}
-			`,
-				variables: {
-				},
-			  });
-			  console.log("submitting subtask");
-			fetch('https://api.monday.com/v2', {
-			  method: 'POST',
-			  headers: {
-				'Content-Type': 'application/json',
-				'Authorization': authKey
-			  },
-			  body: body2,
-			}).then(res2 => res2.text())
-			.then(result2 => {
-				var subitemBoard = JSON.parse(result2);
-				boards[parentBoard.id].subitemBoard = subitemBoard;
-				boards[subitemBoard.id] = subitemBoard;
-				socket.emit('subItemBoardData',subitemBoard)})
-			
-			
-			
-			
-		})
-	  
-	} catch (error) {
-		console.log(error);
-	}	
-}
 
-function boardInfo2(msg){
+function boardInfo(msg){
 	try{
 		var body = JSON.stringify({
 		query: `query {
@@ -113,6 +21,7 @@ function boardInfo2(msg){
 			
 			groups  {
 					title
+					id
 				}
 		  }
 		}
@@ -125,20 +34,69 @@ function boardInfo2(msg){
 		  },
 		  body: body,
 		}).then(res => res.text())
-			
-			
-			
-			
-			
-	  
 	} catch (error) {
 		console.log(error);
 	}	
 }
+function getBoardColumns(board){
+	var columns = board.data.boards[0].columns;
+	var returnObject = {};
+	columns.forEach(value =>{
+		returnObject[value["title"]] = value["id"]
+	})
+	return returnObject
+}
+function confirmParentColumns(board)
+{
+	var columns = getBoardColumns(board);
+	if(!('Reported Date' in columns))
+	{return false;}
+	if(!('Expected Behavior' in columns))
+	{return false;}
+	if(!('Actual Behavior' in columns))
+	{return false;}
+	if(!('Subitems' in columns))
+	{return false;}
+	if(!('Status' in columns))
+	{return false;}
+	return true;
+}
+function confirmSubitemColumns(board)
+{
+	var columns = getBoardColumns(board);
+	if(!('Result' in columns))
+	{return false;}
+	if(!('VCC Call ID' in columns))
+	{return false;}
+	if(!('Timestamp' in columns))
+	{return false;}
+	if(!('Caller\'s Phone Number' in columns))
+	{return false;}
+	if(!('Notes' in columns))
+	{return false;}
+	return true;
+}
+function getBoardID(board)
+{
+	return board.data.boards[0].id;
+}
+function getGroupID(board)
+{
+	return board.data.boards[0].groups[0].id;
+}
 
 
 
-function createDefect(msg) {
+function DateTimeNow(){
+  var a = new Date();
+  return a.toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+	timeZoneName: 'short'
+  });
+}
+
+
+function createDefect(board,msg) {
 	try{
 		/*
 		Name
@@ -148,7 +106,14 @@ function createDefect(msg) {
 		Expected Behavior
 		Actual Behavior
 		*/
+		var columns = getBoardColumns(board);
 		
+		var column_values = {
+			[columns["Reported By"]]:msg["reported_by"],
+			[columns["Reported Date"]]:DateTimeNow(),
+			[columns["Expected Behavior"]]:msg["expected"],
+			[columns["Actual Behavior"]]:msg["actual"]
+		}
 		
 		
 		var body = JSON.stringify({
@@ -163,9 +128,9 @@ function createDefect(msg) {
 		}
 		`,
 			variables: {
-			 board_id: msg.board_id,
-			 group_id: msg.group_id,
-			 column_values: "{\"text\" : \""+msg.callid+"\",\"text6\" : \""+msg.uuid+"\"}",
+			 board_id: getBoardID(board),
+			 group_id: getGroupID(board),
+			 column_values: JSON.stringify(column_values),
 			 name: msg.name
 			},
 		  });
@@ -178,7 +143,7 @@ function createDefect(msg) {
 		  },
 		  body: body,
 		})
-	  .then((res) => io.to(msg.channel).emit('defect submitted',res))
+	  .then((res) => res.text())
 	  .then((result) => console.log(result));
 	} catch (error) {
 		console.log(error);
@@ -186,4 +151,4 @@ function createDefect(msg) {
 	
 }
 
-module.exports = { boardInfo2,authKeySet};
+module.exports = { boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect};

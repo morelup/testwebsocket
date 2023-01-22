@@ -258,34 +258,58 @@ io.on('connection', socket => {
 		socket.leave(msg);
 		console.log("leave message sent for "+msg);
 	});
-	socket.on('defect', msg => {
-		createDefect(msg);
+	socket.on('create_defect', msg => {
+		createDefect(msg.board,msg);
+		console.log("defect message sent for "+msg.callid);
+	});
+	socket.on('create_defect_subitem', msg => {
+		createSubitem(msg.board,msg);
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
-		monday.boardInfo2(msg).then(result => {
-		var parentBoard = JSON.parse(result);
-		if (parentBoard.data.boards.length == 0)
-		{
-			return;
-		}
-		boards[parentBoard.id] = {
-		data:parentBoard
-		};	
-		console.log("returned");
-		if (parentBoard.data.boards.length == 0)
-		{
-			socket.emit('boardData',parentBoard);
-			return;
-		}
-		socket.emit('boardData',parentBoard);
-		//var subtaskBoard = monday.boardInfo2(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds);
-		//socket.emit('subItemBoardData',parentBoard);
-		
-		console.log("boardData "+msg);
-		});
+		connect_boarddata(socket,msg)
 	});
 });
+
+
+function connect_boarddata(socket,msg)
+{
+	var response = {};
+	monday.boardInfo(msg).then(result => {
+		var parentBoard = JSON.parse(result);
+		
+		
+		
+		if (parentBoard.data.boards.length == 0)
+		{
+			socket.emit('boardNotFound',"No Parent Board Found");
+			return;
+		}
+		if (confirmParentColumns(parentBoard))
+		{
+			socket.emit('boardNotFound',"Parent columns not correct");
+			return;
+		}
+		
+		
+		monday.boardInfo(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds).then(result2 => {
+			var subitemBoard = JSON.parse(result2);
+			if (confirmParentColumns(subitemBoard))
+			{
+				socket.emit('boardNotFound',"Subitem columns not correct");
+				return;
+			}
+			response = {
+			parentBoard:parentBoard,
+			subitemBoard:subitemBoard
+			};
+			boards[parentBoard.id] = response;
+			socket.emit('boardFound',response);
+			return;
+		})
+	});
+}
+
 
 
 
