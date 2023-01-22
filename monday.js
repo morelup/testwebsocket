@@ -118,7 +118,7 @@ function createDefect(board,msg) {
 		var columns = getBoardColumns(board);
 		
 		var column_values = {
-			[columns["Reported By"]]:msg["reported_by"],
+			[columns["Reported By"]]:parseInt(msg["reported_by"]),
 			[columns["Reported Date"]]:DateTimeNow(),
 			[columns["Expected Behavior"]]:msg["expected"],
 			[columns["Actual Behavior"]]:msg["actual"]
