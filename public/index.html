@@ -553,7 +553,13 @@ function Info(callID,uuid,timestamp)
 	
 	
 	var ManualSubmitLog = document.createElement("button");//submit monday
-	ManualSubmitLog.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
+	if(board.exists){
+		ManualSubmitLog.setAttribute("onclick","testSubmission('"+this.uniqueID+"')");
+	}
+	else{
+		ManualSubmitLog.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
+	}
+	
 	ManualSubmitLog.innerHTML = "Submit to UAT Log";
 	ManualSubmitLog.type="button";
 	ManualSubmitLog.classList.add("btn","btn-info","col-2");
@@ -673,7 +679,15 @@ socket.on('boardFound', function(msg){
 
 function testSubmission(uniqueID)
 {
+	var msg = {};
+	msg.board = board.id;
+	msg.name = "testname";
+	msg.reported_by = "";
+	msg.expected = "testexpected";
+	msg.actual = "testactual";
+	msg.status = "";
 	
+	socket.emit('create_defect', msg);
 }
   
   
