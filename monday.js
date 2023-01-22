@@ -98,10 +98,7 @@ function getGroupID(board)
 
 function DateTimeNow(){
   var a = new Date();
-  return a.toLocaleString('en-US', {
-    timeZone: 'America/New_York',
-	timeZoneName: 'short'
-  });
+  return a.toISOString().replace('T', ' ').substr(0, 19);
 }
 
 
