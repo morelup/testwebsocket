@@ -126,7 +126,7 @@ function createDefect(board,msg) {
 		
 		
 		var body = JSON.stringify({
-		query: `mutation ($group_id: String, $name: String, $column_values: JSON) {
+		query: `mutation ($board_id: String, $group_id: String, $name: String, $column_values: JSON) {
 		create_item (
 				board_id: $board_id, 
 				group_id: $group_id, 
