@@ -67,10 +67,6 @@ function confirmParentColumns(board)
 	{
 		console.log('Subitems Fail');
 		return false;}
-	if(!('Status' in columns))
-	{
-		console.log('Status Fail');
-		return false;}
 	return true;
 }
 function confirmSubitemColumns(board)
