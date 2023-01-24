@@ -276,6 +276,7 @@ io.on('connection', socket => {
 function create_defect(socket,msg)
 {
 	monday.createDefect(boards[msg.board].parentBoard,msg).then(result => {
+		console.log(result);
 		var response = JSON.parse(result)
 		//response.msg = msg;
 		
