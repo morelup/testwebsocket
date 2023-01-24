@@ -167,6 +167,7 @@ function createSubItem(board,msg,item) {
 		var columns = getBoardColumns(board);
 		console.log("SUBBOARD:"+JSON.stringify(board));
 		console.log("columns:"+JSON.stringify(columns));
+		console.log("msg:"+JSON.stringify(msg));
 		var column_values = {
 			[columns["VCC Call ID"]]:msg["callid"],
 			[columns["Timestamp"]]:msg["timestamp"],
