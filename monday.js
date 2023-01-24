@@ -206,7 +206,7 @@ function createSubItem(board,msg,item) {
 	}
 	
 }
-module.exports = { boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect};
+module.exports = { boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect,createSubItem};
 8001471523
 
 6895
