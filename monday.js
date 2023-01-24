@@ -18,7 +18,10 @@ function boardInfo(msg){
 					id
 					settings_str 
 				}  
-			
+			 subscribers{
+				id
+				name
+			}
 			groups  {
 					title
 					id

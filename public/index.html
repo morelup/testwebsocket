@@ -47,7 +47,7 @@
 	</div>
 	
 	
-	<div class="modal fade" id="modal_monday_submit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" id="modal_manual_monday_submit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog modal-dialog-scrollable modal-xl">
 		<div class="modal-content">
 		  <div class="modal-header">
@@ -108,23 +108,118 @@
 					<tbody>
 						<tr>
 							<td>SubItem</td>
-							<td id="subitemUUID">Studio UUID</td>
-							<td ><button class="btn btn-dark px-3" id="copyUUIDButton" onclick="copyUUID()" >Copy UUID to clipboard</button></td>
+							<td id="manualSubitemUUID">Studio UUID</td>
+							<td ><button class="btn btn-dark px-3" id="manualCopyUUIDButton" onclick="copyUUID()" >Copy UUID to clipboard</button></td>
 						</tr>
 						<tr>
 							<td>VCC Call ID</td>
-							<td id="subitemVCC">VCC</td>
-							<td ><button class="btn btn-dark px-3" id="copyVCCButton" onclick="copyVCC()" >Copy Call ID to clipboard</button></td>
+							<td id="manualSubitemVCC">VCC</td>
+							<td ><button class="btn btn-dark px-3" id="manualCopyVCCButton" onclick="copyVCC()" >Copy Call ID to clipboard</button></td>
 						</tr>
 						<tr>
 							<td>Call Log</td>
 							<td id="subitemCallLog">Copy the call log</td>
-							<td ><button class="btn btn-dark px-3" id="copyCallLogButton" onclick="copyCallLog()" >Copy Call Log to clipboard</button></td>
+							<td ><button class="btn btn-dark px-3" id="manualCopyCallLogButton" onclick="copyCallLog()" >Copy Call Log to clipboard</button></td>
+						</tr>
+						<tr>
+							<td>Timestamp</td>
+							<td id="manualSubitemTimestamp"></td>
+							<td ><button class="btn btn-dark px-3" id="manualCopyTimestampButton" onclick="copyTimestamp()" >Copy Timestamp to clipboard</button></td>
+						</tr>
+						<tr>
+							<td>Caller's Phone Number</td>
+							<td colspan="2">Phone number of the caller</td>
+						</tr>
+						<tr>
+							<td>Notes</td>
+							<td colspan="2">If you have any notes for this specific call enter them here</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+
+	
+	<div class="modal fade" id="modal_monday_submit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		  </div>
+			<div class="modal-body">
+				<h5 >Item</h5>
+				<p></p>
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Column Name</th>
+							<th>Content</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Item</td>
+							<td>Test ID for this defect</td>
+						</tr>
+						<tr>
+							<td>Status</td>
+							<td>Leave as "Reported"</td>
+						</tr>
+						<tr>
+							<td>Assigned</td>
+							<td>Leave blank</td>
+						</tr>
+						<tr>
+							<td>Reported By</td>
+							<td>Select your user</td>
+						</tr>
+						<tr>
+							<td>Expected behavior</td>
+							<td>What were you expecting to hear/experience.</td>
+						</tr>
+						<tr>
+							<td>Actual behavior</td>
+							<td>What did you actually experience.</td>
+						</tr>
+					</tbody>
+				</table>
+				<hr>
+				<h5 >SubItem</h5>
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Column Name</th>
+							<th>Content</th>
+							<th>Clipboard</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>SubItem</td>
+							<td id="subitemUUID">Studio UUID</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>VCC Call ID</td>
+							<td id="subitemVCC">VCC</td>
+							<td ></td>
+						</tr>
+						<tr>
+							<td>Call Log</td>
+							<td id="subitemCallLog">Copy the call log</td>
+							<td ></td>
 						</tr>
 						<tr>
 							<td>Timestamp</td>
 							<td id="subitemTimestamp"></td>
-							<td ><button class="btn btn-dark px-3" id="copyTimestampButton" onclick="copyTimestamp()" >Copy Timestamp to clipboard</button></td>
+							<td ></td>
 						</tr>
 						<tr>
 							<td>Caller's Phone Number</td>
@@ -157,6 +252,13 @@
 		</div>
 	  </div>
 	</header>
+	
+	
+	
+	
+	
+	
+	
 <div class="container-fluid">
 	<div class="row">
 		<!--sidebar-->
@@ -173,6 +275,14 @@
 					</textarea>
 					<small id="testPayloadHelp" class="form-text text-muted">Paste a submission node here.</small>
 					<button onclick="debugMessage()" >submit</button>
+				</div>
+			</div>
+			<div id = "boardmenu" class = "collapse">
+				<h6>Board Menu</h6>
+				<div class="form-group">
+					<select id="reportedby" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+					  <option selected>Choose a tester</option>
+					</select>
 				</div>
 			</div>
 		</div>
@@ -249,6 +359,7 @@ const board = {id:GetURLParameter("board"),
 				exists:false};
 
 const debugmenu = document.getElementById('debugmenu');
+const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'),{toggle:false})
 const ani = document.getElementById('ani');
 const calltable = document.getElementById('CallTable');
 const listening = document.getElementById('listening');
@@ -257,7 +368,7 @@ const listening = document.getElementById('listening');
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
   keyboard: false
 });
-var modal_monday_submit = new bootstrap.Modal(document.getElementById('modal_monday_submit'), {
+var modal_manual_monday_submit = new bootstrap.Modal(document.getElementById('modal_manual_monday_submit'), {
   keyboard: false
 });
 
@@ -425,7 +536,6 @@ function copyVCC(uniqueID)
 function copyCallLog(uniqueID)
 {
 	navigator.clipboard.writeText(JSON.stringify(records[uniqueID].raw, null, '\t'));
-	
 }
 function copyTimestamp(uniqueID)
 {
@@ -433,31 +543,49 @@ function copyTimestamp(uniqueID)
 }
 
 
+const manualSubmissionModal = {
+ manualSubitemUUID:document.getElementById('manualSubitemUUID'),
+ manualCopyUUIDButton:document.getElementById('manualCopyUUIDButton'),
+ manualSubitemVCC:document.getElementById('manualSubitemVCC'),
+ manualCopyVCCButton:document.getElementById('manualCopyVCCButton'),
+ manualCopyCallLogButton:document.getElementById('manualCopyCallLogButton'),
+ manualSubitemTimestamp:document.getElementById('manualSubitemTimestamp'),
+ manualCopyTimestampButton:document.getElementById('manualCopyTimestampButton')
+};
 
-var subitemUUID = document.getElementById('subitemUUID');
-var copyUUIDButton = document.getElementById('copyUUIDButton');
-var subitemVCC = document.getElementById('subitemVCC');
-var copyVCCButton = document.getElementById('copyVCCButton');
-var copyCallLogButton = document.getElementById('copyCallLogButton');
-var subitemTimestamp = document.getElementById('subitemTimestamp');
-var copyTimestampButton = document.getElementById('copyTimestampButton');
+function showManualMondaySubmission(uniqueID){
+	manualSubitemUUID.manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
+	manualSubitemUUID.manualCopyUUIDButton.setAttribute('onclick',"copyUUID('"+uniqueID+"')");
+	manualSubitemUUID.manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
+	manualSubitemUUID.manualCopyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
+	manualSubitemUUID.manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
+	manualSubitemUUID.manualSubitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
+	manualSubitemUUID.manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
+	modal_manual_monday_submit.show();
+	return;
+}
 
 
-
+const submissionModal = {
+	reportedby:document.getElementById('reportedby'),
+};
 
 function showMondaySubmission(uniqueID){
-	subitemUUID.innerHTML = records[uniqueID].info.UUID;
-	copyUUIDButton.setAttribute('onclick',"copyUUID('"+uniqueID+"')");
 	
-	subitemVCC.innerHTML = records[uniqueID].info.callID;
-	copyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
+
+
+	manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
+	manualCopyUUIDButton.setAttribute('onclick',"copyUUID('"+uniqueID+"')");
 	
-	copyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
+	manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
+	manualCopyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
 	
-	subitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
-	copyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
+	manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
 	
-	modal_monday_submit.show();
+	manualSubitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
+	manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
+	
+	modal_manual_monday_submit.show();
 	return;
 }
 
@@ -559,7 +687,7 @@ function Info(callID,uuid,timestamp)
 		ManualSubmitLog.setAttribute("onclick","createDefect('"+this.uniqueID+"')");
 	}
 	else{
-		ManualSubmitLog.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
+		ManualSubmitLog.setAttribute("onclick","showManualMondaySubmission('"+this.uniqueID+"')");
 	}
 	
 	ManualSubmitLog.innerHTML = "Submit to UAT Log";
@@ -668,7 +796,7 @@ socket.on('connect', function() {
 		}
 	});
 socket.on('boardNotFound', function(msg){
-    console.log("defect submitted for" + msg);
+	boardmenu.hide();
 	board.exists=false;
   });
   
@@ -677,6 +805,14 @@ socket.on('boardFound', function(msg){
 	board.parentBoard = msg.parentBoard;
 	board.subitemBoard = msg.subitemBoard
     console.log("Board Found");
+	var subscribers = msg.parentBoard.data.boards[0].subsribers;
+	for(var i = 0; i < subscribers.length; i++) {
+		var el = document.createElement("option");
+		el.textContent = subscribers[i].name;
+		el.value = subscribers[i].id;
+		submissionModal.reportedby.appendChild(el);
+	}
+	boardmenu.show();
   });
   
 socket.on('defect_created', function(msg){
