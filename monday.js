@@ -187,7 +187,7 @@ function createSubItem(board,msg,item) {
 			variables: {
 			 parent_item_id: parseInt(item),
 			 column_values: JSON.stringify(column_values),
-			 name: msg.name
+			 name: msg.subitem
 			},
 		  });
 		  console.log(body);
