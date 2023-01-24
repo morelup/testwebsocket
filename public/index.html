@@ -798,6 +798,7 @@ socket.on('connect', function() {
 socket.on('boardNotFound', function(msg){
 	boardmenu.hide();
 	board.exists=false;
+	console.log("Board Found");
   });
   
 socket.on('boardFound', function(msg){
@@ -805,7 +806,7 @@ socket.on('boardFound', function(msg){
 	board.parentBoard = msg.parentBoard;
 	board.subitemBoard = msg.subitemBoard
     console.log("Board Found");
-	var subscribers = msg.parentBoard.data.boards[0].subsribers;
+	var subscribers = msg.parentBoard.data.boards[0].subscribers;
 	for(var i = 0; i < subscribers.length; i++) {
 		var el = document.createElement("option");
 		el.textContent = subscribers[i].name;
