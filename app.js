@@ -259,24 +259,35 @@ io.on('connection', socket => {
 		console.log("leave message sent for "+msg);
 	});
 	socket.on('create_defect', msg => {
-		console.log('create_defect');
-		console.log(JSON.stringify(msg));
-		console.log('create_defect_1');
-		console.log(JSON.stringify(boards));
-		console.log('create_defect_2');
-		console.log(JSON.stringify(boards[msg.board]));
-		console.log('create_defect_3');
-		console.log(JSON.stringify(boards[msg.board].parentBoard));
-		monday.createDefect(boards[msg.board].parentBoard,msg);
+		create_defect(socket,msg);
+		
 	});
 	socket.on('create_defect_subitem', msg => {
-		createSubitem(msg.board,msg);
+		createSubitem(boards[msg.board].subitemBoard,msg,msg.item);
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
 		connect_boarddata(socket,msg)
 	});
 });
+
+
+
+function create_defect(socket,msg)
+{
+	monday.createDefect(boards[msg.board].parentBoard,msg).then(result => {
+		var response = JSON.parse(result)
+		response.msg = msg;
+		
+		
+		
+		monday.createSubItem(boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id).then(result => {
+			
+			socket.emit('defect_created',"");
+		})
+	});
+}
+
 
 
 function connect_boarddata(socket,msg)

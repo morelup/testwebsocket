@@ -678,6 +678,10 @@ socket.on('boardFound', function(msg){
 	board.subitemBoard = msg.subitemBoard
     console.log("Board Found");
   });
+  
+socket.on('defect_created', function(msg){
+    console.log("defect_created");
+  });
 
 function testSubmission(uniqueID)
 {
@@ -691,6 +695,8 @@ function testSubmission(uniqueID)
 	
 	socket.emit('create_defect', msg);
 }
+
+
   
   
 function createDefect(uniqueID) {
@@ -714,7 +720,7 @@ function createDefect(uniqueID) {
 		notes:"testNote"
 		};
 
-		socket.emit('defect', msg);
+		socket.emit('defect', msg)
 	}
 }
 
@@ -729,7 +735,13 @@ ani.addEventListener("keypress", function(event) {
   }
 });
 
-
+function Defect()
+{
+	this.reported_by = "";
+	this.expected = "";
+	this.actual = "";
+	this.board = "";
+}
 
 
 

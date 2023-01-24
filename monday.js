@@ -113,7 +113,6 @@ function createDefect(board,msg) {
 		Actual Behavior
 		*/
 		var columns = getBoardColumns(board);
-		
 		var column_values = {
 			[columns["Reported By"]]:msg["reported_by"],
 			[columns["Reported Date"]]:DateTimeNow(),
@@ -150,11 +149,64 @@ function createDefect(board,msg) {
 		  body: body,
 		})
 	  .then((res) => res.text())
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+function createSubItem(board,msg,item) {
+	try{
+		/*
+		Name
+		Result
+		VCC Call ID
+		Timestamp
+		Caller's Phone Number
+		Notes
+		*/
+		var columns = getBoardColumns(board);
+		
+		var column_values = {
+			[columns["VCC Call ID"]]:msg["callid"],
+			[columns["Reported Date"]]:DateTimeNow(),
+			[columns["Timestamp"]]:msg["timestamp"],
+			[columns["Notes"]]:msg["notes"]
+		}
+		
+		
+		var body = JSON.stringify({
+		query: `mutation ($parent_item_id: Int!, $name: String, $column_values: JSON) {
+		create_item (
+				parent_item_id: $parent_item_id, 
+				item_name: $name, 
+				column_values: $column_values) {
+			id
+			}
+		}
+		`,
+			variables: {
+			 parent_item_id: parseInt(item),
+			 column_values: JSON.stringify(column_values),
+			 name: msg.name
+			},
+		  });
+		  console.log(body);
+		fetch('https://api.monday.com/v2', {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': authKey
+		  },
+		  body: body,
+		})
+	  .then((res) => res.text())
 	  .then((result) => console.log(result));
 	} catch (error) {
 		console.log(error);
 	}
 	
 }
-
 module.exports = { boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect};
+8001471523
+
+6895
