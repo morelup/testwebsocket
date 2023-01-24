@@ -176,7 +176,7 @@ function createSubItem(board,msg,item) {
 		
 		var body = JSON.stringify({
 		query: `mutation ($parent_item_id: Int!, $name: String, $column_values: JSON) {
-		create_item (
+		create_subitem  (
 				parent_item_id: $parent_item_id, 
 				item_name: $name, 
 				column_values: $column_values) {
