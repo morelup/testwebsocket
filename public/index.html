@@ -715,7 +715,7 @@ function createDefect(uniqueID) {
 		callid:records[uniqueID].info.callID,
 		expected:"expected test value",
 		actual:"actual test value",
-		timestamp:records[uniqueID].info.timestamp,
+		timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
 		ani:ani.value,
 		notes:"testNote"
 		};
