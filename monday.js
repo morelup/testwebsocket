@@ -73,6 +73,7 @@ function confirmParentColumns(board)
 function confirmSubitemColumns(board)
 {
 	var columns = getBoardColumns(board);
+	console.log("SUBBOARD:"+JSON.stringify(board));
 	if(!('Result' in columns))
 	{return false;}
 	if(!('VCC Call ID' in columns))
@@ -118,7 +119,7 @@ function createDefect(board,msg) {
 			[columns["Expected Behavior"]]:msg["expected"],
 			[columns["Actual Behavior"]]:msg["actual"]
 		}
-		
+		console.log("BOARD:"+JSON.stringify(board));
 		
 		var body = JSON.stringify({
 		query: `mutation ($board_id: Int!, $group_id: String, $name: String, $column_values: JSON) {
@@ -164,7 +165,8 @@ function createSubItem(board,msg,item) {
 		Notes
 		*/
 		var columns = getBoardColumns(board);
-		
+		console.log("SUBBOARD:"+JSON.stringify(board));
+		console.log("columns:"+JSON.stringify(columns));
 		var column_values = {
 			[columns["VCC Call ID"]]:msg["callid"],
 			[columns["Reported Date"]]:DateTimeNow(),
