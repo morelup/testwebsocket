@@ -136,7 +136,7 @@ function createDefect(board,msg) {
 			 board_id: parseInt(getBoardID(board)),
 			 group_id: getGroupID(board),
 			 column_values: JSON.stringify(column_values),
-			 name: msg.name
+			 name: msg.item
 			},
 		  });
 		  console.log(body);
