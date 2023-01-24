@@ -556,7 +556,7 @@ function Info(callID,uuid,timestamp)
 	console.log("check board " + board.exists);
 	if(board.exists){
 		
-		ManualSubmitLog.setAttribute("onclick","testSubmission('"+this.uniqueID+"')");
+		ManualSubmitLog.setAttribute("onclick","createDefect('"+this.uniqueID+"')");
 	}
 	else{
 		ManualSubmitLog.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
@@ -720,7 +720,7 @@ function createDefect(uniqueID) {
 		notes:"testNote"
 		};
 		
-		socket.emit('defect', msg)
+		socket.emit('create_defect', msg)
 	}
 }
 
