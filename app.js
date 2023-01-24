@@ -277,11 +277,11 @@ function create_defect(socket,msg)
 {
 	monday.createDefect(boards[msg.board].parentBoard,msg).then(result => {
 		var response = JSON.parse(result)
-		response.msg = msg;
+		//response.msg = msg;
 		
 		
 		
-		monday.createSubItem(boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id).then(result => {
+		monday.createSubItem(boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id).then(result2 => {
 			
 			socket.emit('defect_created',"");
 		})

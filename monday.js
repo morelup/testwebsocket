@@ -83,7 +83,7 @@ function confirmSubitemColumns(board)
 	{return false;}
 	if(!('Notes' in columns))
 	{return false;}
-	return true;
+	return true;	
 }
 function getBoardID(board)
 {
@@ -114,7 +114,6 @@ function createDefect(board,msg) {
 		*/
 		var columns = getBoardColumns(board);
 		var column_values = {
-			[columns["Reported By"]]:msg["reported_by"],
 			[columns["Reported Date"]]:DateTimeNow(),
 			[columns["Expected Behavior"]]:msg["expected"],
 			[columns["Actual Behavior"]]:msg["actual"]
