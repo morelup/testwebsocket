@@ -719,7 +719,7 @@ function createDefect(uniqueID) {
 		ani:ani.value,
 		notes:"testNote"
 		};
-		
+		console.log(JSON.stringify(msg));
 		socket.emit('create_defect', msg)
 	}
 }
