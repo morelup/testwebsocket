@@ -140,7 +140,7 @@ function createDefect(board,msg) {
 			},
 		  });
 		  console.log(body);
-		fetch('https://api.monday.com/v2', {
+		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ function createSubItem(board,msg,item) {
 			},
 		  });
 		  console.log(body);
-		fetch('https://api.monday.com/v2', {
+		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
