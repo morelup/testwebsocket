@@ -169,7 +169,6 @@ function createSubItem(board,msg,item) {
 		console.log("columns:"+JSON.stringify(columns));
 		var column_values = {
 			[columns["VCC Call ID"]]:msg["callid"],
-			[columns["Reported Date"]]:DateTimeNow(),
 			[columns["Timestamp"]]:msg["timestamp"],
 			[columns["Notes"]]:msg["notes"]
 		}
