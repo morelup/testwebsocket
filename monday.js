@@ -121,7 +121,7 @@ function createDefect(board,msg) {
 		}
 		if ([columns["Reported By"]]!= "null")
 		{
-			column_values[columns["Reported By"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]}";
+			column_values[columns["Reported By"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]};
 		}
 		console.log("BOARD:"+JSON.stringify(board));
 		
