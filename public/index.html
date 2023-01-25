@@ -156,11 +156,21 @@
 			<div class="modal-body">
 				<h5 >New defect or retest</h5>
 				<p></p>
-				<div class="form-check form-switch">
-				  <input class="form-check-input" type="checkbox" id="cb_defectOrRetest" onclick="defectOrRetest()">
-				  <label class="form-check-label" id="text_defectOrRetest" for="cb_defectOrRetest">New Defect</label>
-				</div>
 				
+				  
+				  
+				<div class="input-group">
+				  <div class="input-group-text">
+					  <div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" id="cb_defectOrRetest" onclick="defectOrRetest()">
+						<label class="form-check-label" id="text_defectOrRetest" for="cb_defectOrRetest">New Defect</label>
+					</div>
+				  </div>
+				  <input type="text" class="form-control collapse" id="text_newdefect" aria-label="Text input with checkbox">
+					<select id="select_currentItem" class="form-select form-select collapse" aria-label=".form-select-lg example">
+						<option selected>Choose a tester</option>
+					</select>
+				</div>
 				
 				<table class="table table-hover">
 					<thead>
@@ -560,12 +570,17 @@ function showManualMondaySubmission(uniqueID){
 }
 
 
+
 const submissionModal = {
 	reportedby:document.getElementById('reportedby'),
+	cb_defectOrRetest:document.getElementById('cb_defectOrRetest');
+	text_defectOrRetest:document.getElementById('text_defectOrRetest');
+	text_newdefect:new bootstrap.Collapse(document.getElementById('text_newdefect'),{toggle:false})
+	select_currentItem:new bootstrap.Collapse(document.getElementById('select_currentItem'),{toggle:false})
 };
 
 function showMondaySubmission(uniqueID){
-	
+	submissionModal.cb_defectOrRetest.checked = false;
 
 
 	manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
@@ -582,7 +597,18 @@ function showMondaySubmission(uniqueID){
 	modal_monday_submit.show();
 	return;
 }
-
+function defectOrRetest()
+{
+	if (submissionModal.cb_defectOrRetest.checked == true){
+		submissionModal.text_defectOrRetest.innerHTML = "Retest";
+		submissionModal.text_newdefect.hide();
+		submissionModal.select_currentItem.show();
+	} else {
+		submissionModal.text_defectOrRetest.innerHTML = "New Defect";
+		submissionModal.text_newdefect.show();
+		submissionModal.select_currentItem.hide();
+	}
+}
 
 
 function showOffCanvas(value){
@@ -814,18 +840,7 @@ socket.on('defect_created', function(msg){
     console.log("defect_created");
   });
 
-function defectOrRetest()
-{
-	var cb_defectOrRetest  = document.getElementById('cb_defectOrRetest');
-	var text_defectOrRetest = document.getElementById('text_defectOrRetest');
-	
-	if (cb_defectOrRetest.checked == true){
-		text_defectOrRetest.innerHTML = "Retest";
-	} else {
-		text_defectOrRetest.innerHTML = "New Defect";
-	}
-	
-}
+
 
 function testSubmission(uniqueID)
 {
