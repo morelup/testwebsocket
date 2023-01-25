@@ -575,8 +575,11 @@ const submissionModal = {
 	reportedby:document.getElementById('reportedby'),
 	cb_defectOrRetest:document.getElementById('cb_defectOrRetest'),
 	text_defectOrRetest:document.getElementById('text_defectOrRetest'),
-	text_newdefect:new bootstrap.Collapse(document.getElementById('text_newdefect'),{toggle:false}),
-	select_currentItem:new bootstrap.Collapse(document.getElementById('select_currentItem'),{toggle:false})
+	//text_newdefect:new bootstrap.Collapse(document.getElementById('text_newdefect'),{toggle:false}),
+	//select_currentItem:new bootstrap.Collapse(document.getElementById('select_currentItem'),{toggle:false})
+	
+	text_newdefect:document.getElementById('text_newdefect'),
+	select_currentItem:document.getElementById('select_currentItem')
 };
 
 function showMondaySubmission(uniqueID){
@@ -601,12 +604,12 @@ function defectOrRetest()
 {
 	if (submissionModal.cb_defectOrRetest.checked == true){
 		submissionModal.text_defectOrRetest.innerHTML = "Retest";
-		submissionModal.text_newdefect.hide();
-		submissionModal.select_currentItem.show();
+		submissionModal.text_newdefect.hidden = true;
+		submissionModal.select_currentItem.hidden = false;
 	} else {
 		submissionModal.text_defectOrRetest.innerHTML = "New Defect";
-		submissionModal.text_newdefect.show();
-		submissionModal.select_currentItem.hide();
+		submissionModal.text_newdefect.hidden = false;
+		submissionModal.select_currentItem.hidden = true;
 	}
 }
 
