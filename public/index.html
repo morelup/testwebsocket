@@ -150,12 +150,18 @@
 	  <div class="modal-dialog modal-dialog-scrollable modal-xl">
 		<div class="modal-content">
 		  <div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			<h5 class="modal-title" id="exampleModalLabel">Submit Defect</h5>
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		  </div>
 			<div class="modal-body">
-				<h5 >Item</h5>
+				<h5 >New defect or retest</h5>
 				<p></p>
+				<div class="form-check form-switch">
+				  <input class="form-check-input" type="checkbox" id="cb_defectOrRetest" onclick="defectOrRetest()">
+				  <label class="form-check-label" id="text_defectOrRetest" for="cb_defectOrRetest">New Defect</label>
+				</div>
+				
+				
 				<table class="table table-hover">
 					<thead>
 						<tr>
@@ -167,26 +173,12 @@
 						<tr>
 							<td>Item</td>
 							<td>Test ID for this defect</td>
+							<td>Test ID for this defect</td>
 						</tr>
 						<tr>
 							<td>Status</td>
+							<td></td>
 							<td>Leave as "Reported"</td>
-						</tr>
-						<tr>
-							<td>Assigned</td>
-							<td>Leave blank</td>
-						</tr>
-						<tr>
-							<td>Reported By</td>
-							<td>Select your user</td>
-						</tr>
-						<tr>
-							<td>Expected behavior</td>
-							<td>What were you expecting to hear/experience.</td>
-						</tr>
-						<tr>
-							<td>Actual behavior</td>
-							<td>What did you actually experience.</td>
 						</tr>
 					</tbody>
 				</table>
@@ -821,6 +813,19 @@ socket.on('boardFound', function(msg){
 socket.on('defect_created', function(msg){
     console.log("defect_created");
   });
+
+function defectOrRetest()
+{
+	var cb_defectOrRetest  = document.getElementById('cb_defectOrRetest');
+	var text_defectOrRetest = document.getElementById('text_defectOrRetest');
+	
+	if (cb_defectOrRetest.checked == true){
+		text_defectOrRetest.innerHTML = "Retest";
+	} else {
+		text_defectOrRetest.innerHTML = "New Defect";
+	}
+	
+}
 
 function testSubmission(uniqueID)
 {
