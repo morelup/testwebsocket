@@ -119,7 +119,7 @@ function createDefect(board,msg) {
 			[columns["Actual Behavior"]]:msg["actual"]
 			
 		}
-		if ([columns["Reported By"]]!= "null")
+		if (msg["reportedby"]!= "null")
 		{
 			column_values[columns["Reported By"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]};
 		}

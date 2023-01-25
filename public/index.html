@@ -514,13 +514,13 @@ const manualSubmissionModal = {
 };
 
 function showManualMondaySubmission(uniqueID){
-	manualSubitemUUID.manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
-	manualSubitemUUID.manualCopyUUIDButton.setAttribute('onclick',"copyUUID('"+uniqueID+"')");
-	manualSubitemUUID.manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
-	manualSubitemUUID.manualCopyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
-	manualSubitemUUID.manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
-	manualSubitemUUID.manualSubitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
-	manualSubitemUUID.manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
+	manualSubmissionModal.manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
+	manualSubmissionModal.manualCopyUUIDButton.setAttribute('onclick',"copyUUID('"+uniqueID+"')");
+	manualSubmissionModal.manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
+	manualSubmissionModal.manualCopyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
+	manualSubmissionModal.manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
+	manualSubmissionModal.manualSubitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
+	manualSubmissionModal.manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
 	modal_manual_monday_submit.show();
 	return;
 }
