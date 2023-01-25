@@ -160,18 +160,27 @@
 				  
 				  
 				<div class="input-group">
-				  <div class="input-group-text">
-					  <div class="form-check form-switch">
-						<input class="form-check-input" type="checkbox" id="cb_defectOrRetest" onclick="defectOrRetest()">
-						<label class="form-check-label" id="text_defectOrRetest" for="cb_defectOrRetest">New Defect</label>
+					<div class="input-group-text">
+						<div class="form-check form-switch">
+							<input class="form-check-input" type="checkbox" id="cb_defectOrRetest" onclick="defectOrRetest()">
+							<label class="form-check-label" id="text_defectOrRetest" for="cb_defectOrRetest">New Defect</label>
+						</div>
 					</div>
-				  </div>
-				  <input type="text" class="form-control " id="text_newdefect" aria-label="Text input with checkbox">
+					<input type="text" class="form-control " id="text_newdefect" aria-label="Type in the name of the defect" placeholder="Type in the name of the defect">
 					<select id="select_currentItem" class="form-select form-select " aria-label=".form-select-lg example">
-						<option selected>Choose a tester</option>
+						<option selected>Choose the pre-existing defect name</option>
 					</select>
 				</div>
-				
+				<div id="div_defectDetails" class="input-group collapse" >
+					<div class="mb-3">
+						<label for="text_expected" class="form-label">Expected Behavior</label>
+						<textarea class="form-control" id="text_expected" rows="3"></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="text_actual" class="form-label">Actual Behavior</label>
+						<textarea class="form-control" id="text_actual" rows="3"></textarea>
+					</div>
+				</div>
 				<table class="table table-hover">
 					<thead>
 						<tr>
@@ -579,23 +588,23 @@ const submissionModal = {
 	//select_currentItem:new bootstrap.Collapse(document.getElementById('select_currentItem'),{toggle:false})
 	
 	text_newdefect:document.getElementById('text_newdefect'),
-	select_currentItem:document.getElementById('select_currentItem')
+	select_currentItem:document.getElementById('select_currentItem'),
+	
+	div_defectDetails:new bootstrap.Collapse(document.getElementById('div_defectDetails'),{toggle:false}),
+	text_expected:document.getElementById('text_expected'),
+	text_actual:document.getElementById('text_actual')
 };
 
 function showMondaySubmission(uniqueID){
 	submissionModal.cb_defectOrRetest.checked = false;
+	submissionModal.text_defectOrRetest.innerHTML = "New Defect";
+	submissionModal.text_newdefect.hidden = false;
+	submissionModal.select_currentItem.hidden = true;
+	submissionModal.div_defectDetails.show();
+	submissionModal.text_expected.value = "";
+	submissionModal.text_actual.value = "";
+	submissionModal.text_newdefect.value = "";
 
-
-	manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
-	manualCopyUUIDButton.setAttribute('onclick',"copyUUID('"+uniqueID+"')");
-	
-	manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
-	manualCopyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
-	
-	manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
-	
-	manualSubitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
-	manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
 	
 	modal_monday_submit.show();
 	return;
@@ -606,10 +615,12 @@ function defectOrRetest()
 		submissionModal.text_defectOrRetest.innerHTML = "Retest";
 		submissionModal.text_newdefect.hidden = true;
 		submissionModal.select_currentItem.hidden = false;
+		submissionModal.div_defectDetails.hide();
 	} else {
 		submissionModal.text_defectOrRetest.innerHTML = "New Defect";
 		submissionModal.text_newdefect.hidden = false;
 		submissionModal.select_currentItem.hidden = true;
+		submissionModal.div_defectDetails.show();
 	}
 }
 
