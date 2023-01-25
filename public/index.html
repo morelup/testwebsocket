@@ -625,6 +625,40 @@ function defectOrRetest()
 }
 
 
+
+
+function createDefect(uniqueID) {
+	//this.uniqueID=callID+uuid;
+	//this.callID=callID;
+	//this.UUID=uuid;
+	//this.timestamp=timestamp;
+	
+	if(cb_defectOrRetest.checked)//retest
+	{
+	
+	}
+	else//newdefect
+	{
+		if(board.id != "null")
+		{
+			var msg = {
+				board:board.id,
+				item:submissionModal.text_newdefect.value,
+				subitem:records[uniqueID].info.UUID,
+				callid:records[uniqueID].info.callID,
+				expected:submissionModal.text_expected.value,
+				actual:submissionModal.text_actual.value,
+				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
+				ani:ani.value,
+				notes:"testNote"
+			};
+			console.log(JSON.stringify(msg));
+			socket.emit('create_defect', msg)
+		}
+	}
+	
+}
+
 function showOffCanvas(value){
 	editorOffCanvas.load(value);
 	return;
@@ -872,30 +906,7 @@ function testSubmission(uniqueID)
 
   
   
-function createDefect(uniqueID) {
-	//this.uniqueID=callID+uuid;
-	//this.callID=callID;
-	//this.UUID=uuid;
-	//this.timestamp=timestamp;
-	
-	
-	if(board.id != "null")
-	{
-		var msg = {
-		board:board.id,
-		item:"testvalue",
-		subitem:records[uniqueID].info.UUID,
-		callid:records[uniqueID].info.callID,
-		expected:"expected test value",
-		actual:"actual test value",
-		timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
-		ani:ani.value,
-		notes:"testNote"
-		};
-		console.log(JSON.stringify(msg));
-		socket.emit('create_defect', msg)
-	}
-}
+
 
 
 ani.addEventListener("keypress", function(event) {
