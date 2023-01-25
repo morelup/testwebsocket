@@ -172,55 +172,22 @@
 				</div>
 				<div id="div_defectDetails" class="container collapse" >
 					<div class="row">
-						<label for="text_expected" class="form-label">Expected Behavior</label>
+						<label for="text_expected" class="form-label" placeholder="Type in here the behavior you expected to experience">Expected Behavior</label>
 						<textarea class="form-control" id="text_expected" rows="3"></textarea>
 					</div>
 					<div class="row">
-						<label for="text_actual" class="form-label">Actual Behavior</label>
+						<label for="text_actual" class="form-label" placeholder="Type in here the behavior you actually experienced">Actual Behavior</label>
 						<textarea class="form-control" id="text_actual" rows="3"></textarea>
 					</div>
 				</div>
 				<hr>
-				<h5 >SubItem</h5>
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th>Column Name</th>
-							<th>Content</th>
-							<th>Clipboard</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>SubItem</td>
-							<td id="subitemUUID">Studio UUID</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>VCC Call ID</td>
-							<td id="subitemVCC">VCC</td>
-							<td ></td>
-						</tr>
-						<tr>
-							<td>Call Log</td>
-							<td id="subitemCallLog">Copy the call log</td>
-							<td ></td>
-						</tr>
-						<tr>
-							<td>Timestamp</td>
-							<td id="subitemTimestamp"></td>
-							<td ></td>
-						</tr>
-						<tr>
-							<td>Caller's Phone Number</td>
-							<td colspan="2">Phone number of the caller</td>
-						</tr>
-						<tr>
-							<td>Notes</td>
-							<td colspan="2">If you have any notes for this specific call enter them here</td>
-						</tr>
-					</tbody>
-				</table>
+				<h5 >Call Specific Notes</h5>
+				<div class="container" >
+					<div class="row">
+						<label for="text_notes" class="form-label" placeholder="Any other notes you wish for Five9 to know about this call" >Notes</label>
+						<textarea class="form-control" id="text_notes" rows="3"></textarea>
+					</div>
+				</div>
 			</div>
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -573,7 +540,8 @@ const submissionModal = {
 	div_defectDetails:new bootstrap.Collapse(document.getElementById('div_defectDetails'),{toggle:false}),
 	text_expected:document.getElementById('text_expected'),
 	text_actual:document.getElementById('text_actual'),
-	mondaySubmit:document.getElementById('mondaySubmit')
+	mondaySubmit:document.getElementById('mondaySubmit'),
+	text_notes:document.getElementById('text_notes')
 };
 
 function showMondaySubmission(uniqueID){
@@ -586,7 +554,7 @@ function showMondaySubmission(uniqueID){
 	submissionModal.text_actual.value = "";
 	submissionModal.text_newdefect.value = "";
 	submissionModal.mondaySubmit.setAttribute('onclick',"createDefect('"+uniqueID+"')");
-	
+	submissionModal.text_notes.value = "";
 	modal_monday_submit.show();
 	return;
 }
@@ -632,7 +600,7 @@ function createDefect(uniqueID) {
 				actual:submissionModal.text_actual.value,
 				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
 				ani:ani.value,
-				notes:"testNote"
+				notes:submissionModal.text_notes.value
 			};
 			console.log(JSON.stringify(msg));
 			socket.emit('create_defect', msg)
