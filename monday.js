@@ -117,6 +117,11 @@ function createDefect(board,msg) {
 			[columns["Reported Date"]]:DateTimeNow(),
 			[columns["Expected Behavior"]]:msg["expected"],
 			[columns["Actual Behavior"]]:msg["actual"]
+			
+		}
+		if ([columns["Reported By"]]!= "null")
+		{
+			column_values[columns["Reported By"]]="{\"person\":{\"personsAndTeams\":[{\"id\":"+msg["reportedby"]+",\"kind\":\"person\"}]}}";
 		}
 		console.log("BOARD:"+JSON.stringify(board));
 		

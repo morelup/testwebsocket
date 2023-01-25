@@ -272,7 +272,7 @@
 				<h6>Board Menu</h6>
 				<div class="form-group">
 					<select id="reportedby" class="form-select form-select" aria-label=".form-select-lg example">
-					  <option selected>Choose a tester</option>
+					  <option value="null" selected>Choose a tester</option>
 					</select>
 				</div>
 			</div>
@@ -624,6 +624,7 @@ function createDefect(uniqueID) {
 		{
 			var msg = {
 				board:board.id,
+				reportedby:submissionModal.reportedby.value,
 				item:submissionModal.text_newdefect.value,
 				subitem:records[uniqueID].info.UUID,
 				callid:records[uniqueID].info.callID,
