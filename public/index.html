@@ -519,7 +519,7 @@ function showManualMondaySubmission(uniqueID){
 	manualSubmissionModal.manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
 	manualSubmissionModal.manualCopyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
 	manualSubmissionModal.manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
-	manualSubmissionModal.manualSubitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
+	manualSubmissionModal.manualSubitemTimestamp.innerHTML = dateTimeConverter(records[uniqueID].info.timestamp);
 	manualSubmissionModal.manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
 	modal_manual_monday_submit.show();
 	return;
