@@ -371,7 +371,9 @@ var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
 var modal_manual_monday_submit = new bootstrap.Modal(document.getElementById('modal_manual_monday_submit'), {
   keyboard: false
 });
-
+var modal_monday_submit = new bootstrap.Modal(document.getElementById('modal_monday_submit'), {
+  keyboard: false
+});
 
 
 
@@ -585,7 +587,7 @@ function showMondaySubmission(uniqueID){
 	manualSubitemTimestamp.innerHTML = records[uniqueID].info.timestamp;
 	manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
 	
-	modal_manual_monday_submit.show();
+	modal_monday_submit.show();
 	return;
 }
 
@@ -684,7 +686,7 @@ function Info(callID,uuid,timestamp)
 	console.log("check board " + board.exists);
 	if(board.exists){
 		
-		ManualSubmitLog.setAttribute("onclick","createDefect('"+this.uniqueID+"')");
+		ManualSubmitLog.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
 	}
 	else{
 		ManualSubmitLog.setAttribute("onclick","showManualMondaySubmission('"+this.uniqueID+"')");
