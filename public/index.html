@@ -245,6 +245,7 @@
 			</div>
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary" id="mondaySubmit" onclick="createDefect()">Save changes</button>
 		  </div>
 		</div>
 	  </div>
@@ -592,7 +593,8 @@ const submissionModal = {
 	
 	div_defectDetails:new bootstrap.Collapse(document.getElementById('div_defectDetails'),{toggle:false}),
 	text_expected:document.getElementById('text_expected'),
-	text_actual:document.getElementById('text_actual')
+	text_actual:document.getElementById('text_actual'),
+	mondaySubmit:document.getElementById('mondaySubmit')
 };
 
 function showMondaySubmission(uniqueID){
@@ -604,7 +606,7 @@ function showMondaySubmission(uniqueID){
 	submissionModal.text_expected.value = "";
 	submissionModal.text_actual.value = "";
 	submissionModal.text_newdefect.value = "";
-
+	submissionModal.mondaySubmit.setAttribute('onclick',"createDefect('"+uniqueID+"')");
 	
 	modal_monday_submit.show();
 	return;
@@ -656,7 +658,7 @@ function createDefect(uniqueID) {
 			socket.emit('create_defect', msg)
 		}
 	}
-	
+	modal_monday_submit.hide();
 }
 
 function showOffCanvas(value){
