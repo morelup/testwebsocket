@@ -239,6 +239,7 @@
 					</textarea>
 					<small id="testPayloadHelp" class="form-text text-muted">Paste a submission node here.</small>
 					<button onclick="debugMessage()" >submit</button>
+					<button type="button" class="btn btn-primary" id="mondaySubmit" onclick="testSubmission()">test</button>
 				</div>
 			</div>
 			<div id = "boardmenu" class = "collapse">
@@ -254,7 +255,6 @@
 		<!--main table-->
 		<main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 pt-4">
 			<div >
-			<button type="button" class="btn btn-primary" id="mondaySubmit" onclick="testSubmission()">test</button>
 				<div class="accordion" id="CallTable">
 				</div>					
 					
@@ -601,7 +601,8 @@ function createDefect(uniqueID) {
 				callid:records[uniqueID].info.callID,
 				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
 				ani:ani.value,
-				notes:submissionModal.text_notes.value
+				notes:submissionModal.text_notes.value,
+				calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
 			};
 			console.log(JSON.stringify(msg));
 			socket.emit('create_defect_subitem', msg)
@@ -620,7 +621,8 @@ function createDefect(uniqueID) {
 				actual:submissionModal.text_actual.value,
 				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
 				ani:ani.value,
-				notes:submissionModal.text_notes.value
+				notes:submissionModal.text_notes.value,
+				calllog:calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
 			};
 			console.log(JSON.stringify(msg));
 			socket.emit('create_defect', msg)

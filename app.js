@@ -256,8 +256,7 @@ io.on('connection', socket => {
 		
 	});
 	socket.on('create_defect_subitem', msg => {
-		monday.createSubItem(boards[msg.board].subitemBoard,msg,msg.item);
-		console.log("defect message sent for "+msg.callid);
+		create_subItem(socket,boards[msg.board].subitemBoard,msg,msg.item);
 	});
 	socket.on('connect_boarddata', msg => {
 		connect_boarddata(socket,msg)
@@ -283,14 +282,17 @@ function create_defect(socket,msg)
 		//response.msg = msg;
 		
 		
+		create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);
 		
-		monday.createSubItem(boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id).then(result2 => {
-			
-			socket.emit('defect_created',"");
-		})
 	});
 }
-
+function create_subItem(socket,board,msg,item)
+{
+	monday.createSubItem(socket,board,msg,item).then(result => {
+		socket.emit('defect_created',"");
+		uploadFile(msg,JSON.parse(result).data.create_item.id);
+	})
+}
 
 
 function connect_boarddata(socket,msg)
