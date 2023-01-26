@@ -286,7 +286,7 @@ function create_defect(socket,msg)
 		create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);
 		
 	});
-	{
+	}
 	catch (error)
 	{
 		console.log(error)
@@ -299,7 +299,7 @@ function create_subItem(socket,board,msg,item)
 		socket.emit('defect_created',"");
 		monday.uploadFile(msg,JSON.parse(result).data.create_item.id);
 	})
-	{
+	}
 	catch (error)
 	{
 		console.log(error)
