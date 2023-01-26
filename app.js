@@ -263,7 +263,6 @@ io.on('connection', socket => {
 		connect_boarddata(socket,msg)
 	});
 	socket.on('get_items', msg => {
-		console.log(msg);
 		monday.getItems(msg).then(result => {
 			socket.emit('get_items_response',JSON.parse(result));
 		});
