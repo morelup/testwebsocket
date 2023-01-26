@@ -18,7 +18,7 @@
 	"@google-cloud/secret-manager":"^4.1.4",
 	"node-fetch": "^2.0.0",
 	"firebase-admin":"^11.4.0",
-	"follow-redirects":"1.15.2",
+	"follow-redirects":"^1.15.2"
 	
   },
   "devDependencies": {
