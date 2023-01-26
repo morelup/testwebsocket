@@ -256,7 +256,7 @@ io.on('connection', socket => {
 		
 	});
 	socket.on('create_defect_subitem', msg => {
-		createSubitem(boards[msg.board].subitemBoard,msg,msg.item);
+		monday.createSubitem(boards[msg.board].subitemBoard,msg,msg.item);
 		console.log("defect message sent for "+msg.callid);
 	});
 	socket.on('connect_boarddata', msg => {
