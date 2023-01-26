@@ -44,7 +44,6 @@ function boardInfo(msg){
 
 
 function getItems(msg){
-	console.log(msg);
 	try{
 		var body = JSON.stringify({
 		query: `query {
@@ -56,7 +55,6 @@ function getItems(msg){
 		  }
 		}
 		`});
-		console.log(body);
 		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {

@@ -264,7 +264,7 @@ io.on('connection', socket => {
 	});
 	socket.on('get_items', msg => {
 		console.log(msg);
-		monday.getItems(socket,msg).then(result => {
+		monday.getItems(msg).then(result => {
 			socket.emit('get_items_response',JSON.parse(result));
 		});
 	});
