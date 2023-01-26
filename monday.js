@@ -100,8 +100,8 @@ function getItems(msg){
 	try{
 		var body = JSON.stringify({
 		query: `query {
-		  boards (ids: [${msg}], order_by: name) {
-			items {
+		  boards (ids: [${msg}]) {
+			items (order_by: name){
 					id
 					name 
 				} 
