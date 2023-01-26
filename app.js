@@ -294,8 +294,10 @@ function create_defect(socket,msg)
 }
 function create_subItem(socket,board,msg,item)
 {
+	
 	try{
 	monday.createSubItem(board,msg,item).then(result => {
+		console.log(result);
 		socket.emit('defect_created',"");
 		monday.uploadFile(msg,JSON.parse(result).data.create_item.id);
 	})

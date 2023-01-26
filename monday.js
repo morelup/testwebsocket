@@ -29,7 +29,6 @@ var req = https.request(options, function (res) {
 
   res.on("end", function (chunk) {
     var body = Buffer.concat(chunks);
-    console.log(body.toString());
   });
 
   res.on("error", function (error) {
@@ -151,7 +150,6 @@ function confirmParentColumns(board)
 function confirmSubitemColumns(board)
 {
 	var columns = getBoardColumns(board);
-	console.log("SUBBOARD:"+JSON.stringify(board));
 	if(!('Result' in columns))
 	{return false;}
 	if(!('VCC Call ID' in columns))
@@ -224,7 +222,6 @@ function createDefect(board,msg) {
 			 name: msg.item
 			},
 		  });
-		  console.log(body);
 		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
@@ -279,7 +276,6 @@ function createSubItem(board,msg,item) {
 			 name: msg.subitem
 			},
 		  });
-		  console.log(body);
 		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
