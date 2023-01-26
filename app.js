@@ -269,6 +269,11 @@ io.on('connection', socket => {
 	socket.on('connect_boarddata', msg => {
 		connect_boarddata(socket,msg)
 	});
+	socket.on('get_items', msg => {
+		monday.getItems(socket,msg).then(result => {
+			socket.emit('get_items_response',JSON.parse(result));
+		});
+	});
 });
 
 

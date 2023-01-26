@@ -549,12 +549,14 @@ function showMondaySubmission(uniqueID){
 	submissionModal.text_defectOrRetest.innerHTML = "New Defect";
 	submissionModal.text_newdefect.hidden = false;
 	submissionModal.select_currentItem.hidden = true;
+	submissionModal.select_currentItem.innerHTML = "<option selected>Choose the pre-existing defect name</option>";
 	submissionModal.div_defectDetails.show();
 	submissionModal.text_expected.value = "";
 	submissionModal.text_actual.value = "";
 	submissionModal.text_newdefect.value = "";
 	submissionModal.mondaySubmit.setAttribute('onclick',"createDefect('"+uniqueID+"')");
 	submissionModal.text_notes.value = "";
+	socket.emit('get_items', board.id);
 	modal_monday_submit.show();
 	return;
 }
@@ -584,7 +586,18 @@ function createDefect(uniqueID) {
 	
 	if(cb_defectOrRetest.checked)//retest
 	{
-	
+		var msg = {
+				board:board.id,
+				reportedby:submissionModal.reportedby.value,
+				item:submissionModal.select_currentItem.value,
+				subitem:records[uniqueID].info.UUID,
+				callid:records[uniqueID].info.callID,
+				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
+				ani:ani.value,
+				notes:submissionModal.text_notes.value
+			};
+			console.log(JSON.stringify(msg));
+			socket.emit('create_defect_subitem', msg)
 	}
 	else//newdefect
 	{
@@ -837,7 +850,15 @@ socket.on('boardFound', function(msg){
 socket.on('defect_created', function(msg){
     console.log("defect_created");
   });
-
+socket.on('get_items_response', function(msg){
+	var items = msg.parentBoard.data.boards[0].items;
+    for(var i = 0; i < items.length; i++) {
+		var el = document.createElement("option");
+		el.textContent = items[i].name;
+		el.value = items[i].id;
+		submissionModal.select_currentItem.appendChild(el);
+	}
+  });
 
 
 function testSubmission(uniqueID)

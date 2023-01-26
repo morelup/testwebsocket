@@ -41,6 +41,32 @@ function boardInfo(msg){
 		console.log(error);
 	}	
 }
+
+
+function getItems(msg){
+	try{
+		var body = JSON.stringify({
+		query: `query {
+		  boards (ids: [${msg}]) {
+			items {
+					id
+					name 
+				} 
+		  }
+		}
+		`});
+		return fetch('https://api.monday.com/v2', {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': authKey
+		  },
+		  body: body,
+		}).then(res => res.text())
+	} catch (error) {
+		console.log(error);
+	}	
+}
 function getBoardColumns(board){
 	var columns = board.data.boards[0].columns;
 	var returnObject = {};
@@ -82,6 +108,8 @@ function confirmSubitemColumns(board)
 	if(!('Caller\'s Phone Number' in columns))
 	{return false;}
 	if(!('Notes' in columns))
+	{return false;}
+	if(!('Caller' in columns))
 	{return false;}
 	return true;	
 }
@@ -177,7 +205,10 @@ function createSubItem(board,msg,item) {
 			[columns["Timestamp"]]:msg["timestamp"],
 			[columns["Notes"]]:msg["notes"]
 		}
-		
+		if (msg["reportedby"]!= "null")
+		{
+			column_values[columns["Caller"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]};
+		}
 		
 		var body = JSON.stringify({
 		query: `mutation ($parent_item_id: Int!, $name: String, $column_values: JSON) {
@@ -211,7 +242,7 @@ function createSubItem(board,msg,item) {
 	}
 	
 }
-module.exports = { boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect,createSubItem};
+module.exports = { getItems,boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect,createSubItem};
 8001471523
 
 6895
