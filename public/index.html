@@ -622,7 +622,7 @@ function createDefect(uniqueID) {
 				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
 				ani:ani.value,
 				notes:submissionModal.text_notes.value,
-				calllog:calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
+				calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
 			};
 			console.log(JSON.stringify(msg));
 			socket.emit('create_defect', msg)
