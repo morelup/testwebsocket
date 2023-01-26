@@ -276,6 +276,7 @@ io.on('connection', socket => {
 
 function create_defect(socket,msg)
 {
+	try{
 	monday.createDefect(boards[msg.board].parentBoard,msg).then(result => {
 		console.log(result);
 		var response = JSON.parse(result)
@@ -285,13 +286,22 @@ function create_defect(socket,msg)
 		create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);
 		
 	});
+	catch (error)
+	{
+		console.log(error)
+	}
 }
 function create_subItem(socket,board,msg,item)
 {
+	try{
 	monday.createSubItem(board,msg,item).then(result => {
 		socket.emit('defect_created',"");
-		uploadFile(msg,JSON.parse(result).data.create_item.id);
+		monday.uploadFile(msg,JSON.parse(result).data.create_item.id);
 	})
+	catch (error)
+	{
+		console.log(error)
+	}
 }
 
 
