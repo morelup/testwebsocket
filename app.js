@@ -288,7 +288,7 @@ function create_defect(socket,msg)
 }
 function create_subItem(socket,board,msg,item)
 {
-	monday.createSubItem(socket,board,msg,item).then(result => {
+	monday.createSubItem(board,msg,item).then(result => {
 		socket.emit('defect_created',"");
 		uploadFile(msg,JSON.parse(result).data.create_item.id);
 	})
@@ -297,7 +297,9 @@ function create_subItem(socket,board,msg,item)
 
 function connect_boarddata(socket,msg)
 {
-	var response = {};
+	
+	try{
+		var response = {};
 	monday.boardInfo(msg).then(result => {
 		var parentBoard = JSON.parse(result);
 		
@@ -331,6 +333,10 @@ function connect_boarddata(socket,msg)
 			return;
 		})
 	});
+	}
+	catch (error) {
+		socket.emit('boardNotFound',error);
+	}
 }
 
 
