@@ -851,7 +851,7 @@ socket.on('defect_created', function(msg){
     console.log("defect_created");
   });
 socket.on('get_items_response', function(msg){
-	var items = msg.parentBoard.data.boards[0].items;
+	var items = msg.data.boards[0].items;
     for(var i = 0; i < items.length; i++) {
 		var el = document.createElement("option");
 		el.textContent = items[i].name;
