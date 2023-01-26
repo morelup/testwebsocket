@@ -1,6 +1,59 @@
 
 var authKey = "";
 function authKeySet(value){authKey = value}
+var https = require('follow-redirects').https;
+var fs = require('fs');
+
+function uploadFile(msg){
+	try{
+		
+		
+		
+		
+var options = {
+  'method': 'POST',
+  'hostname': 'api.monday.com',
+  'path': '/v2/file',
+  'headers': {
+    'Authorization': authKey
+  },
+  'maxRedirects': 20
+};
+
+var req = https.request(options, function (res) {
+  var chunks = [];
+
+  res.on("data", function (chunk) {
+    chunks.push(chunk);
+  });
+
+  res.on("end", function (chunk) {
+    var body = Buffer.concat(chunks);
+    console.log(body.toString());
+  });
+
+  res.on("error", function (error) {
+    console.error(error);
+  });
+});
+
+var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"query\"\r\n\r\nmutation add_file($file: File!) {add_file_to_column (item_id: 3872739032, column_id:\"doc\" file: $file) {id}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"map\"\r\n\r\n{\"image\":\"variables.file\"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"image\"; filename=\"/C:/Users/matth/Downloads/Capture.json\"\r\nContent-Type: \"text/json\"\r\n\r\n1234\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+
+req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
+
+req.write(postData);
+
+req.end();
+		
+		
+		
+		
+		
+		
+	} catch (error) {
+		console.log(error);
+	}	
+}
 
 
 function boardInfo(msg){
@@ -47,7 +100,7 @@ function getItems(msg){
 	try{
 		var body = JSON.stringify({
 		query: `query {
-		  boards (ids: [${msg}]) {
+		  boards (ids: [${msg}], order_by: name) {
 			items {
 					id
 					name 
@@ -242,7 +295,4 @@ function createSubItem(board,msg,item) {
 	}
 	
 }
-module.exports = { getItems,boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect,createSubItem};
-8001471523
-
-6895
+module.exports = { uploadFile,getItems,boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect,createSubItem};

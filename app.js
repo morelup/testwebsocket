@@ -267,6 +267,10 @@ io.on('connection', socket => {
 			socket.emit('get_items_response',JSON.parse(result));
 		});
 	});
+	socket.on('test', msg => {
+		monday.uploadFile(msg);
+		
+	});
 });
 
 
