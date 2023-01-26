@@ -836,7 +836,6 @@ socket.on('boardFound', function(msg){
 	board.exists=true;
 	board.parentBoard = msg.parentBoard;
 	board.subitemBoard = msg.subitemBoard
-    console.log("Board Found");
 	var subscribers = msg.parentBoard.data.boards[0].subscribers;
 	for(var i = 0; i < subscribers.length; i++) {
 		var el = document.createElement("option");
@@ -848,9 +847,9 @@ socket.on('boardFound', function(msg){
   });
   
 socket.on('defect_created', function(msg){
-    console.log("defect_created");
   });
 socket.on('get_items_response', function(msg){
+	console.log(JSON.stringify(msg));
 	var items = msg.data.boards[0].items;
     for(var i = 0; i < items.length; i++) {
 		var el = document.createElement("option");
@@ -904,7 +903,6 @@ function assignANI() {
 listening.innerHTML = "Listening to: "+ani.value;
 listening.classList.add("bg-success");
 listening.classList.remove("bg-danger");
-console.log("Joining: "+ani.value);
 socket.emit('leave', oldvalue);
 socket.emit('join', ani.value);
 oldvalue = ani.value;

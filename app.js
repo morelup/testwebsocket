@@ -52,7 +52,6 @@ const firebaseConfig = {
   appId: "1:564770775641:web:eb24cf739dec18657d0748",
   measurementId: "G-C5WBNR2SFP"
 };
-console.log("FINDME"+process.version);
 
 
 const io = require('socket.io')(server, {
@@ -190,9 +189,6 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/MYSQL_HO
 	  password :  pass.payload.data.toString(),
 	  database : 'orelupor_uatpoc'
 	});
-	console.log(host.payload.data.toString());
-	console.log(user.payload.data.toString());
-	console.log(pass.payload.data.toString());
 };
 
 
@@ -236,7 +232,6 @@ app.post('/', function requestHandler(req, res) {
 });
 
 app.get('/', (req, res) => {
-  console.log("app directory "+__dirname);
   res.sendFile(__dirname + '/index.html');
 
 });
@@ -252,11 +247,9 @@ io.on('connection', socket => {
 	//socket.on('chat message', msg => {io.emit('chat message', msg);});
 	socket.on('join', msg => {
 		socket.join(msg);
-		console.log("join message sent for "+msg);
 	});
 	socket.on('leave', msg => {
 		socket.leave(msg);
-		console.log("leave message sent for "+msg);
 	});
 	socket.on('create_defect', msg => {
 		create_defect(socket,msg);
