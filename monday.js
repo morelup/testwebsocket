@@ -44,6 +44,7 @@ function boardInfo(msg){
 
 
 function getItems(msg){
+	console.log(msg);
 	try{
 		var body = JSON.stringify({
 		query: `query {
