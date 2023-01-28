@@ -32,7 +32,7 @@
 	  <div class="modal-dialog modal-dialog-scrollable modal-xl">
 		<div class="modal-content">
 		  <div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			<h5 class="modal-title" id="exampleModalLabel">Call Log</h5>
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		  </div>
 		  <div class="modal-body">
@@ -51,7 +51,7 @@
 	  <div class="modal-dialog modal-dialog-scrollable modal-xl">
 		<div class="modal-content">
 		  <div class="modal-header">
-			<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+			<h5 class="modal-title" id="exampleModalLabel">Submit Manual Defect</h5>
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		  </div>
 			<div class="modal-body">
@@ -205,12 +205,12 @@
 	
 	
 	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-	  <a class="navbar-brand col-md-2 col-lg-2 me-0 px-3" href="#">Company name</a>
+	  <a class="navbar-brand col-md-2 col-lg-2 me-0 px-3" href="#"><img src="/img/FIVN.D.svg" class="mx-auto d-block" height="28" alt="Five9"></a>
 	  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	  </button>
-	  <input class="form-control form-control-dark   " name="ani" id="ani" title="This is the number for the device you are calling from, not the number you are dialing to." type="text" placeholder="Your phone number" aria-label="Search">
-	  <div class="navbar-nav col-md-2 col-lg-2">
+	  <input class="form-control form-control-dark " name="ani" id="ani" title="This is the number for the device you are calling from, not the number you are dialing to." type="text" placeholder="Your phone number" aria-label="Search">
+	  <div class="navbar-nav col-2 ">
 		<div class="nav-item text-nowrap">
 		  <button class="btn btn-dark px-3" onclick="assignANI()" >Assign ANI</button>
 		</div>
@@ -716,7 +716,7 @@ function Info(callID,uuid,timestamp)
 	CallJSONButton.setAttribute("onclick","showRawLog('"+this.uniqueID+"')");
 	CallJSONButton.innerHTML = "See Log";
 	CallJSONButton.type="button";
-	CallJSONButton.classList.add("btn","btn-info","col-2");
+	CallJSONButton.classList.add("btn","btn-primary","col-2");
 	Row.appendChild(CallJSONButton);
 	
 	
@@ -732,7 +732,7 @@ function Info(callID,uuid,timestamp)
 	
 	ManualSubmitLog.innerHTML = "Submit to UAT Log";
 	ManualSubmitLog.type="button";
-	ManualSubmitLog.classList.add("btn","btn-info","col-2");
+	ManualSubmitLog.classList.add("btn","btn-primary","col-2");
 	Row.appendChild(ManualSubmitLog);
 	
 	

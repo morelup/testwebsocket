@@ -6,49 +6,31 @@ var fs = require('fs');
 
 function uploadFile(msg,item){
 	try{
-		
-		
-		
-		
-var options = {
-  'method': 'POST',
-  'hostname': 'api.monday.com',
-  'path': '/v2/file',
-  'headers': {
-    'Authorization': authKey
-  },
-  'maxRedirects': 20
-};
-
-var req = https.request(options, function (res) {
-  var chunks = [];
-
-  res.on("data", function (chunk) {
-    chunks.push(chunk);
-  });
-
-  res.on("end", function (chunk) {
-    var body = Buffer.concat(chunks);
-  });
-
-  res.on("error", function (error) {
-    console.error(error);
-  });
-});
-
-var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"query\"\r\n\r\nmutation add_file($file: File!) {add_file_to_column (item_id: "+item+", column_id:\"doc\" file: $file) {id}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"map\"\r\n\r\n{\"image\":\"variables.file\"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"image\"; filename=\""+msg.subitem+".json\"\r\nContent-Type: \"text/json\"\r\n\r\n"+msg+"\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
-
-req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
-
-req.write(postData);
-
-req.end();
-		
-		
-		
-		
-		
-		
+		var options = {
+		  'method': 'POST',
+		  'hostname': 'api.monday.com',
+		  'path': '/v2/file',
+		  'headers': {
+			'Authorization': authKey
+		  },
+		  'maxRedirects': 20
+		};
+		var req = https.request(options, function (res) {
+		  var chunks = [];
+		  res.on("data", function (chunk) {
+			chunks.push(chunk);
+		  });
+		  res.on("end", function (chunk) {
+			var body = Buffer.concat(chunks);
+		  });
+		  res.on("error", function (error) {
+			console.error(error);
+		  });
+		});
+		var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"query\"\r\n\r\nmutation add_file($file: File!) {add_file_to_column (item_id: "+item+", column_id:\"doc\" file: $file) {id}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"map\"\r\n\r\n{\"image\":\"variables.file\"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"image\"; filename=\""+msg.subitem+".json\"\r\nContent-Type: \"text/json\"\r\n\r\n"+msg+"\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+		req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
+		req.write(postData);
+		req.end();
 	} catch (error) {
 		console.log(error);
 	}	
@@ -130,7 +112,6 @@ function getBoardColumns(board){
 function confirmParentColumns(board)
 {
 	var columns = getBoardColumns(board);
-	console.log(JSON.stringify(columns));
 	if(!('Reported Date' in columns))
 	{console.log('Reported Date Fail');
 		return false;}
@@ -202,7 +183,6 @@ function createDefect(board,msg) {
 		{
 			column_values[columns["Reported By"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]};
 		}
-		console.log("BOARD:"+JSON.stringify(board));
 		
 		var body = JSON.stringify({
 		query: `mutation ($board_id: Int!, $group_id: String, $name: String, $column_values: JSON) {
@@ -247,9 +227,6 @@ function createSubItem(board,msg,item) {
 		Notes
 		*/
 		var columns = getBoardColumns(board);
-		console.log("SUBBOARD:"+JSON.stringify(board));
-		console.log("columns:"+JSON.stringify(columns));
-		console.log("msg:"+JSON.stringify(msg));
 		var column_values = {
 			[columns["VCC Call ID"]]:msg["callid"],
 			[columns["Timestamp"]]:msg["timestamp"],
