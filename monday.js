@@ -3,6 +3,7 @@ var authKey = "";
 function authKeySet(value){authKey = value}
 var https = require('follow-redirects').https;
 var fs = require('fs');
+const fetch = require('node-fetch');
 
 function uploadFile(msg,item){
 	try{
