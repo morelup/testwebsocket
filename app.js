@@ -32,6 +32,18 @@ const monday = require('./monday.js');
 const boards = {};
 accessSecret("MondayAuthKey").then(result => {monday.authKeySet(result)});
 
+async function accessSecret(name) {
+var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/"+name+"/versions/latest";
+  const [version] = await client.accessSecretVersion({
+    name: secretName,
+  });
+  // Extract the payload as a string.
+  const payload = version.payload.data.toString();
+  // WARNING: Do not print the secret in a production environment - this
+  // snippet is showing how to access the secret material.
+  return payload;
+};
+
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 var bRunFirstSocket = true;
