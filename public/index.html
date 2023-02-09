@@ -186,7 +186,7 @@
 					<div class="row">
 						<label for="select_result" class="form-label" placeholder="Select a call result">Call Result</label>
 						<select id="select_result" class="form-select form-select " aria-label=".form-select-lg example">
-							<option selected>Call Result</option>
+							<option value="null" selected>Call Result</option>
 						</select>
 					</div>
 					<div class="row">
@@ -528,6 +528,7 @@ function showManualMondaySubmission(uniqueID){
 	manualSubmissionModal.manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
 	manualSubmissionModal.manualSubitemTimestamp.innerHTML = dateTimeConverter(records[uniqueID].info.timestamp);
 	manualSubmissionModal.manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
+	
 	modal_manual_monday_submit.show();
 	return;
 }
@@ -548,7 +549,8 @@ const submissionModal = {
 	text_expected:document.getElementById('text_expected'),
 	text_actual:document.getElementById('text_actual'),
 	mondaySubmit:document.getElementById('mondaySubmit'),
-	text_notes:document.getElementById('text_notes')
+	text_notes:document.getElementById('text_notes'),
+	select_result:document.getElementById('select_result')
 };
 
 function showMondaySubmission(uniqueID){
@@ -602,6 +604,7 @@ function createDefect(uniqueID) {
 				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
 				ani:ani.value,
 				notes:submissionModal.text_notes.value,
+				status:submissionModal.select_result.value,
 				calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
 			};
 			console.log(JSON.stringify(msg));
@@ -622,6 +625,7 @@ function createDefect(uniqueID) {
 				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
 				ani:ani.value,
 				notes:submissionModal.text_notes.value,
+				status:submissionModal.select_result.value,
 				calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
 			};
 			console.log(JSON.stringify(msg));
@@ -853,6 +857,30 @@ socket.on('boardFound', function(msg){
 		submissionModal.reportedby.appendChild(el);
 	}
 	boardmenu.show();
+	
+	
+	var subcolumns = msg.subitemBoard.data.boards[0].columns;
+	for(var i = 0; i < subcolumns.length; i++) {
+		if (subcolumns[i].title == "Result")
+		{
+			var resultFields = JSON.parse(subcolumns[i].settings_str).labels;
+			
+			for(const key in resultFields) {
+				var el = document.createElement("option");
+				el.textContent = resultFields[key];
+				el.value = key;
+				submissionModal.select_result.appendChild(el);
+			}
+			break;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
   });
   
 socket.on('defect_created', function(msg){

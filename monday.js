@@ -237,6 +237,10 @@ function createSubItem(board,msg,item) {
 		{
 			column_values[columns["Caller"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]};
 		}
+		if (msg["status"]!= "null")
+		{
+			column_values[columns["Result"]]=msg["status"];
+		}
 		
 		var body = JSON.stringify({
 		query: `mutation ($parent_item_id: Int!, $name: String, $column_values: JSON) {

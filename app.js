@@ -44,6 +44,8 @@ var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/"+name+"
   return payload;
 };
 
+accessSecret("MondayAuthKey").then(result => {monday.authKeySet(result)});
+
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 var bRunFirstSocket = true;
