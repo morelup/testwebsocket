@@ -28,7 +28,7 @@ function uploadFile(msg,item){
 			console.error(error);
 		  });
 		});
-		var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"query\"\r\n\r\nmutation add_file($file: File!) {add_file_to_column (item_id: "+item+", column_id:\"doc\" file: $file) {id}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"map\"\r\n\r\n{\"image\":\"variables.file\"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"image\"; filename=\""+msg.subitem+".json\"\r\nContent-Type: \"text/json\"\r\n\r\n"+msg+"\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+		var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"query\"\r\n\r\nmutation add_file($file: File!) {add_file_to_column (item_id: "+item+", column_id:\"doc\" file: $file) {id}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"map\"\r\n\r\n{\"image\":\"variables.file\"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"image\"; filename=\""+msg.subitem+".json\"\r\nContent-Type: \"text/json\"\r\n\r\n"+msg.calllog+"\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
 		req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
 		req.write(postData);
 		req.end();
