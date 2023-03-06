@@ -241,6 +241,10 @@ function createSubItem(board,msg,item) {
 		{
 			column_values[columns["Result"]]=msg["status"];
 		}
+		if (msg["ani"]!= "null")
+		{
+			column_values[columns["Caller's Phone Number"]]=msg["ani"];
+		}
 		
 		var body = JSON.stringify({
 		query: `mutation ($parent_item_id: Int!, $name: String, $column_values: JSON) {
