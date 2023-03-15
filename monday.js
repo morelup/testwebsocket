@@ -228,18 +228,23 @@ function createSubItem(board,msg,item) {
 		Notes
 		*/
 		const columns = getBoardColumns(board);
-		const column_values = {};
-		if (msg.callid !== "null") column_values[columns["VCC Call ID"]] = msg.callid;
-		if (msg.timestamp !== "null") column_values[columns["Timestamp"]] = msg.timestamp;
-		if (msg.notes !== "null") column_values[columns["Notes"]] = msg.notes;
-		if (msg.reportedby !== "null") column_values[columns["Caller"]] = { personsAndTeams: [{ id: msg.reportedby, kind: "person" }] };
-		if (msg.status !== "null") column_values[columns["Result"]] = msg.status;
-		if (msg.ani !== "null") column_values[columns["Caller's Phone Number"]] = msg.ani;
-		const variables = {
-			  parent_item_id: parseInt(item),
-			  column_values: JSON.stringify(column_values),
-			  name: msg.subitem,
-			};
+		const column_values = {
+			[columns["VCC Call ID"]]:msg["callid"],
+			[columns["Timestamp"]]:msg["timestamp"],
+			[columns["Notes"]]:msg["notes"]
+		}
+		if (msg["reportedby"]!= "null")
+		{
+			column_values[columns["Caller"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]};
+		}
+		if (msg["status"]!= "null")
+		{
+			column_values[columns["Result"]]=msg["status"];
+		}
+		if (msg["ani"]!= "null")
+		{
+			column_values[columns["Caller's Phone Number"]]=msg["ani"];
+		}
 		
 		const body = JSON.stringify({
 		query: `mutation ($parent_item_id: Int!, $name: String, $column_values: JSON) {
@@ -251,7 +256,11 @@ function createSubItem(board,msg,item) {
 			}
 		}
 		`,
-			variables
+			variables: {
+			 parent_item_id: parseInt(item),
+			 column_values: JSON.stringify(column_values),
+			 name: msg.subitem
+			},
 		  });
 		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
