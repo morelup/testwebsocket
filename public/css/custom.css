@@ -45,7 +45,11 @@ body {
     top: 5rem;
   }
 }
-
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background-color: #1a1a1a;
+  }
+}
 .sidebar-sticky {
   position: relative;
   top: 0;
