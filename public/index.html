@@ -278,7 +278,7 @@ const board = { id: urlParams.get("board") ?? "null", exists: false };
 const debugmenu = document.getElementById('debugmenu');
 if (urlParams.has("debug")) new bootstrap.Collapse(debugmenu);
 const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'), { toggle: false });
-const ani = document.getElementById('ani');
+const _ani = document.getElementById('ani');
 const calltable = document.getElementById('CallTable');
 const listening = document.getElementById('listening');
 
