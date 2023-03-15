@@ -622,23 +622,25 @@ function Info(callID, uuid, timestamp) {
     CallJSONButton.classList.add("btn", "btn-primary", "col-2");
     Row.appendChild(CallJSONButton);
 
-    var ManualSubmitLog = document.createElement("button"); //submit monday
-    console.log("check board " + board.exists);
-    if (board.exists) {
+    // Create the button element
+	const ManualSubmitLog = document.createElement("button");
+	console.log("check board " + board.exists);
+	if (board.exists) {
+	  ManualSubmitLog.setAttribute("onclick", "showMondaySubmission('" + this.uniqueID + "')");
+	} else {
+	  ManualSubmitLog.setAttribute("onclick", "showManualMondaySubmission('" + this.uniqueID + "')");
+	}
+	ManualSubmitLog.innerHTML = "Submit to UAT Log";
+	ManualSubmitLog.type = "button";
+	ManualSubmitLog.classList.add("btn", "btn-primary");
 
-        ManualSubmitLog.setAttribute("onclick", "showMondaySubmission('" + this.uniqueID + "')");
-    } else {
-        ManualSubmitLog.setAttribute("onclick", "showManualMondaySubmission('" + this.uniqueID + "')");
-    }
+	// Create the row element
+	const Row = document.createElement("div");
+	Row.classList.add("row", "mt-3"); // add margin top for spacing
+	Row.appendChild(ManualSubmitLog);
 
-    ManualSubmitLog.innerHTML = "Submit to UAT Log";
-    ManualSubmitLog.type = "button";
-    ManualSubmitLog.classList.add("btn", "btn-primary", "col-2");
-    Row.appendChild(ManualSubmitLog);
-
-    Row = document.createElement("div"); //row 2
-    Row.classList.add("row");
-    CallDetailBody.appendChild(Row);
+	// Append the row element to the parent element
+	CallDetailBody.appendChild(Row);
 
     //create subitem table
     var SummaryTable = document.createElement("Table");
@@ -794,40 +796,20 @@ socket.on('boardFound', function (msg) {
   boardmenu.show();
 });
 socket.on('defect_created', function (msg) {});
+
 socket.on('get_items_response', function (msg) {
-    var items = msg.data.boards[0].items;
-    function sortArray(arr) {
-        return arr.sort((a, b) => {
-            const nameA = a.name;
-            const nameB = b.name;
-            const isNameANumber = !isNaN(parseInt(nameA));
-            const isNameBNumber = !isNaN(parseInt(nameB));
-
-            if (isNameANumber && isNameBNumber) {
-                return parseInt(nameA) - parseInt(nameB);
-            } else if (isNameANumber) {
-                return -1;
-            } else if (isNameBNumber) {
-                return 1;
-            } else {
-                return nameA.localeCompare(nameB);
-            }
-        });
-    }
-    items = sortArray(items);
-
+    var items = msg.data.boards[0].items.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+  
     for (var i = 0; i < items.length; i++) {
         var el = document.createElement("option");
         el.textContent = items[i].name;
         el.value = items[i].id;
         submissionModal.select_currentItem.appendChild(el);
     }
-
 });
 
 function testSubmission(uniqueID) {
     var msg = {};
-
     socket.emit('test', document.getElementById('testPayload').value);
 }
 
