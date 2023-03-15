@@ -14,7 +14,12 @@ body {
   background-color: #1c1c1c;
   color: #f8f9fa;
 }
-
+.dark-mode-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 101; /* higher than the sidebar z-index */
+}
 
 
 /*
