@@ -22,8 +22,7 @@ const io = require('socket.io')(server, {
 app.post('/', (req, res) => {
   const queryObject = url.parse(req.url, true).query;
   const ifDebug = "debug" in queryObject;
-  var node_type = (!req.node_type) ? "ERROR" : req.node_type;
-  var ANI = (!req.body[0].node_values.XSIP_x_five9ani) ? "ERROR" : req.body[0].node_values.XSIP_x_five9ani;
+  const ANI = req.body[0].node_values.XSIP_x_five9ani || "ERROR";
 
   try {
     if (io.sockets.adapter.rooms.has(ANI)) {
@@ -32,7 +31,6 @@ app.post('/', (req, res) => {
   } catch (error) {
     console.log(error);
   }
-
   res.send(req.body);
 });
 
@@ -40,6 +38,8 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+
+let bRunFirstSocket = true;
 io.on('connection', socket => {
   if (bRunFirstSocket) {
     bRunFirstSocket = false;
@@ -90,58 +90,37 @@ function create_subItem(socket,board,msg,item) {
 }
 
 
-function connect_boarddata(socket,msg)
-{
-	try{
-		monday.boardInfo(msg).then(result => {
-		var parentBoard = JSON.parse(result);
-		
-		
-		
-		if (parentBoard.data.boards.length == 0)
-		{
-			socket.emit('boardNotFound',"No Parent Board Found");
-			return;
-		}
-		if (!(monday.confirmParentColumns(parentBoard)))
-		{
-			socket.emit('boardNotFound',"Parent columns not correct");
-			return;
-		}
-		monday.boardInfo(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds).then(result2 => {
-			var subitemBoard = JSON.parse(result2);
-			if (!(monday.confirmSubitemColumns(subitemBoard)))
-			{
-				socket.emit('boardNotFound',"Subitem columns not correct");
-				return;
-			}
-			var response = {
-				parentBoard:parentBoard,
-				subitemBoard:subitemBoard
-			};
-			boards[parentBoard.data.boards[0].id] = response;
-			socket.emit('boardFound',response);
-			return;
-		})
-	});
-	}
-	catch (error) {
-		socket.emit('boardNotFound',error);
-	}
+async function connect_boarddata(socket, msg) {
+    try {
+        const parentBoard = JSON.parse(await monday.boardInfo(msg));
+        if (parentBoard.data.boards.length == 0 || !(monday.confirmParentColumns(parentBoard))) {
+            socket.emit('boardNotFound', parentBoard.data.boards.length == 0 ? "No Parent Board Found" : "Parent columns not correct");
+            return;
+        }
+        const subitemBoard = JSON.parse(await monday.boardInfo(JSON.parse(parentBoard.data.boards[0].columns[1].settings_str).boardIds));
+        if (!(monday.confirmSubitemColumns(subitemBoard))) {
+            socket.emit('boardNotFound', "Subitem columns not correct");
+            return;
+        }
+        const response = {
+            parentBoard: parentBoard,
+            subitemBoard: subitemBoard
+        };
+        boards[parentBoard.data.boards[0].id] = response;
+        socket.emit('boardFound', response);
+    } catch (error) {
+        socket.emit('boardNotFound', error);
+    }
 }
-var bRunFirstSocket = true;
+
+
+
 
 async function accessSecret(name) {
-var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/"+name+"/versions/latest";
-  const [version] = await client.accessSecretVersion({
-    name: secretName,
-  });
-  // Extract the payload as a string.
-  const payload = version.payload.data.toString();
-  // WARNING: Do not print the secret in a production environment - this
-  // snippet is showing how to access the secret material.
-  return payload;
-};
+  const secretName = `projects/${process.env.GOOGLE_CLOUD_PROJECT}/secrets/${name}/versions/latest`;
+  const [version] = await client.accessSecretVersion({ name: secretName });
+  return version.payload.data.toString();
+}
 
 
 
