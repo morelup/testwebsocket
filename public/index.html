@@ -612,35 +612,35 @@ function Info(callID, uuid, timestamp) {
     var CallDetailBody = document.createElement("div");
     CallDetailBody.classList.add("accordion-body");
     CallDetail.appendChild(CallDetailBody);
+	
+	
     var Row = document.createElement("div"); //row 1
-    Row.classList.add("btn-toolbar");
-    CallDetailBody.appendChild(Row);
-    var CallJSONButton = document.createElement("button"); //call log button
-    CallJSONButton.setAttribute("onclick", "showRawLog('" + this.uniqueID + "')");
-    CallJSONButton.innerHTML = "See Log";
-    CallJSONButton.type = "button";
-    CallJSONButton.classList.add("btn", "btn-primary", "col-2");
-    Row.appendChild(CallJSONButton);
+	Row.classList.add("btn-toolbar");
+	CallDetailBody.appendChild(Row);
 
-    // Create the button element
-	const ManualSubmitLog = document.createElement("button");
+	var CallJSONButton = document.createElement("button"); //call log button
+	CallJSONButton.setAttribute("onclick", "showRawLog('" + this.uniqueID + "')");
+	CallJSONButton.innerHTML = "See Log";
+	CallJSONButton.type = "button";
+	CallJSONButton.classList.add("btn", "btn-primary", "col-md-4", "me-2");
+	Row.appendChild(CallJSONButton);
+
+	var ManualSubmitLog = document.createElement("button"); //submit monday
 	console.log("check board " + board.exists);
 	if (board.exists) {
 	  ManualSubmitLog.setAttribute("onclick", "showMondaySubmission('" + this.uniqueID + "')");
 	} else {
 	  ManualSubmitLog.setAttribute("onclick", "showManualMondaySubmission('" + this.uniqueID + "')");
 	}
+
 	ManualSubmitLog.innerHTML = "Submit to UAT Log";
 	ManualSubmitLog.type = "button";
-	ManualSubmitLog.classList.add("btn", "btn-primary");
-
-	// Create the row element
-	Row = document.createElement("div");
-	Row.classList.add("row", "mt-3"); // add margin top for spacing
+	ManualSubmitLog.classList.add("btn", "btn-primary", "col-md-4");
 	Row.appendChild(ManualSubmitLog);
 
-	// Append the row element to the parent element
-	CallDetailBody.appendChild(Row);
+    Row = document.createElement("div"); //row 2
+    Row.classList.add("row");
+    CallDetailBody.appendChild(Row);
 
     //create subitem table
     var SummaryTable = document.createElement("Table");
