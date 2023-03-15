@@ -6,26 +6,10 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-	
-	
-
     <title>Five9 UAT Tooltest</title>
-
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
- 
 	<link rel="stylesheet" type="text/css" href="css/custom.css" />
-
-
-
-
-
-
-
-
-
-
-
 </head>
 <body>
 	<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -291,684 +275,565 @@
 <script src="js/jquery.json-editor.min.js" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 <script>
-function GetURLParameter(sParam) {
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) 
-    {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) 
-        {
-            return sParameterName[1];
-        }
-    }
-	return "null";
-}
-function dateTimeConverter(UNIX_timestamp){
-  var a = new Date(UNIX_timestamp*1);
-  return a.toLocaleString('en-US', {
-    timeZone: 'America/New_York',
-	timeZoneName: 'short'
-  });
-}
-function timeConverter(UNIX_timestamp){
-  var a = new Date(UNIX_timestamp*1);
-  return a.toLocaleString('en-US', {
-    timeZone: 'America/New_York',
-	timeStyle: 'medium'
-  });
-}
-const fullLog = GetURLParameter("fullLog");
-const project = GetURLParameter("project");
-const board = {id:GetURLParameter("board"),
-				exists:false};
-
+const urlParams = new URLSearchParams(window.location.search);
+const fullLog = urlParams.get("fullLog") ?? "null";
+const project = urlParams.get("project") ?? "null";
+const board = { id: urlParams.get("board") ?? "null", exists: false };
 const debugmenu = document.getElementById('debugmenu');
-const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'),{toggle:false})
-const _ani = document.getElementById('ani');
+if (urlParams.has("debug")) new bootstrap.Collapse(debugmenu);
+const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'), { toggle: false });
+const ani = document.getElementById('ani');
 const calltable = document.getElementById('CallTable');
 const listening = document.getElementById('listening');
 
 
-var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
-  keyboard: false
-});
-var modal_manual_monday_submit = new bootstrap.Modal(document.getElementById('modal_manual_monday_submit'), {
-  keyboard: false
-});
-var modal_monday_submit = new bootstrap.Modal(document.getElementById('modal_monday_submit'), {
-  keyboard: false
-});
 
+
+
+function dateTimeConverter(UNIX_timestamp, isTimeOnly = false) {
+  const options = {
+    timeZone: 'America/New_York',
+    timeZoneName: 'short'
+  };
+  if (isTimeOnly) {
+    options.timeStyle = 'medium';
+  }
+  return new Date(UNIX_timestamp * 1).toLocaleString('en-US', options);
+}
+
+
+
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+        keyboard: false
+    });
+var modal_manual_monday_submit = new bootstrap.Modal(document.getElementById('modal_manual_monday_submit'), {
+        keyboard: false
+    });
+var modal_monday_submit = new bootstrap.Modal(document.getElementById('modal_monday_submit'), {
+        keyboard: false
+    });
 
 
 var jsonObject = {};
-var editor =new JsonEditor('#json-display', getJson());
-var editorOffCanvas =new JsonEditor('#json-displayOffCanvas', getJson());
-
+var editor = new JsonEditor('#json-display', getJson());
+var editorOffCanvas = new JsonEditor('#json-displayOffCanvas', getJson());
 
 var oldvalue = "";
 var records = {};
 
-if(GetURLParameter("debug") != "null")
-{
-	new bootstrap.Collapse(debugmenu);
-}
-
-
-
-
-
 
 
 function loopLogItem(msg) {
-	var callID = (!msg.node_values.XSIP_x_five9callid ) ? "" : msg.node_values.XSIP_x_five9callid;
-	var uuid = (!msg.uuid ) ? "" : msg.uuid;
-	var record = records[callID+uuid];
-	var node_order = (!msg.node_order) ? "" : msg.node_order;
-	var index = 0;
-	if(node_order != "")
-	{
-		index = msg.node_order;
-	}else
-	{
-		index = Object.keys(record.raw).length;
-	}
-	record.raw[index] = msg;
-  
-	if("prompt_text" in msg.node_values)
-	{
-		var description = (!msg.node_values.prompt_text ) ? "" : msg.node_values.prompt_text;
-		Summary(record,msg,index,description,"https://us7.studioportal.io/icons/prompt.svg");
-	}
-	if ("hangup_header" == msg.node_type)
-	{
-		var routeType = (!msg.node_values["X-route_type"] ) ? "" : msg.node_values["X-route_type"]; 
-		var routeReason = (!msg.node_values["X-route_reason"] ) ? "" : msg.node_values["X-route_reason"]; 
-		var routeValue = (!msg.node_values["X-route_value"] ) ? "" : msg.node_values["X-route_value"] ; 
-		Summary(record,msg,index,routeType +":"+routeValue+" - "+routeReason,"https://us7.studioportal.io/icons/hangup.svg");
-	}
-	if("json_response" in msg.node_values)
-	{
-		try{
-		
-			function loop_responses(value)
-			{
-				var parsedInput = JSON.parse(value)
-				var image = "https://us7.studioportal.io/icons/prompt_recorder.svg";
-				if("input_mode" in parsedInput)
-				{
-					if (parsedInput.input_mode == "dtmf")
-					{
-						image = "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
-					}
-				}
-				Summary(record,msg,index,parsedInput.input,image);
-			
-			}
-			if(Array.isArray(msg.node_values.json_response))
-			{
-				msg.node_values.json_response.forEach(loop_responses);
-			}
-			else
-			{
-				var image = "https://us7.studioportal.io/icons/prompt_recorder.svg";
-				if("input_mode" in msg.node_values.json_response)
-				{
-					if (msg.node_values.json_response.input_mode == "dtmf")
-					{
-						image = "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
-					}
-				}
-				
-				if("input" in msg.node_values.json_response)
-				{
-					Summary(record,msg,index,msg.node_values.json_response.input,image);
-				}
-				else
-				{
-					Summary(record,msg,index,msg.node_values.json_response.data.raw_transcribe,image);
-				}
-			}
-		}
-		catch (ex) {
-			console.error('Wrong JSON Format: ' + msg.node_values.json_response);
-		}
-		
-		
-	}
-	
-	
-  
- 
+    const callID = msg.node_values.XSIP_x_five9callid || "";
+    const uuid = msg.uuid || "";
+    const record = records[callID + uuid];
+    const node_order = msg.node_order || "";
+    const index = node_order || Object.keys(record.raw).length;
+    record.raw[index] = msg;
+
+    if (msg.node_values.prompt_text) {
+        const description = msg.node_values.prompt_text;
+        Summary(record, msg, index, description, "https://us7.studioportal.io/icons/prompt.svg");
+    }
+
+    if (msg.node_type === "hangup_header") {
+        const routeType = msg.node_values["X-route_type"] || "";
+        const routeReason = msg.node_values["X-route_reason"] || "";
+        const routeValue = msg.node_values["X-route_value"] || "";
+        const message = `${routeType}:${routeValue} - ${routeReason}`;
+        Summary(record, msg, index, message, "https://us7.studioportal.io/icons/hangup.svg");
+    }
+
+    if (msg.node_values.json_response) {
+        try {
+            const responses = Array.isArray(msg.node_values.json_response) 
+                ? msg.node_values.json_response
+                : [msg.node_values.json_response];
+            const image = (response) => {
+                if (response.input_mode === "dtmf") {
+                    return "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
+                }
+                return "https://us7.studioportal.io/icons/prompt_recorder.svg";
+            };
+            responses.forEach((response) => {
+                const input = response.input || response.data.raw_transcribe || "";
+                Summary(record, msg, index, input, image(response));
+            });
+        } catch (ex) {
+            console.error(`Wrong JSON Format: ${msg.node_values.json_response}`);
+        }
+    }
 }
 
+function logMessage(msg) {
+    console.log("Call Information Recieved");
+    console.log(msg);
+    var callID = (!msg[0].node_values.XSIP_x_five9callid) ? "" : msg[0].node_values.XSIP_x_five9callid;
+    var uuid = (!msg[0].uuid) ? "" : msg[0].uuid;
+
+    if (callID == "" && uuid == "") {
+        console.log("Invalid call recieved");
+        return;
+    }
+    if (callID + uuid in records) {
+        msg.forEach(loopLogItem);
+        console.log("Call Update");
+        return;
+    }
+
+    records[callID + uuid] = new Record(callID, uuid, msg[0].timestamp) 
 
 
+        msg.forEach(loopLogItem);
 
-function logMessage(msg)
-{
-	console.log("Call Information Recieved");
-	console.log(msg);
-	var callID = (!msg[0].node_values.XSIP_x_five9callid ) ? "" : msg[0].node_values.XSIP_x_five9callid;
-	var uuid = (!msg[0].uuid ) ? "" : msg[0].uuid;
-	
-	if(callID == "" && uuid == "")
-	{
-		console.log("Invalid call recieved");
-		return;
-	}
-	if (callID+uuid in records)
-	{
-		msg.forEach(loopLogItem);
-		console.log("Call Update");
-		return;
-	}
-	
-	
-	records[callID+uuid] = new Record(callID,uuid,msg[0].timestamp)//timeConverter(msg[0].timestamp)
-	
-	
-	
-	
-	msg.forEach(loopLogItem);
-	
-	
-	
-	
 }
 
-
-
-
-function debugMessage()
-{
-	logMessage(JSON.parse(document.getElementById('testPayload').value));
+function debugMessage() {
+    logMessage(JSON.parse(document.getElementById('testPayload').value));
 }
 function getJson() {
-  try {
-    return jsonObject;
-  }catch (ex) {
-    alert('Wrong JSON Format: ' + ex);
-  }
+    try {
+        return jsonObject;
+    } catch (ex) {
+        alert('Wrong JSON Format: ' + ex);
+    }
 }
-function showRawLog(uniqueID){
-	jsonObject = records[uniqueID].raw;
-	editor.load(getJson());
-	myModal.show();
-	return;
-}
-
-function copyUUID(uniqueID)
-{
-	navigator.clipboard.writeText(records[uniqueID].info.UUID);
-}
-function copyVCC(uniqueID)
-{
-	navigator.clipboard.writeText(records[uniqueID].info.callID);
-}
-function copyCallLog(uniqueID)
-{
-	navigator.clipboard.writeText(JSON.stringify(records[uniqueID].raw, null, '\t'));
-}
-function copyTimestamp(uniqueID)
-{
-	navigator.clipboard.writeText(dateTimeConverter(records[uniqueID].info.timestamp));
+function showRawLog(uniqueID) {
+    jsonObject = records[uniqueID].raw;
+    editor.load(getJson());
+    myModal.show();
+    return;
 }
 
+function copyUUID(uniqueID) {
+    navigator.clipboard.writeText(records[uniqueID].info.UUID);
+}
+function copyVCC(uniqueID) {
+    navigator.clipboard.writeText(records[uniqueID].info.callID);
+}
+function copyCallLog(uniqueID) {
+    navigator.clipboard.writeText(JSON.stringify(records[uniqueID].raw, null, '\t'));
+}
+function copyTimestamp(uniqueID) {
+    navigator.clipboard.writeText(dateTimeConverter(records[uniqueID].info.timestamp));
+}
 
 const manualSubmissionModal = {
- manualSubitemUUID:document.getElementById('manualSubitemUUID'),
- manualCopyUUIDButton:document.getElementById('manualCopyUUIDButton'),
- manualSubitemVCC:document.getElementById('manualSubitemVCC'),
- manualCopyVCCButton:document.getElementById('manualCopyVCCButton'),
- manualCopyCallLogButton:document.getElementById('manualCopyCallLogButton'),
- manualSubitemTimestamp:document.getElementById('manualSubitemTimestamp'),
- manualCopyTimestampButton:document.getElementById('manualCopyTimestampButton')
+    manualSubitemUUID: document.getElementById('manualSubitemUUID'),
+    manualCopyUUIDButton: document.getElementById('manualCopyUUIDButton'),
+    manualSubitemVCC: document.getElementById('manualSubitemVCC'),
+    manualCopyVCCButton: document.getElementById('manualCopyVCCButton'),
+    manualCopyCallLogButton: document.getElementById('manualCopyCallLogButton'),
+    manualSubitemTimestamp: document.getElementById('manualSubitemTimestamp'),
+    manualCopyTimestampButton: document.getElementById('manualCopyTimestampButton')
 };
 
-function showManualMondaySubmission(uniqueID){
-	manualSubmissionModal.manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
-	manualSubmissionModal.manualCopyUUIDButton.setAttribute('onclick',"copyUUID('"+uniqueID+"')");
-	manualSubmissionModal.manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
-	manualSubmissionModal.manualCopyVCCButton.setAttribute('onclick',"copyVCC('"+uniqueID+"')");
-	manualSubmissionModal.manualCopyCallLogButton.setAttribute('onclick',"copyCallLog('"+uniqueID+"')");
-	manualSubmissionModal.manualSubitemTimestamp.innerHTML = dateTimeConverter(records[uniqueID].info.timestamp);
-	manualSubmissionModal.manualCopyTimestampButton.setAttribute('onclick',"copyTimestamp('"+uniqueID+"')");
-	
-	modal_manual_monday_submit.show();
-	return;
+function showManualMondaySubmission(uniqueID) {
+    manualSubmissionModal.manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
+    manualSubmissionModal.manualCopyUUIDButton.setAttribute('onclick', "copyUUID('" + uniqueID + "')");
+    manualSubmissionModal.manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
+    manualSubmissionModal.manualCopyVCCButton.setAttribute('onclick', "copyVCC('" + uniqueID + "')");
+    manualSubmissionModal.manualCopyCallLogButton.setAttribute('onclick', "copyCallLog('" + uniqueID + "')");
+    manualSubmissionModal.manualSubitemTimestamp.innerHTML = dateTimeConverter(records[uniqueID].info.timestamp);
+    manualSubmissionModal.manualCopyTimestampButton.setAttribute('onclick', "copyTimestamp('" + uniqueID + "')");
+
+    modal_manual_monday_submit.show();
+    return;
 }
-
-
 
 const submissionModal = {
-	reportedby:document.getElementById('reportedby'),
-	cb_defectOrRetest:document.getElementById('cb_defectOrRetest'),
-	text_defectOrRetest:document.getElementById('text_defectOrRetest'),
-	//text_newdefect:new bootstrap.Collapse(document.getElementById('text_newdefect'),{toggle:false}),
-	//select_currentItem:new bootstrap.Collapse(document.getElementById('select_currentItem'),{toggle:false})
-	
-	text_newdefect:document.getElementById('text_newdefect'),
-	select_currentItem:document.getElementById('select_currentItem'),
-	
-	div_defectDetails:new bootstrap.Collapse(document.getElementById('div_defectDetails'),{toggle:false}),
-	text_expected:document.getElementById('text_expected'),
-	text_actual:document.getElementById('text_actual'),
-	mondaySubmit:document.getElementById('mondaySubmit'),
-	text_notes:document.getElementById('text_notes'),
-	select_result:document.getElementById('select_result')
+    reportedby: document.getElementById('reportedby'),
+    cb_defectOrRetest: document.getElementById('cb_defectOrRetest'),
+    text_defectOrRetest: document.getElementById('text_defectOrRetest'),
+    //text_newdefect:new bootstrap.Collapse(document.getElementById('text_newdefect'),{toggle:false}),
+    //select_currentItem:new bootstrap.Collapse(document.getElementById('select_currentItem'),{toggle:false})
+
+    text_newdefect: document.getElementById('text_newdefect'),
+    select_currentItem: document.getElementById('select_currentItem'),
+
+    div_defectDetails: new bootstrap.Collapse(document.getElementById('div_defectDetails'), {
+        toggle: false
+    }),
+    text_expected: document.getElementById('text_expected'),
+    text_actual: document.getElementById('text_actual'),
+    mondaySubmit: document.getElementById('mondaySubmit'),
+    text_notes: document.getElementById('text_notes'),
+    select_result: document.getElementById('select_result')
 };
 
-function showMondaySubmission(uniqueID){
-	submissionModal.cb_defectOrRetest.checked = false;
-	submissionModal.text_defectOrRetest.innerHTML = "New Defect";
-	submissionModal.text_newdefect.hidden = false;
-	submissionModal.select_currentItem.hidden = true;
-	submissionModal.select_currentItem.innerHTML = "<option selected>Choose the pre-existing defect name</option>";
-	submissionModal.div_defectDetails.show();
-	submissionModal.text_expected.value = "";
-	submissionModal.text_actual.value = "";
-	submissionModal.text_newdefect.value = "";
-	submissionModal.mondaySubmit.setAttribute('onclick',"createDefect('"+uniqueID+"')");
-	submissionModal.text_notes.value = "";
-	socket.emit('get_items', board.id);
-	modal_monday_submit.show();
-	return;
+function showMondaySubmission(uniqueID) {
+    submissionModal.cb_defectOrRetest.checked = false;
+    submissionModal.text_defectOrRetest.innerHTML = "New Defect";
+    submissionModal.text_newdefect.hidden = false;
+    submissionModal.select_currentItem.hidden = true;
+    submissionModal.select_currentItem.innerHTML = "<option selected>Choose the pre-existing defect name</option>";
+    submissionModal.div_defectDetails.show();
+    submissionModal.text_expected.value = "";
+    submissionModal.text_actual.value = "";
+    submissionModal.text_newdefect.value = "";
+    submissionModal.mondaySubmit.setAttribute('onclick', "createDefect('" + uniqueID + "')");
+    submissionModal.text_notes.value = "";
+    socket.emit('get_items', board.id);
+    modal_monday_submit.show();
+    return;
 }
-function defectOrRetest()
-{
-	if (submissionModal.cb_defectOrRetest.checked == true){
-		submissionModal.text_defectOrRetest.innerHTML = "Retest";
-		submissionModal.text_newdefect.hidden = true;
-		submissionModal.select_currentItem.hidden = false;
-		submissionModal.div_defectDetails.hide();
-	} else {
-		submissionModal.text_defectOrRetest.innerHTML = "New Defect";
-		submissionModal.text_newdefect.hidden = false;
-		submissionModal.select_currentItem.hidden = true;
-		submissionModal.div_defectDetails.show();
-	}
+function defectOrRetest() {
+    if (submissionModal.cb_defectOrRetest.checked == true) {
+        submissionModal.text_defectOrRetest.innerHTML = "Retest";
+        submissionModal.text_newdefect.hidden = true;
+        submissionModal.select_currentItem.hidden = false;
+        submissionModal.div_defectDetails.hide();
+    } else {
+        submissionModal.text_defectOrRetest.innerHTML = "New Defect";
+        submissionModal.text_newdefect.hidden = false;
+        submissionModal.select_currentItem.hidden = true;
+        submissionModal.div_defectDetails.show();
+    }
 }
-
-
-
 
 function createDefect(uniqueID) {
-	//this.uniqueID=callID+uuid;
-	//this.callID=callID;
-	//this.UUID=uuid;
-	//this.timestamp=timestamp;
-	
-	if(cb_defectOrRetest.checked)//retest
-	{
-		var msg = {
-				board:board.id,
-				reportedby:submissionModal.reportedby.value,
-				item:submissionModal.select_currentItem.value,
-				subitem:records[uniqueID].info.UUID,
-				callid:records[uniqueID].info.callID,
-				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
-				ani:_ani.value,
-				notes:submissionModal.text_notes.value,
-				status:submissionModal.select_result.value,
-				calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
-			};
-			console.log(JSON.stringify(msg));
-			socket.emit('create_defect_subitem', msg)
-	}
-	else//newdefect
-	{
-		if(board.id != "null")
-		{
-			var msg = {
-				board:board.id,
-				reportedby:submissionModal.reportedby.value,
-				item:submissionModal.text_newdefect.value,
-				subitem:records[uniqueID].info.UUID,
-				callid:records[uniqueID].info.callID,
-				expected:submissionModal.text_expected.value,
-				actual:submissionModal.text_actual.value,
-				timestamp:dateTimeConverter(records[uniqueID].info.timestamp),
-				ani:_ani.value,
-				notes:submissionModal.text_notes.value,
-				status:submissionModal.select_result.value,
-				calllog:JSON.stringify(records[uniqueID].raw, null, '\t')
-			};
-			console.log(JSON.stringify(msg));
-			socket.emit('create_defect', msg)
-		}
-	}
-	modal_monday_submit.hide();
+    //this.uniqueID=callID+uuid;
+    //this.callID=callID;
+    //this.UUID=uuid;
+    //this.timestamp=timestamp;
+
+    if (cb_defectOrRetest.checked) //retest
+    {
+        var msg = {
+            board: board.id,
+            reportedby: submissionModal.reportedby.value,
+            item: submissionModal.select_currentItem.value,
+            subitem: records[uniqueID].info.UUID,
+            callid: records[uniqueID].info.callID,
+            timestamp: dateTimeConverter(records[uniqueID].info.timestamp),
+            ani: _ani.value,
+            notes: submissionModal.text_notes.value,
+            status: submissionModal.select_result.value,
+            calllog: JSON.stringify(records[uniqueID].raw, null, '\t')
+        };
+        console.log(JSON.stringify(msg));
+        socket.emit('create_defect_subitem', msg)
+    } else //newdefect
+    {
+        if (board.id != "null") {
+            var msg = {
+                board: board.id,
+                reportedby: submissionModal.reportedby.value,
+                item: submissionModal.text_newdefect.value,
+                subitem: records[uniqueID].info.UUID,
+                callid: records[uniqueID].info.callID,
+                expected: submissionModal.text_expected.value,
+                actual: submissionModal.text_actual.value,
+                timestamp: dateTimeConverter(records[uniqueID].info.timestamp),
+                ani: _ani.value,
+                notes: submissionModal.text_notes.value,
+                status: submissionModal.select_result.value,
+                calllog: JSON.stringify(records[uniqueID].raw, null, '\t')
+            };
+            console.log(JSON.stringify(msg));
+            socket.emit('create_defect', msg)
+        }
+    }
+    modal_monday_submit.hide();
 }
 
-function showOffCanvas(value){
-	editorOffCanvas.load(value);
-	return;
+function showOffCanvas(value) {
+    editorOffCanvas.load(value);
+    return;
 }
-
 
 //objects
-function Record(callID,uuid,timestamp)
-{
-	this.raw = {};
-	this.summary = new Array();
-	this.issue = new Issue();
-	this.info = new Info(callID,uuid,timestamp);
+function Record(callID, uuid, timestamp) {
+    this.raw = {};
+    this.summary = new Array();
+    this.issue = new Issue();
+    this.info = new Info(callID, uuid, timestamp);
 }
-function Issue()
-{
-	this.exists = false;
+function Issue() {
+    this.exists = false;
 }
-function Info(callID,uuid,timestamp)
-{
-	this.uniqueID=callID+uuid;
-	this.callID=callID;
-	this.UUID=uuid;
-	this.timestamp=timestamp;
-	
-	
-	//createcallitem
-	var callItemContainer = document.createElement("div");
-	this.callItem = callItemContainer;
-	callItemContainer.classList.add("accordion-item");
-	
-	//itemheader
-	var callItemHeader = document.createElement("div");
-	callItemHeader.classList.add("accordion-header");
-	callItemHeader.id="CallItem-"+this.uniqueID;
-	callItemContainer.appendChild(callItemHeader);
-	var callItemButton = document.createElement("button");
-	callItemButton.classList.add("accordion-button","collapsed");
-	callItemButton.type="button";
-	callItemButton.setAttribute("data-bs-toggle","collapse");
-	callItemButton.setAttribute("data-bs-target","#CallItemLog-"+this.uniqueID);
-	callItemButton.setAttribute("aria-expanded","true");
-	callItemButton.setAttribute("aria-controls","CallItemLog-"+this.uniqueID);
-	callItemHeader.appendChild(callItemButton);
-	var CallItemTable = document.createElement("Table");
-	CallItemTable.classList.add("table");
-	callItemButton.appendChild(CallItemTable);
-	var CallItemTableHeader = CallItemTable.createTHead();
-	var HeaderRow = CallItemTableHeader.insertRow();
-	var HeaderCell1 = document.createElement("th");
-	var HeaderCell2 = document.createElement("th");
-	var HeaderCell3 = document.createElement("th");
-	HeaderCell1.innerHTML = "Time(ET)";
-	HeaderCell2.innerHTML = "VCC Call ID";
-	HeaderCell3.innerHTML = "Studio UUID";
-	HeaderRow.appendChild(HeaderCell1);
-	HeaderRow.appendChild(HeaderCell2);
-	HeaderRow.appendChild(HeaderCell3);
-	
-	var CallItemTableBody = CallItemTable.createTBody();
-	var row = CallItemTableBody.insertRow();
-	row.classList.add("no-bottom-border");
-	var cell1 = row.insertCell(0);
-	var cell2 = row.insertCell(1);
-	var cell3 = row.insertCell(2);
-	cell1.innerHTML = dateTimeConverter(this.timestamp);
-	cell2.innerHTML = this.callID;
-	cell3.innerHTML = this.UUID;
-	
-	//createsubitem view
-	var CallDetail = document.createElement("div");
-	CallDetail.classList.add("accordion-collapse","collapse");
-	CallDetail.id="CallItemLog-"+this.uniqueID;
-	CallDetail.setAttribute("aria-labelledby","CallItem-"+this.uniqueID);
-	callItemContainer.appendChild(CallDetail);
-	var CallDetailBody = document.createElement("div");
-	CallDetailBody.classList.add("accordion-body");
-	CallDetail.appendChild(CallDetailBody);
-	var Row = document.createElement("div");//row 1
-	Row.classList.add("btn-toolbar");
-	CallDetailBody.appendChild(Row);
-	var CallJSONButton = document.createElement("button");//call log button
-	CallJSONButton.setAttribute("onclick","showRawLog('"+this.uniqueID+"')");
-	CallJSONButton.innerHTML = "See Log";
-	CallJSONButton.type="button";
-	CallJSONButton.classList.add("btn","btn-primary","col-2");
-	Row.appendChild(CallJSONButton);
-	
-	
-	var ManualSubmitLog = document.createElement("button");//submit monday
-	console.log("check board " + board.exists);
-	if(board.exists){
-		
-		ManualSubmitLog.setAttribute("onclick","showMondaySubmission('"+this.uniqueID+"')");
-	}
-	else{
-		ManualSubmitLog.setAttribute("onclick","showManualMondaySubmission('"+this.uniqueID+"')");
-	}
-	
-	ManualSubmitLog.innerHTML = "Submit to UAT Log";
-	ManualSubmitLog.type="button";
-	ManualSubmitLog.classList.add("btn","btn-primary","col-2");
-	Row.appendChild(ManualSubmitLog);
-	
-	
-	
-	Row = document.createElement("div");//row 2
-	Row.classList.add("row");
-	CallDetailBody.appendChild(Row);
-	
-	
-	//create subitem table
-	var SummaryTable = document.createElement("Table");
-	this.callDetail  = SummaryTable; //Summary Table Record
-	Row.appendChild(SummaryTable);
-	SummaryTable.classList.add("table");
-	var SummaryTableHeader = SummaryTable.createTHead();
-	var HeaderRow = SummaryTableHeader.insertRow();
-	var HeaderCell1 = document.createElement("th");
-	var HeaderCell2 = document.createElement("th");
-	var HeaderCell3 = document.createElement("th");
-	var HeaderCellempty = document.createElement("th");
-	var HeaderCell4 = document.createElement("th");
-	HeaderCell1.innerHTML = "Time(ET)";
-	HeaderCell2.innerHTML = "Task";
-	HeaderCell3.innerHTML = "Node Name";
-	HeaderCell4.innerHTML = "Behavior";
-	HeaderRow.appendChild(HeaderCell1);
-	HeaderRow.appendChild(HeaderCell2);
-	HeaderRow.appendChild(HeaderCell3);
-	HeaderRow.appendChild(HeaderCellempty);
-	HeaderRow.appendChild(HeaderCell4);
-	var SummaryTableBody = SummaryTable.createTBody();
-	this.summaryTableBody = SummaryTableBody;
-	calltable.appendChild(this.callItem);
+function Info(callID, uuid, timestamp) {
+    this.uniqueID = callID + uuid;
+    this.callID = callID;
+    this.UUID = uuid;
+    this.timestamp = timestamp;
+
+    //createcallitem
+    var callItemContainer = document.createElement("div");
+    this.callItem = callItemContainer;
+    callItemContainer.classList.add("accordion-item");
+
+    //itemheader
+    var callItemHeader = document.createElement("div");
+    callItemHeader.classList.add("accordion-header");
+    callItemHeader.id = "CallItem-" + this.uniqueID;
+    callItemContainer.appendChild(callItemHeader);
+    var callItemButton = document.createElement("button");
+    callItemButton.classList.add("accordion-button", "collapsed");
+    callItemButton.type = "button";
+    callItemButton.setAttribute("data-bs-toggle", "collapse");
+    callItemButton.setAttribute("data-bs-target", "#CallItemLog-" + this.uniqueID);
+    callItemButton.setAttribute("aria-expanded", "true");
+    callItemButton.setAttribute("aria-controls", "CallItemLog-" + this.uniqueID);
+    callItemHeader.appendChild(callItemButton);
+    var CallItemTable = document.createElement("Table");
+    CallItemTable.classList.add("table");
+    callItemButton.appendChild(CallItemTable);
+    var CallItemTableHeader = CallItemTable.createTHead();
+    var HeaderRow = CallItemTableHeader.insertRow();
+    var HeaderCell1 = document.createElement("th");
+    var HeaderCell2 = document.createElement("th");
+    var HeaderCell3 = document.createElement("th");
+    HeaderCell1.innerHTML = "Time(ET)";
+    HeaderCell2.innerHTML = "VCC Call ID";
+    HeaderCell3.innerHTML = "Studio UUID";
+    HeaderRow.appendChild(HeaderCell1);
+    HeaderRow.appendChild(HeaderCell2);
+    HeaderRow.appendChild(HeaderCell3);
+
+    var CallItemTableBody = CallItemTable.createTBody();
+    var row = CallItemTableBody.insertRow();
+    row.classList.add("no-bottom-border");
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+    cell1.innerHTML = dateTimeConverter(this.timestamp);
+    cell2.innerHTML = this.callID;
+    cell3.innerHTML = this.UUID;
+
+    //createsubitem view
+    var CallDetail = document.createElement("div");
+    CallDetail.classList.add("accordion-collapse", "collapse");
+    CallDetail.id = "CallItemLog-" + this.uniqueID;
+    CallDetail.setAttribute("aria-labelledby", "CallItem-" + this.uniqueID);
+    callItemContainer.appendChild(CallDetail);
+    var CallDetailBody = document.createElement("div");
+    CallDetailBody.classList.add("accordion-body");
+    CallDetail.appendChild(CallDetailBody);
+    var Row = document.createElement("div"); //row 1
+    Row.classList.add("btn-toolbar");
+    CallDetailBody.appendChild(Row);
+    var CallJSONButton = document.createElement("button"); //call log button
+    CallJSONButton.setAttribute("onclick", "showRawLog('" + this.uniqueID + "')");
+    CallJSONButton.innerHTML = "See Log";
+    CallJSONButton.type = "button";
+    CallJSONButton.classList.add("btn", "btn-primary", "col-2");
+    Row.appendChild(CallJSONButton);
+
+    var ManualSubmitLog = document.createElement("button"); //submit monday
+    console.log("check board " + board.exists);
+    if (board.exists) {
+
+        ManualSubmitLog.setAttribute("onclick", "showMondaySubmission('" + this.uniqueID + "')");
+    } else {
+        ManualSubmitLog.setAttribute("onclick", "showManualMondaySubmission('" + this.uniqueID + "')");
+    }
+
+    ManualSubmitLog.innerHTML = "Submit to UAT Log";
+    ManualSubmitLog.type = "button";
+    ManualSubmitLog.classList.add("btn", "btn-primary", "col-2");
+    Row.appendChild(ManualSubmitLog);
+
+    Row = document.createElement("div"); //row 2
+    Row.classList.add("row");
+    CallDetailBody.appendChild(Row);
+
+    //create subitem table
+    var SummaryTable = document.createElement("Table");
+    this.callDetail = SummaryTable; //Summary Table Record
+    Row.appendChild(SummaryTable);
+    SummaryTable.classList.add("table");
+    var SummaryTableHeader = SummaryTable.createTHead();
+    var HeaderRow = SummaryTableHeader.insertRow();
+    var HeaderCell1 = document.createElement("th");
+    var HeaderCell2 = document.createElement("th");
+    var HeaderCell3 = document.createElement("th");
+    var HeaderCellempty = document.createElement("th");
+    var HeaderCell4 = document.createElement("th");
+    HeaderCell1.innerHTML = "Time(ET)";
+    HeaderCell2.innerHTML = "Task";
+    HeaderCell3.innerHTML = "Node Name";
+    HeaderCell4.innerHTML = "Behavior";
+    HeaderRow.appendChild(HeaderCell1);
+    HeaderRow.appendChild(HeaderCell2);
+    HeaderRow.appendChild(HeaderCell3);
+    HeaderRow.appendChild(HeaderCellempty);
+    HeaderRow.appendChild(HeaderCell4);
+    var SummaryTableBody = SummaryTable.createTBody();
+    this.summaryTableBody = SummaryTableBody;
+    calltable.appendChild(this.callItem);
 }
-function updateOffCanvas(record,index)
-{
-	
-	var temp = JSON.stringify(records[record].raw[index]);
-	showOffCanvas(JSON.parse(temp));
+function updateOffCanvas(record, index) {
+
+    var temp = JSON.stringify(records[record].raw[index]);
+    showOffCanvas(JSON.parse(temp));
 }
 
-function Summary(record,msg,index,description,image)
-{
-	
-	var row = record.info.summaryTableBody.insertRow();
-	var task = (!msg.node_values.task_name) ? "" : msg.node_values.task_name; 
-	console.log(record.summary.length);
-	console.log(record.info.uniqueID);
-	this.row = row;
-	this.msg = msg;
-	this.issue = new Issue();
-	record.summary.push(this);
-	
-	row.classList.add("clickable");
-	row.setAttribute("data-bs-toggle","offcanvas");
-	row.setAttribute("data-bs-target","#offcanvasRight");
-	row.setAttribute("aria-controls","offcanvasRight");
-	row.setAttribute("onclick","updateOffCanvas(\""+record.info.uniqueID+"\",\""+index+"\")");
-	var cell1 = row.insertCell(0);
-	var cell2 = row.insertCell(1);
-	var cell3 = row.insertCell(2);
-	var cellImage = row.insertCell(3);
-	var cell4 = row.insertCell(4);
-	cell1.innerHTML = timeConverter(msg.timestamp);
-	cell2.innerHTML = task;
-	cell3.innerHTML = (!msg.node_name ) ? msg_nodeType : msg.node_name;
-	cell4.innerHTML = description;
-	cellImage.innerHTML = '<img src="'+image+'">';
+function Summary(record, msg, index, description, image) {
+    // Insert a new row into the summary table body
+    var row = record.info.summaryTableBody.insertRow();
+
+    // Determine the task name to display, if any
+    var task = (!msg.node_values.task_name) ? "" : msg.node_values.task_name;
+
+    // Save references to this summary's row, message, and issue
+    this.row = row;
+    this.msg = msg;
+    this.issue = new Issue();
+    record.summary.push(this);
+
+    // Add attributes to make the row clickable and trigger the offcanvas
+    row.classList.add("clickable");
+    row.setAttribute("data-bs-toggle", "offcanvas");
+    row.setAttribute("data-bs-target", "#offcanvasRight");
+    row.setAttribute("aria-controls", "offcanvasRight");
+    row.setAttribute("onclick", "updateOffCanvas(\"" + record.info.uniqueID + "\",\"" + index + "\")");
+
+    // Insert cells into the row and populate them with content
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+    var cellImage = row.insertCell(3);
+    var cell4 = row.insertCell(4);
+    cell1.innerHTML = dateTimeConverter(msg.timestamp,true);
+    cell2.innerHTML = task;
+    cell3.innerHTML = (!msg.node_name) ? msg_nodeType : msg.node_name;
+    cell4.innerHTML = description;
+    cellImage.innerHTML = '<img src="' + image + '">';
 }
-
-
-
-
 
 //socket info
 const socket = io({
-  reconnectionDelayMax: 10000
+        reconnectionDelayMax: 10000
+    });
+
+socket.on('us7 message', function (msg) {
+    logMessage(msg);
+});
+socket.on('us6 message', function (msg) {
+    logMessage(msg);
 });
 
-socket.on('us7 message', function(msg){
-    logMessage(msg);
-  });
-socket.on('us6 message', function(msg){
-    logMessage(msg);
-  });
-
-socket.on('boardData', function(msg){
+socket.on('boardData', function (msg) {
     board.data = msg.data;
-  });
-socket.on('subItemBoardData', function(msg){
+});
+socket.on('subItemBoardData', function (msg) {
     subItemBoard.data = msg.data;
-	subItemBoard.id = subItemBoard.data.boards[0].id;
-  });
-socket.on('defect submitted', function(msg){
+    subItemBoard.id = subItemBoard.data.boards[0].id;
+});
+socket.on('defect submitted', function (msg) {
     console.log("defect submitted for" + msg);
-  });
-socket.on('connect', function() {
-		console.log("Connected to websocket");
-		if(oldvalue != "")
-		{
-			console.log("Rejoining: "+ani.value);
-			socket.emit('join', ani.value);
-		}
-		if(GetURLParameter("board") != "null")
-		{
-			socket.emit('connect_boarddata', GetURLParameter("board"));
-		}
-	});
-socket.on('boardNotFound', function(msg){
-	boardmenu.hide();
-	board.exists=false;
-	console.log("Board Found");
-  });
-  
-socket.on('boardFound', function(msg){
-	board.exists=true;
-	board.parentBoard = msg.parentBoard;
-	board.subitemBoard = msg.subitemBoard
-	var subscribers = msg.parentBoard.data.boards[0].subscribers;
-	for(var i = 0; i < subscribers.length; i++) {
-		var el = document.createElement("option");
-		el.textContent = subscribers[i].name;
-		el.value = subscribers[i].id;
-		submissionModal.reportedby.appendChild(el);
+});
+socket.on('connect', function () {
+    console.log("Connected to websocket");
+    if (oldvalue != "") {
+        console.log("Rejoining: " + ani.value);
+        socket.emit('join', ani.value);
+    }
+    if (board.id !== "null") {
+	  socket.emit('connect_boarddata', board.id);
 	}
-	boardmenu.show();
-	
-	
-	var subcolumns = msg.subitemBoard.data.boards[0].columns;
-	for(var i = 0; i < subcolumns.length; i++) {
-		if (subcolumns[i].title == "Result")
-		{
-			var resultFields = JSON.parse(subcolumns[i].settings_str).labels;
-			
-			for(const key in resultFields) {
-				var el = document.createElement("option");
-				el.textContent = resultFields[key];
-				el.value = key;
-				submissionModal.select_result.appendChild(el);
-			}
-			break;
-		}
-	}
-	
-	
-	
-	
-	
-	
-	
-  });
-  
-socket.on('defect_created', function(msg){
-  });
-socket.on('get_items_response', function(msg){
-	var items = msg.data.boards[0].items;
-	items.sort((a, b) => {
-	  const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-	  const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-	  if (nameA < nameB) {
-		return -1;
-	  }
-	  if (nameA > nameB) {
-		return 1;
-	  }
-
-	  // names must be equal
-	  return 0;
-	});
-	
-	
-	
-    for(var i = 0; i < items.length; i++) {
-		var el = document.createElement("option");
-		el.textContent = items[i].name;
-		el.value = items[i].id;
-		submissionModal.select_currentItem.appendChild(el);
-	}
-	
-	
-	
-  });
-
-
-function testSubmission(uniqueID)
-{
-	var msg = {};
-	
-	socket.emit('test',document.getElementById('testPayload').value );
-}
-
-
-  
-  
-
-
-
-ani.addEventListener("keypress", function(event) {
-  // If the user presses the "Enter" key on the keyboard
-  if (event.key === "Enter") {
-    // Cancel the default action, if needed
-    event.preventDefault();
-    // Trigger the button element with a click
-    assignANI();
-  }
+});
+socket.on('boardNotFound', function (msg) {
+    boardmenu.hide();
+    board.exists = false;
+    console.log("Board Found");
 });
 
-function Defect()
-{
-	this.reported_by = "";
-	this.expected = "";
-	this.actual = "";
-	this.board = "";
+socket.on('boardFound', function (msg) {
+    board.exists = true;
+    board.parentBoard = msg.parentBoard;
+    board.subitemBoard = msg.subitemBoard
+        var subscribers = msg.parentBoard.data.boards[0].subscribers;
+    for (var i = 0; i < subscribers.length; i++) {
+        var el = document.createElement("option");
+        el.textContent = subscribers[i].name;
+        el.value = subscribers[i].id;
+        submissionModal.reportedby.appendChild(el);
+    }
+    boardmenu.show();
+
+    var subcolumns = msg.subitemBoard.data.boards[0].columns;
+    for (var i = 0; i < subcolumns.length; i++) {
+        if (subcolumns[i].title == "Result") {
+            var resultFields = JSON.parse(subcolumns[i].settings_str).labels;
+
+            for (const key in resultFields) {
+                var el = document.createElement("option");
+                el.textContent = resultFields[key];
+                el.value = key;
+                submissionModal.select_result.appendChild(el);
+            }
+            break;
+        }
+    }
+
+});
+
+socket.on('defect_created', function (msg) {});
+socket.on('get_items_response', function (msg) {
+    var items = msg.data.boards[0].items;
+    function sortArray(arr) {
+        return arr.sort((a, b) => {
+            const nameA = a.name;
+            const nameB = b.name;
+            const isNameANumber = !isNaN(parseInt(nameA));
+            const isNameBNumber = !isNaN(parseInt(nameB));
+
+            if (isNameANumber && isNameBNumber) {
+                return parseInt(nameA) - parseInt(nameB);
+            } else if (isNameANumber) {
+                return -1;
+            } else if (isNameBNumber) {
+                return 1;
+            } else {
+                return nameA.localeCompare(nameB);
+            }
+        });
+    }
+    items = sortArray(items);
+
+    for (var i = 0; i < items.length; i++) {
+        var el = document.createElement("option");
+        el.textContent = items[i].name;
+        el.value = items[i].id;
+        submissionModal.select_currentItem.appendChild(el);
+    }
+
+});
+
+function testSubmission(uniqueID) {
+    var msg = {};
+
+    socket.emit('test', document.getElementById('testPayload').value);
 }
 
+ani.addEventListener("keypress", function (event) {
+    // If the user presses the "Enter" key on the keyboard
+    if (event.key === "Enter") {
+        // Cancel the default action, if needed
+        event.preventDefault();
+        // Trigger the button element with a click
+        assignANI();
+    }
+});
 
+function Defect() {
+    this.reported_by = "";
+    this.expected = "";
+    this.actual = "";
+    this.board = "";
+}
 
 function assignANI() {
-listening.innerHTML = "Listening to: "+_ani.value;
-listening.classList.add("bg-success");
-listening.classList.remove("bg-danger");
-socket.emit('leave', oldvalue);
-socket.emit('join', _ani.value);
-oldvalue = _ani.value;
+    listening.innerHTML = "Listening to: " + _ani.value;
+    listening.classList.add("bg-success");
+    listening.classList.remove("bg-danger");
+    socket.emit('leave', oldvalue);
+    socket.emit('join', _ani.value);
+    oldvalue = _ani.value;
 }
+
 	</script>  
   
   
