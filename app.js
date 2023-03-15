@@ -129,7 +129,7 @@ function connect_boarddata(socket,msg)
 		socket.emit('boardNotFound',error);
 	}
 }
-
+var bRunFirstSocket = true;
 
 async function accessSecret(name) {
 var secretName = 'projects/'+process.env.GOOGLE_CLOUD_PROJECT+"/secrets/"+name+"/versions/latest";
