@@ -753,61 +753,45 @@ socket.on('boardNotFound', function (msg) {
 });
 
 socket.on('boardFound', function (msg) {
-    board.exists = true;
-    board.parentBoard = msg.parentBoard;
-    board.subitemBoard = msg.subitemBoard;
+  // Set board information
+  board.exists = true;
+  board.parentBoard = msg.parentBoard;
+  board.subitemBoard = msg.subitemBoard;
 
-    // Sort subscribers alphabetically
-    var subscribers = msg.parentBoard.data.boards[0].subscribers;
-    subscribers.sort(function(a, b) {
-        var nameA = a.name.toUpperCase();
-        var nameB = b.name.toUpperCase();
-        if (nameA < nameB) {
-            return -1;
-        }
-        if (nameA > nameB) {
-            return 1;
-        }
-        return 0;
-    });
+  // Add subscribers to reported by dropdown
+  var subscribers = msg.parentBoard.data.boards[0].subscribers;
+  subscribers.sort(function(a, b) {
+    return a.name.localeCompare(b.name);
+  });
+  for (var i = 0; i < subscribers.length; i++) {
+    var option = document.createElement("option");
+    option.textContent = subscribers[i].name;
+    option.value = subscribers[i].id;
+    submissionModal.reportedby.appendChild(option);
+  }
 
-    for (var i = 0; i < subscribers.length; i++) {
-        var el = document.createElement("option");
-        el.textContent = subscribers[i].name;
-        el.value = subscribers[i].id;
-        submissionModal.reportedby.appendChild(el);
+  // Add result fields to result dropdown
+  var subcolumns = msg.subitemBoard.data.boards[0].columns;
+  for (var i = 0; i < subcolumns.length; i++) {
+    if (subcolumns[i].title == "Result") {
+      var resultFields = JSON.parse(subcolumns[i].settings_str).labels;
+
+      // Sort result fields alphabetically
+      var sortedFields = Object.keys(resultFields).sort(function(a, b) {
+        return resultFields[a].localeCompare(resultFields[b]);
+      });
+
+      for (const key of sortedFields) {
+        var option = document.createElement("option");
+        option.textContent = resultFields[key];
+        option.value = key;
+        submissionModal.select_result.appendChild(option);
+      }
+      break;
     }
+  }
 
-    boardmenu.show();
-
-    var subcolumns = msg.subitemBoard.data.boards[0].columns;
-    for (var i = 0; i < subcolumns.length; i++) {
-        if (subcolumns[i].title == "Result") {
-            var resultFields = JSON.parse(subcolumns[i].settings_str).labels;
-
-            // Sort result fields alphabetically
-            var resultFieldKeys = Object.keys(resultFields);
-            resultFieldKeys.sort(function(a, b) {
-                var fieldA = resultFields[a].toUpperCase();
-                var fieldB = resultFields[b].toUpperCase();
-                if (fieldA < fieldB) {
-                    return -1;
-                }
-                if (fieldA > fieldB) {
-                    return 1;
-                }
-                return 0;
-            });
-
-            for (const key of resultFieldKeys) {
-                var el = document.createElement("option");
-                el.textContent = resultFields[key];
-                el.value = key;
-                submissionModal.select_result.appendChild(el);
-            }
-            break;
-        }
-    }
+  boardmenu.show();
 });
 socket.on('defect_created', function (msg) {});
 socket.on('get_items_response', function (msg) {
