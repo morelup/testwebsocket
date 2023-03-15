@@ -622,7 +622,7 @@ function Info(callID, uuid, timestamp) {
 	CallJSONButton.setAttribute("onclick", "showRawLog('" + this.uniqueID + "')");
 	CallJSONButton.innerHTML = "See Log";
 	CallJSONButton.type = "button";
-	CallJSONButton.classList.add("btn", "btn-primary", "col-md-4", "me-2");
+	CallJSONButton.classList.add("btn", "btn-primary", "col-auto", "me-2");
 	Row.appendChild(CallJSONButton);
 
 	var ManualSubmitLog = document.createElement("button"); //submit monday
@@ -635,7 +635,7 @@ function Info(callID, uuid, timestamp) {
 
 	ManualSubmitLog.innerHTML = "Submit to UAT Log";
 	ManualSubmitLog.type = "button";
-	ManualSubmitLog.classList.add("btn", "btn-primary", "col-md-4");
+	ManualSubmitLog.classList.add("btn", "btn-primary", "col-auto");
 	Row.appendChild(ManualSubmitLog);
 
     Row = document.createElement("div"); //row 2
