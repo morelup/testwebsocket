@@ -1,5 +1,6 @@
 body {
-  font-size: .875rem;
+  font-size: 16px;
+  background-color: #f8f9fa;
 }
 
 .feather {
@@ -65,6 +66,12 @@ body {
   color: inherit;
 }
 
+.sidebar .nav-link:hover {
+  color: #2470dc;
+}
+.asside .nav-link:hover {
+  color: #2470dc;
+}
 .sidebar-heading {
   font-size: .75rem;
   text-transform: uppercase;
@@ -75,8 +82,8 @@ body {
  */
 
 .navbar-brand {
-  padding-top: .75rem;
-  padding-bottom: .75rem;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
   font-size: 1rem;
   background-color: rgba(0, 0, 0, .25);
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
@@ -157,6 +164,11 @@ body {
   color: inherit;
 }
 
+.navbar-nav .nav-link:hover {
+  color: #fff;
+  background-color: #2470dc;
+}
+
 .asside-heading {
   font-size: .75rem;
   text-transform: uppercase;
@@ -164,12 +176,17 @@ body {
 .accordion-header button{
   padding-top: 0px;
   padding-bottom: 0px;
-  
+  margin-bottom: 1rem;
 }
 .accordion-header td {
   border-bottom: none;
   padding: 0px;
 }
 td.hiddentile {
-  padding: 0px;
+  padding: 0;
+  border: none;
+}
+.accordion-header button {
+  margin: 0;
+  padding: .5rem 1rem;
 }
