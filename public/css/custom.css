@@ -10,7 +10,10 @@ body {
 }
 
 
-
+.dark {
+  background-color: #1c1c1c;
+  color: #f8f9fa;
+}
 
 
 

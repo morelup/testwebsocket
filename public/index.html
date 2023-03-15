@@ -205,7 +205,7 @@
 	
 	
 	
-	
+<button id="dark-mode-toggle" class="btn btn-secondary position-fixed bottom-0 start-0 m-3"><i class="fas fa-moon"></i></button>	
 	
 <div class="container-fluid">
 	<div class="row">
@@ -838,6 +838,25 @@ function assignANI() {
     socket.emit('join', _ani.value);
     oldvalue = _ani.value;
 }
+const toggleDarkMode = () => {
+    const body = document.querySelector('body');
+    const darkMode = localStorage.getItem('darkMode');
+    if (darkMode === 'enabled') {
+      body.classList.remove('dark');
+      localStorage.setItem('darkMode', null);
+    } else {
+      body.classList.add('dark');
+      localStorage.setItem('darkMode', 'enabled');
+    }
+  };
+
+  const darkModeToggle = document.querySelector('#dark-mode-toggle');
+  darkModeToggle.addEventListener('click', toggleDarkMode);
+
+  const darkMode = localStorage.getItem('darkMode');
+  if (darkMode === 'enabled') {
+    document.querySelector('body').classList.add('dark');
+  }
 
 	</script>  
   
