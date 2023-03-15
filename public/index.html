@@ -381,6 +381,13 @@ function loopLogItem(msg) {
 		var description = (!msg.node_values.prompt_text ) ? "" : msg.node_values.prompt_text;
 		Summary(record,msg,index,description,"https://us7.studioportal.io/icons/prompt.svg");
 	}
+	if ("hangup_header" == msg.node_type)
+	{
+		var routeType = (!msg.node_values.X-route_type ) ? "" : msg.node_values.X-route_type; 
+		var routeReason = (!msg.node_values.X-route_reason ) ? "" : msg.node_values.X-route_reason; 
+		var routeValue = (!msg.node_values.X-route_value ) ? "" : msg.node_values.X-route_value; 
+		Summary(record,msg,index,routeType +":"+routeValue+" - "+routeReason,"https://us7.studioportal.io/icons/hangup.svg");
+	}
 	if("json_response" in msg.node_values)
 	{
 		try{
@@ -755,15 +762,18 @@ function Info(callID,uuid,timestamp)
 	var HeaderRow = SummaryTableHeader.insertRow();
 	var HeaderCell1 = document.createElement("th");
 	var HeaderCell2 = document.createElement("th");
-	var HeaderCellempty = document.createElement("th");
 	var HeaderCell3 = document.createElement("th");
+	var HeaderCellempty = document.createElement("th");
+	var HeaderCell4 = document.createElement("th");
 	HeaderCell1.innerHTML = "Time(ET)";
-	HeaderCell2.innerHTML = "Node Name";
-	HeaderCell3.innerHTML = "Behavior";
+	HeaderCell2.innerHTML = "Task";
+	HeaderCell3.innerHTML = "Node Name";
+	HeaderCell4.innerHTML = "Behavior";
 	HeaderRow.appendChild(HeaderCell1);
 	HeaderRow.appendChild(HeaderCell2);
-	HeaderRow.appendChild(HeaderCellempty);
 	HeaderRow.appendChild(HeaderCell3);
+	HeaderRow.appendChild(HeaderCellempty);
+	HeaderRow.appendChild(HeaderCell4);
 	var SummaryTableBody = SummaryTable.createTBody();
 	this.summaryTableBody = SummaryTableBody;
 	calltable.appendChild(this.callItem);
@@ -779,6 +789,7 @@ function Summary(record,msg,index,description,image)
 {
 	
 	var row = record.info.summaryTableBody.insertRow();
+	var task = (!msg.node_values.task_name) ? "" : msg.node_values.task_name; 
 	console.log(record.summary.length);
 	console.log(record.info.uniqueID);
 	this.row = row;
@@ -793,11 +804,13 @@ function Summary(record,msg,index,description,image)
 	row.setAttribute("onclick","updateOffCanvas(\""+record.info.uniqueID+"\",\""+index+"\")");
 	var cell1 = row.insertCell(0);
 	var cell2 = row.insertCell(1);
-	var cellImage = row.insertCell(2);
-	var cell3 = row.insertCell(3);
+	var cell3 = row.insertCell(2);
+	var cellImage = row.insertCell(3);
+	var cell4 = row.insertCell(4);
 	cell1.innerHTML = timeConverter(msg.timestamp);
-	cell2.innerHTML = (!msg.node_name ) ? msg_nodeType : msg.node_name;;
-	cell3.innerHTML = description;
+	cell2.innerHTML = task;
+	cell3.innerHTML = (!msg.node_name ) ? msg_nodeType : msg.node_name;
+	cell4.innerHTML = description;
 	cellImage.innerHTML = '<img src="'+image+'">';
 }
 
@@ -886,12 +899,21 @@ socket.on('boardFound', function(msg){
 socket.on('defect_created', function(msg){
   });
 socket.on('get_items_response', function(msg){
-	console.log(JSON.stringify(msg));
 	var items = msg.data.boards[0].items;
-    for(var i = 0; i < items.length; i++) {
+	
+	var itemNameArray = [];
+	var itemValueArray = {};
+	for(var i = 0; i < items.length; i++) {
+	
+		itemNameArray.push(items[i].name);
+		itemValueArray[items[i].name] = items[i].id
+	}
+	itemNameArray.sort();
+	
+    for(var i = 0; i < itemNameArray.length; i++) {
 		var el = document.createElement("option");
-		el.textContent = items[i].name;
-		el.value = items[i].id;
+		el.textContent = itemNameArray[i];
+		el.value = itemValueArray[itemNameArray[i]];
 		submissionModal.select_currentItem.appendChild(el);
 	}
   });
