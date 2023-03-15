@@ -274,8 +274,7 @@
 <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 <script src="js/jquery.json-editor.min.js" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
-<script>
-const urlParams = new URLSearchParams(window.location.search);
+<script>const urlParams = new URLSearchParams(window.location.search);
 const fullLog = urlParams.get("fullLog") ?? "null";
 const project = urlParams.get("project") ?? "null";
 const board = { id: urlParams.get("board") ?? "null", exists: false };
@@ -346,7 +345,6 @@ function loopLogItem(msg) {
 
     if (msg.node_values.json_response) {
         try {
-
             function loop_responses(value) {
                 var parsedInput = JSON.parse(value)
                     var image = "https://us7.studioportal.io/icons/prompt_recorder.svg";
@@ -356,7 +354,6 @@ function loopLogItem(msg) {
                     }
                 }
                 Summary(record, msg, index, parsedInput.input, image);
-
             }
             if (Array.isArray(msg.node_values.json_response)) {
                 msg.node_values.json_response.forEach(loop_responses);
@@ -367,7 +364,6 @@ function loopLogItem(msg) {
                         image = "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
                     }
                 }
-
                 if ("input" in msg.node_values.json_response) {
                     Summary(record, msg, index, msg.node_values.json_response.input, image);
                 } else {
@@ -375,37 +371,29 @@ function loopLogItem(msg) {
                 }
             }
         } catch (ex) {
-            console.error('Wrong JSON Format: ' + msg.node_values.json_response);
+            console.error('Wrong JSON Format: ' + ex);
         }
     }
 }
 
 function logMessage(msg) {
-    console.log("Call Information Recieved");
-    console.log(msg);
-    var callID = (!msg[0].node_values.XSIP_x_five9callid) ? "" : msg[0].node_values.XSIP_x_five9callid;
-    var uuid = (!msg[0].uuid) ? "" : msg[0].uuid;
-
+    const callID = msg[0]?.node_values?.XSIP_x_five9callid || "";
+	const uuid = msg[0]?.uuid || "";
     if (callID == "" && uuid == "") {
-        console.log("Invalid call recieved");
         return;
     }
     if (callID + uuid in records) {
         msg.forEach(loopLogItem);
-        console.log("Call Update");
         return;
     }
-
-    records[callID + uuid] = new Record(callID, uuid, msg[0].timestamp) 
-
-
-        msg.forEach(loopLogItem);
-
+    records[callID + uuid] = new Record(callID, uuid, msg[0].timestamp);
+    msg.forEach(loopLogItem);
 }
 
 function debugMessage() {
     logMessage(JSON.parse(document.getElementById('testPayload').value));
 }
+
 function getJson() {
     try {
         return jsonObject;
@@ -444,16 +432,15 @@ const manualSubmissionModal = {
 };
 
 function showManualMondaySubmission(uniqueID) {
-    manualSubmissionModal.manualSubitemUUID.innerHTML = records[uniqueID].info.UUID;
-    manualSubmissionModal.manualCopyUUIDButton.setAttribute('onclick', "copyUUID('" + uniqueID + "')");
-    manualSubmissionModal.manualSubitemVCC.innerHTML = records[uniqueID].info.callID;
-    manualSubmissionModal.manualCopyVCCButton.setAttribute('onclick', "copyVCC('" + uniqueID + "')");
-    manualSubmissionModal.manualCopyCallLogButton.setAttribute('onclick', "copyCallLog('" + uniqueID + "')");
-    manualSubmissionModal.manualSubitemTimestamp.innerHTML = dateTimeConverter(records[uniqueID].info.timestamp);
-    manualSubmissionModal.manualCopyTimestampButton.setAttribute('onclick', "copyTimestamp('" + uniqueID + "')");
-
+    const info = records[uniqueID].info;
+    manualSubmissionModal.manualSubitemUUID.textContent = info.UUID;
+    manualSubmissionModal.manualCopyUUIDButton.onclick = () => copyUUID(uniqueID);
+    manualSubmissionModal.manualSubitemVCC.textContent = info.callID;
+    manualSubmissionModal.manualCopyVCCButton.onclick = () => copyVCC(uniqueID);
+    manualSubmissionModal.manualCopyCallLogButton.onclick = () => copyCallLog(uniqueID);
+    manualSubmissionModal.manualSubitemTimestamp.textContent = dateTimeConverter(info.timestamp);
+    manualSubmissionModal.manualCopyTimestampButton.onclick = () => copyTimestamp(uniqueID);
     modal_manual_monday_submit.show();
-    return;
 }
 
 const submissionModal = {
@@ -722,33 +709,43 @@ const socket = io({
         reconnectionDelayMax: 10000
     });
 
-socket.on('us7 message', function (msg) {
-    logMessage(msg);
-});
-socket.on('us6 message', function (msg) {
-    logMessage(msg);
-});
+// Log messages for US7
+socket.on('us7 message', logMessage);
 
+// Log messages for US6
+socket.on('us6 message', logMessage);
+
+// Update board data
 socket.on('boardData', function (msg) {
     board.data = msg.data;
 });
+
+// Update subItem board data
 socket.on('subItemBoardData', function (msg) {
     subItemBoard.data = msg.data;
     subItemBoard.id = subItemBoard.data.boards[0].id;
 });
+
+// Log when a defect is submitted
 socket.on('defect submitted', function (msg) {
     console.log("defect submitted for" + msg);
 });
+
+// Log when connected to the websocket and join if previously connected
 socket.on('connect', function () {
     console.log("Connected to websocket");
     if (oldvalue != "") {
         console.log("Rejoining: " + ani.value);
         socket.emit('join', ani.value);
     }
+    // Connect to board data if board id is not null
     if (board.id !== "null") {
 	  socket.emit('connect_boarddata', board.id);
 	}
 });
+
+
+
 socket.on('boardNotFound', function (msg) {
     boardmenu.hide();
     board.exists = false;
@@ -758,20 +755,22 @@ socket.on('boardNotFound', function (msg) {
 socket.on('boardFound', function (msg) {
     board.exists = true;
     board.parentBoard = msg.parentBoard;
-    board.subitemBoard = msg.subitemBoard
-        var subscribers = msg.parentBoard.data.boards[0].subscribers;
-    for (var i = 0; i < subscribers.length; i++) {
+    board.subitemBoard = msg.subitemBoard;
+
+    // populate 'reportedby' dropdown with board subscribers
+    msg.parentBoard.data.boards[0].subscribers.forEach(function(subscriber) {
         var el = document.createElement("option");
-        el.textContent = subscribers[i].name;
-        el.value = subscribers[i].id;
+        el.textContent = subscriber.name;
+        el.value = subscriber.id;
         submissionModal.reportedby.appendChild(el);
-    }
+    });
+
     boardmenu.show();
 
-    var subcolumns = msg.subitemBoard.data.boards[0].columns;
-    for (var i = 0; i < subcolumns.length; i++) {
-        if (subcolumns[i].title == "Result") {
-            var resultFields = JSON.parse(subcolumns[i].settings_str).labels;
+    // populate 'select_result' dropdown with result fields
+    msg.subitemBoard.data.boards[0].columns.forEach(function(column) {
+        if (column.title == "Result") {
+            var resultFields = JSON.parse(column.settings_str).labels;
 
             for (const key in resultFields) {
                 var el = document.createElement("option");
@@ -779,10 +778,9 @@ socket.on('boardFound', function (msg) {
                 el.value = key;
                 submissionModal.select_result.appendChild(el);
             }
-            break;
+            return;
         }
-    }
-
+    });
 });
 
 socket.on('defect_created', function (msg) {});
