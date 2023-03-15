@@ -10,10 +10,6 @@ body {
 }
 
 
-.dark {
-  background-color: #1c1c1c;
-  color: #f8f9fa;
-}
 .dark-mode-btn {
   position: fixed;
   bottom: 20px;
@@ -43,11 +39,6 @@ body {
 @media (max-width: 767.98px) {
   .sidebar {
     top: 5rem;
-  }
-}
-@media (prefers-color-scheme: dark) {
-  .sidebar {
-    background-color: #1a1a1a;
   }
 }
 .sidebar-sticky {

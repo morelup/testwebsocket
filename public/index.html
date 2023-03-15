@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -838,14 +838,15 @@ function assignANI() {
     socket.emit('join', _ani.value);
     oldvalue = _ani.value;
 }
+
+
 const toggleDarkMode = () => {
-    const body = document.querySelector('body');
     const darkMode = localStorage.getItem('darkMode');
     if (darkMode === 'enabled') {
-      body.classList.remove('dark');
+	  document.documentElement.setAttribute('data-bs-theme','light');
       localStorage.setItem('darkMode', null);
     } else {
-      body.classList.add('dark');
+      document.documentElement.setAttribute('data-bs-theme','dark');
       localStorage.setItem('darkMode', 'enabled');
     }
   };
@@ -855,7 +856,7 @@ const toggleDarkMode = () => {
 
   const darkMode = localStorage.getItem('darkMode');
   if (darkMode === 'enabled') {
-    document.querySelector('body').classList.add('dark');
+    document.documentElement.setAttribute('data-bs-theme','dark');
   }
 
 	</script>  
