@@ -383,9 +383,9 @@ function loopLogItem(msg) {
 	}
 	if ("hangup_header" == msg.node_type)
 	{
-		var routeType = (!msg.node_values.X-route_type ) ? "" : msg.node_values.X-route_type; 
-		var routeReason = (!msg.node_values.X-route_reason ) ? "" : msg.node_values.X-route_reason; 
-		var routeValue = (!msg.node_values.X-route_value ) ? "" : msg.node_values.X-route_value; 
+		var routeType = (!msg.node_values["X-route_type"] ) ? "" : msg.node_values["X-route_type"]; 
+		var routeReason = (!msg.node_values["X-route_reason"] ) ? "" : msg.node_values["X-route_reason"]; 
+		var routeValue = (!msg.node_values["X-route_value"] ) ? "" : msg.node_values["X-route_value"] ; 
 		Summary(record,msg,index,routeType +":"+routeValue+" - "+routeReason,"https://us7.studioportal.io/icons/hangup.svg");
 	}
 	if("json_response" in msg.node_values)
@@ -900,22 +900,31 @@ socket.on('defect_created', function(msg){
   });
 socket.on('get_items_response', function(msg){
 	var items = msg.data.boards[0].items;
+	items.sort((a, b) => {
+	  const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+	  const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+	  if (nameA < nameB) {
+		return -1;
+	  }
+	  if (nameA > nameB) {
+		return 1;
+	  }
+
+	  // names must be equal
+	  return 0;
+	});
 	
-	var itemNameArray = [];
-	var itemValueArray = {};
-	for(var i = 0; i < items.length; i++) {
 	
-		itemNameArray.push(items[i].name);
-		itemValueArray[items[i].name] = items[i].id
-	}
-	itemNameArray.sort();
 	
-    for(var i = 0; i < itemNameArray.length; i++) {
+    for(var i = 0; i < items.length; i++) {
 		var el = document.createElement("option");
-		el.textContent = itemNameArray[i];
-		el.value = itemValueArray[itemNameArray[i]];
+		el.textContent = items[i].name;
+		el.value = items[i].id;
 		submissionModal.select_currentItem.appendChild(el);
 	}
+	
+	
+	
   });
 
 
