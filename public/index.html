@@ -1,4 +1,4 @@
-<html lang="en" data-bs-theme="dark">
+<html lang="en" >
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -203,9 +203,6 @@
 	
 	
 	
-	
-	
-<button id="dark-mode-toggle" class="btn btn-secondary position-fixed bottom-0 start-0 m-3 dark-mode-btn"><i class="fas fa-moon"></i></button>	
 	
 <div class="container-fluid">
 	<div class="row">
@@ -840,24 +837,6 @@ function assignANI() {
 }
 
 
-const toggleDarkMode = () => {
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'enabled') {
-	  document.documentElement.setAttribute('data-bs-theme','light');
-      localStorage.setItem('darkMode', null);
-    } else {
-      document.documentElement.setAttribute('data-bs-theme','dark');
-      localStorage.setItem('darkMode', 'enabled');
-    }
-  };
-
-  const darkModeToggle = document.querySelector('#dark-mode-toggle');
-  darkModeToggle.addEventListener('click', toggleDarkMode);
-
-  const darkMode = localStorage.getItem('darkMode');
-  if (darkMode === 'enabled') {
-    document.documentElement.setAttribute('data-bs-theme','dark');
-  }
 
 	</script>  
   
