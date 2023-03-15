@@ -190,3 +190,7 @@ td.hiddentile {
   margin: 0;
   padding: .5rem 1rem;
 }
+.clickable:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
