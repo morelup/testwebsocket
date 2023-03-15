@@ -293,14 +293,14 @@ const listening = document.getElementById('listening');
 function dateTimeConverter(UNIX_timestamp, isTimeOnly = false) {
   const options = {
     timeZone: 'America/New_York',
-    timeZoneName: 'short'
   };
   if (isTimeOnly) {
     options.timeStyle = 'medium';
+  } else {
+    options.timeZoneName = 'short';
   }
   return new Date(UNIX_timestamp * 1).toLocaleString('en-US', options);
 }
-
 
 
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
@@ -346,21 +346,36 @@ function loopLogItem(msg) {
 
     if (msg.node_values.json_response) {
         try {
-            const responses = Array.isArray(msg.node_values.json_response) 
-                ? msg.node_values.json_response
-                : [msg.node_values.json_response];
-            const image = (response) => {
-                if (response.input_mode === "dtmf") {
-                    return "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
+
+            function loop_responses(value) {
+                var parsedInput = JSON.parse(value)
+                    var image = "https://us7.studioportal.io/icons/prompt_recorder.svg";
+                if ("input_mode" in parsedInput) {
+                    if (parsedInput.input_mode == "dtmf") {
+                        image = "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
+                    }
                 }
-                return "https://us7.studioportal.io/icons/prompt_recorder.svg";
-            };
-            responses.forEach((response) => {
-                const input = response.input || response.data.raw_transcribe || "";
-                Summary(record, msg, index, input, image(response));
-            });
+                Summary(record, msg, index, parsedInput.input, image);
+
+            }
+            if (Array.isArray(msg.node_values.json_response)) {
+                msg.node_values.json_response.forEach(loop_responses);
+            } else {
+                var image = "https://us7.studioportal.io/icons/prompt_recorder.svg";
+                if ("input_mode" in msg.node_values.json_response) {
+                    if (msg.node_values.json_response.input_mode == "dtmf") {
+                        image = "https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg";
+                    }
+                }
+
+                if ("input" in msg.node_values.json_response) {
+                    Summary(record, msg, index, msg.node_values.json_response.input, image);
+                } else {
+                    Summary(record, msg, index, msg.node_values.json_response.data.raw_transcribe, image);
+                }
+            }
         } catch (ex) {
-            console.error(`Wrong JSON Format: ${msg.node_values.json_response}`);
+            console.error('Wrong JSON Format: ' + msg.node_values.json_response);
         }
     }
 }
