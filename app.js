@@ -22,12 +22,25 @@ const io = require('socket.io')(server, {
 app.post('/', (req, res) => {
   const queryObject = url.parse(req.url, true).query;
   const ifDebug = "debug" in queryObject;
+  
   const ANI = req.body[0].node_values.XSIP_x_five9ani || "ERROR";
 
   try {
-    if (io.sockets.adapter.rooms.has(ANI)) {
-      io.to(ANI).emit('us7 message', req.body);
-    }
+    if (ANI != "ERROR")
+	{
+		if (io.sockets.adapter.rooms.has(ANI)) {
+		  io.to(ANI).emit('us7 message', req.body);
+		}
+	}
+	else
+	{
+		if(queryObject.board)
+		{
+			if (io.sockets.adapter.rooms.has(queryObject.board)) {
+			  io.to(queryObject.board).emit('us7 message', req.body);
+			}
+		}
+	}
   } catch (error) {
     console.log(error);
   }

@@ -39,69 +39,70 @@ function uploadFile(msg,item){
 
 
 function boardInfo(msg){
-	try{
+	try {
 		var body = JSON.stringify({
-		query: `query {
-		  boards (ids: [${msg}]) {
-			name
-			state
-			board_folder_id
-			id
-			columns {
-					title
-					type
+			query: `query {
+				boards (ids: [${msg}]) {
+					name
+					state
+					board_folder_id
 					id
-					settings_str 
-				}  
-			 subscribers{
-				id
-				name
-			}
-			groups  {
-					title
-					id
+					columns {
+						title
+						type
+						id
+						settings_str 
+					}  
+					subscribers{
+						id
+						name
+					}
+					groups  {
+						title
+						id
+					}
 				}
-		  }
-		}
-		`});
-		return fetch('https://api.monday.com/v2', {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json',
-			'Authorization': authKey
-		  },
-		  body: body,
-		}).then(res => res.text())
+			}`
+		});
+		return callApi(body);
 	} catch (error) {
 		console.log(error);
 	}	
 }
-
 
 function getItems(msg){
-	try{
+	try {
 		var body = JSON.stringify({
-		query: `query {
-		  boards (ids: [${msg}]) {
-			items {
-					id
-					name 
-				} 
-		  }
-		}
-		`});
-		return fetch('https://api.monday.com/v2', {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json',
-			'Authorization': authKey
-		  },
-		  body: body,
-		}).then(res => res.text())
+			query: `query {
+				boards (ids: [${msg}]) {
+					items {
+						id
+						name 
+					} 
+				}
+			}`
+		});
+		return callApi(body);
 	} catch (error) {
 		console.log(error);
 	}	
 }
+
+
+function callApi(body) {
+  return fetch('https://api.monday.com/v2', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': authKey
+    },
+    body: body,
+  }).then(res => res.text());
+}
+
+
+
+
 function getBoardColumns(board){
 	var columns = board.data.boards[0].columns;
 	var returnObject = {};
@@ -110,41 +111,23 @@ function getBoardColumns(board){
 	})
 	return returnObject
 }
-function confirmParentColumns(board)
-{
-	var columns = getBoardColumns(board);
-	if(!('Reported Date' in columns))
-	{console.log('Reported Date Fail');
-		return false;}
-	if(!('Expected Behavior' in columns))
-	{console.log('Expected Behavior Fail');
-		return false;}
-	if(!('Actual Behavior' in columns))
-	{
-		console.log('Actual Behavior Fail');
-		return false;}
-	if(!('Subitems' in columns))
-	{
-		console.log('Subitems Fail');
-		return false;}
-	return true;
+
+
+function confirmParentColumns(board) {
+  var columns = getBoardColumns(board);
+  var requiredColumns = ['Reported Date', 'Expected Behavior', 'Actual Behavior', 'Subitems'];
+  for (var i = 0; i < requiredColumns.length; i++) {
+    if (!(requiredColumns[i] in columns)) {
+      console.log(requiredColumns[i] + ' Fail');
+      return false;
+    }
+  }
+  return true;
 }
-function confirmSubitemColumns(board)
-{
-	var columns = getBoardColumns(board);
-	if(!('Result' in columns))
-	{return false;}
-	if(!('VCC Call ID' in columns))
-	{return false;}
-	if(!('Timestamp' in columns))
-	{return false;}
-	if(!('Caller\'s Phone Number' in columns))
-	{return false;}
-	if(!('Notes' in columns))
-	{return false;}
-	if(!('Caller' in columns))
-	{return false;}
-	return true;	
+function confirmSubitemColumns(board) {
+  var requiredColumns = ['Result', 'VCC Call ID', 'Timestamp', "Caller's Phone Number", 'Notes', 'Caller'];
+  var columns = getBoardColumns(board);
+  return requiredColumns.every(column => column in columns);
 }
 function getBoardID(board)
 {
@@ -157,24 +140,15 @@ function getGroupID(board)
 
 
 
-function DateTimeNow(){
-  var a = new Date();
-  return a.toISOString().replace('T', ' ').substr(0, 19);
+function DateTimeNow() {
+  return new Date().toISOString().slice(0, 19).replace('T', ' ');
 }
 
 
 function createDefect(board,msg) {
 	try{
-		/*
-		Name
-		Status
-		Reported By
-		Reported Date
-		Expected Behavior
-		Actual Behavior
-		*/
-		var columns = getBoardColumns(board);
-		var column_values = {
+		const columns = getBoardColumns(board);
+		const column_values = {
 			[columns["Reported Date"]]:DateTimeNow(),
 			[columns["Expected Behavior"]]:msg["expected"],
 			[columns["Actual Behavior"]]:msg["actual"]
@@ -185,7 +159,7 @@ function createDefect(board,msg) {
 			column_values[columns["Reported By"]]={"personsAndTeams":[{"id":msg["reportedby"],"kind":"person"}]};
 		}
 		
-		var body = JSON.stringify({
+		const body = JSON.stringify({
 		query: `mutation ($board_id: Int!, $group_id: String, $name: String, $column_values: JSON) {
 		create_item (
 				board_id: $board_id, 
@@ -219,14 +193,6 @@ function createDefect(board,msg) {
 
 function createSubItem(board,msg,item) {
 	try{
-		/*
-		Name
-		Result
-		VCC Call ID
-		Timestamp
-		Caller's Phone Number
-		Notes
-		*/
 		const columns = getBoardColumns(board);
 		const column_values = {};
 		if (msg.callid !== "null") column_values[columns["VCC Call ID"]] = msg.callid;

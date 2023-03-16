@@ -740,6 +740,7 @@ socket.on('connect', function () {
     // Connect to board data if board id is not null
     if (board.id !== "null") {
 	  socket.emit('connect_boarddata', board.id);
+	  if (urlParams.has("testing")) socket.emit('join', board.id);
 	}
 });
 
