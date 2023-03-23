@@ -219,6 +219,7 @@ function createSubItem(board,msg,item) {
 		`,
 			variables
 		  });
+		  console.log(body);
 		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {
