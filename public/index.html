@@ -374,6 +374,18 @@ function loopLogItem(msg) {
             console.error('Wrong JSON Format: ' + ex);
         }
     }
+	if (msg.node_values.nlp_response) {
+		if (msg.node_values.open_form["0/0/fulfillmentText"]) {
+			try {
+				const user_response = msg.node_values.open_form["0/0/fulfillmentText"] || "";
+				const message = `${user_response}`;
+				Summary(record, msg, index, message, "https://us7.studioportal.io/icons/prompt_recorder.svg");
+				}
+			catch{
+				
+				}
+		}
+	}
 	if (msg.node_values.open_form) {
 		if (msg.node_values.open_form.user_response) {
 			try {
