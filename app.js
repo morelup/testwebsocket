@@ -34,10 +34,10 @@ app.post('/', (req, res) => {
 	}
 	else
 	{
-		if(queryObject.board)
+		if(queryObject.boardId)
 		{
-			if (io.sockets.adapter.rooms.has(queryObject.board)) {
-			  io.to(queryObject.board).emit('us7 message', req.body);
+			if (io.sockets.adapter.rooms.has(queryObject.boardId)) {
+			  io.to(queryObject.boardId).emit('us7 message', req.body);
 			}
 		}
 	}
