@@ -375,9 +375,9 @@ function loopLogItem(msg) {
         }
     }
 	if (msg.node_values.nlp_response) {
-		if (msg.node_values.open_form["0/0/fulfillmentText"]) {
+		if (msg.node_values.nlp_response["0/0/intent/displayName"]) {
 			try {
-				const user_response = msg.node_values.open_form["0/0/fulfillmentText"] || "";
+				const user_response = msg.node_values.nlp_response["0/0/intent/displayName"] || "";
 				const message = `${user_response}`;
 				Summary(record, msg, index, message, "https://us7.studioportal.io/icons/prompt_recorder.svg");
 				}
