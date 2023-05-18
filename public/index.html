@@ -343,6 +343,34 @@ function loopLogItem(msg) {
         const message = `${time_taken}`;
         Summary(record, msg, index, message, "https://us7.studioportal.io/icons/integration.svg");
     }
+	if (msg.node_type === "data_store") {
+		
+		
+		try{
+			if (msg.node_values.form_data.document_rules.event){
+				const event = msg.node_values.form_data.document_rules.event || "";
+				const message = `${event}`;
+				Summary(record, msg, index, message, "https://us7.studioportal.io/icons/data_store_system.svg");
+				}
+			if (msg.node_values.form_data.document_rules.param1){
+				const event = msg.node_values.form_data.document_rules.param1 || "";
+				const message = `${event}`;
+				Summary(record, msg, index, message, "https://us7.studioportal.io/icons/data_store_system.svg");
+				}
+			if (msg.node_values.form_data.document_rules.param2){
+				const event = msg.node_values.form_data.document_rules.param2 || "";
+				const message = `${event}`;
+				Summary(record, msg, index, message, "https://us7.studioportal.io/icons/data_store_system.svg");
+				}
+			if (msg.node_values.form_data.document_rules.param3){
+				const event = msg.node_values.form_data.document_rules.param3 || "";
+				const message = `${event}`;
+				Summary(record, msg, index, message, "https://us7.studioportal.io/icons/data_store_system.svg");
+				}
+		}
+		catch{
+		}
+    }
     if (msg.node_values.json_response) {
         try {
             function loop_responses(value) {
