@@ -930,77 +930,29 @@ function Defect() {
 }
 
 function assignANI() {
-	if (!_ani.value) {
-		if (board.id !== "null") {
-			listen(board.id);
-		}
+	if (_ani.value == "") {
+      if (board.id !== "null") {
+        listen(board.id);
+      }else{
+        alert("No ANI Value Set");
+      }
     }
 	else
 	{
-		listen(_ani.value);
+		  listen(_ani.value);
 	}
    
 }
+
 function listen(listenvalue)
 {
-	listening.innerHTML = "Listening to: " + listenvalue;
-	listening.classList.add("bg-success");
-    listening.classList.remove("bg-danger");
-    socket.emit('leave', oldvalue);
-    socket.emit('join', listenvalue);
-    oldvalue = listenvalue;
+  listening.innerHTML = "Listening to: " + listenvalue;
+  listening.classList.add("bg-success");
+  listening.classList.remove("bg-danger");
+  socket.emit('leave', oldvalue);
+  socket.emit('join', listenvalue);
+  oldvalue = listenvalue;
 }
 	</script>  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-    
-	
   </body>
 </html>
