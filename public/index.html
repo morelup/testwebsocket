@@ -39,7 +39,7 @@
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		  </div>
 			<div class="modal-body">
-				<h5 >Item</h5>
+				<h5>Item</h5>
 				<p>If you are reporting a new defect, create a new item and subitem.  If you are retesting a previously failed test just create a new subitem under the defect.</p>
 				<table class="table table-hover">
 					<thead>
@@ -273,25 +273,44 @@
 
 
 //Define Constants and UI Elements
+const ELEMENTS = {
+
+	//elements
+	const debugmenu = document.getElementById('debugmenu');
+	const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'), { toggle: false });
+	const ANI = document.getElementById('ani');
+	const calltable = document.getElementById('CallTable');
+	const listening = document.getElementById('listening');
+
+
+
+
+	//element listeners
+	ANI.addEventListener("keypress", function (event) {
+		// If the user presses the "Enter" key on the keyboard
+		if (event.key === "Enter") {
+			// Cancel the default action, if needed
+			event.preventDefault();
+			// Trigger the button element with a click
+			assignANI();
+		}
+	});
+
+};
+
+//define global variables
 const urlParams = new URLSearchParams(window.location.search);
+const board = { id: urlParams.get("boardId") ?? "null", exists: false };
+if (urlParams.has("debug")) new bootstrap.Collapse(ELEMENTS.debugmenu);
 const fullLog = urlParams.get("fullLog") ?? "null";
 const project = urlParams.get("project") ?? "null";
-const board = { id: urlParams.get("boardId") ?? "null", exists: false };
-const debugmenu = document.getElementById('debugmenu');
-if (urlParams.has("debug")) new bootstrap.Collapse(debugmenu);
-const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'), { toggle: false });
-const ANI = document.getElementById('ani');
-ANI.addEventListener("keypress", function (event) {
-    // If the user presses the "Enter" key on the keyboard
-    if (event.key === "Enter") {
-        // Cancel the default action, if needed
-        event.preventDefault();
-        // Trigger the button element with a click
-        assignANI();
-    }
-});
-const calltable = document.getElementById('CallTable');
-const listening = document.getElementById('listening');
+var jsonObject = {};
+var editor = new JsonEditor('#json-display', getJson());
+var editorOffCanvas = new JsonEditor('#json-displayOffCanvas', getJson());
+var oldvalue = "";
+var records = {};
+var missingFields = [];
+
 
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
         keyboard: false
@@ -331,12 +350,7 @@ const submissionModal = {
     })
 };
 
-var jsonObject = {};
-var editor = new JsonEditor('#json-display', getJson());
-var editorOffCanvas = new JsonEditor('#json-displayOffCanvas', getJson());
 
-var oldvalue = "";
-var records = {};
 
 
 
@@ -372,97 +386,101 @@ function dateTimeConverter(UNIX_timestamp, isTimeOnly = false) {
 
 
 function loopLogItem(msg) {
-  const callID = msg.node_values.XSIP_x_five9callid || "";
-  const uuid = msg.uuid || "";
-  const record = records[callID + uuid];
-  const node_order = msg.node_order || "";
-  const index = node_order || Object.keys(record.raw).length;
-  record.raw[index] = msg;
+	const callID = msg.node_values.XSIP_x_five9callid || "";
+	const uuid = msg.uuid || "";
+	const record = records[callID + uuid];
+	const node_order = msg.node_order || "";
+	const index = node_order || Object.keys(record.raw).length;
+	record.raw[index] = msg;
 
-  if (msg.node_values.prompt_text) {
-      const description = msg.node_values.prompt_text;
-      Summary(record, msg, index, description, studio_images.prompt);
-  }
+	if (msg.node_values.prompt_text) {
+		const description = msg.node_values.prompt_text;
+		Summary(record, msg, index, description, studio_images.prompt);
+	}
 
-  if (msg.node_type === "hangup_header") {
-      const routeType = msg.node_values["X-route_type"] || "";
-      const routeReason = msg.node_values["X-route_reason"] || "";
-      const routeValue = msg.node_values["X-route_value"] || "";
-      const message = `${routeType}:${routeValue} - ${routeReason}`;
-      Summary(record, msg, index, message, studio_images.hangup);
-  }
-	if (msg.node_type === "integration") {
-        const time_taken = msg.node_values["time_taken"] || "";
-        const message = `${time_taken}`;
-        Summary(record, msg, index, message, studio_images.integration );
-  }
-	if (msg.node_type === "data_store") {
-		try{
-			if (msg.node_values.form_data.document_rules.event){
-				const event = msg.node_values.form_data.document_rules.event || "";
-				const message = `${event}`;
-				Summary(record, msg, index, message,studio_images.system );
-				}
-			if (msg.node_values.form_data.document_rules.param1){
-				const event = msg.node_values.form_data.document_rules.param1 || "";
-				const message = `${event}`;
-				Summary(record, msg, index, message, studio_images.system);
-				}
-			if (msg.node_values.form_data.document_rules.param2){
-				const event = msg.node_values.form_data.document_rules.param2 || "";
-				const message = `${event}`;
-				Summary(record, msg, index, message, studio_images.system);
-				}
-			if (msg.node_values.form_data.document_rules.param3){
-				const event = msg.node_values.form_data.document_rules.param3 || "";
-				const message = `${event}`;
-				Summary(record, msg, index, message, studio_images.system);
-				}
-		}
-		catch{
-		}
-  }
-  if (msg.node_values.json_response) {
-      try {
-          function loop_responses(value) {
-              var parsedInput = JSON.parse(value)
-                  var image = studio_images.prompt_recorder;
-              if ("input_mode" in parsedInput) {
-                  if (parsedInput.input_mode == "dtmf") {
-                      image = studio_images.webrtc;
-                  }
-              }
-              Summary(record, msg, index, parsedInput.input, image);
-          }
-          if (Array.isArray(msg.node_values.json_response)) {
-              msg.node_values.json_response.forEach(loop_responses);
-          } else {
-              var image = studio_images.prompt_recorder;
-              if ("input_mode" in msg.node_values.json_response) {
-                  if (msg.node_values.json_response.input_mode == "dtmf") {
-                      image = studio_images.webrtc;
-                  }
-              }
-              if ("input" in msg.node_values.json_response) {
-                  Summary(record, msg, index, msg.node_values.json_response.input, image);
-              } else {
-                  Summary(record, msg, index, msg.node_values.json_response.data.raw_transcribe, image);
-              }
-          }
-      } catch (ex) {
-          console.error('Wrong JSON Format: ' + ex);
-      }
-  }
+	if (msg.node_type === "hangup_header") {
+		const routeType = msg.node_values["X-route_type"] || "";
+		const routeReason = msg.node_values["X-route_reason"] || "";
+		const routeValue = msg.node_values["X-route_value"] || "";
+		const message = `${routeType}:${routeValue} - ${routeReason}`;
+		Summary(record, msg, index, message, studio_images.hangup);
+	}
+	else if (msg.node_type === "integration") {
+		const time_taken = msg.node_values["time_taken"] || "";
+		const message = `${time_taken}`;
+		Summary(record, msg, index, message, studio_images.integration );
+	}
+	else if (msg.node_type === "data_store") {
+	try{
+		if (msg.node_values.form_data.document_rules.event){
+			const event = msg.node_values.form_data.document_rules.event || "";
+			const message = `${event}`;
+			Summary(record, msg, index, message,studio_images.system );
+			}
+		if (msg.node_values.form_data.document_rules.param1){
+			const event = msg.node_values.form_data.document_rules.param1 || "";
+			const message = `${event}`;
+			Summary(record, msg, index, message, studio_images.system);
+			}
+		if (msg.node_values.form_data.document_rules.param2){
+			const event = msg.node_values.form_data.document_rules.param2 || "";
+			const message = `${event}`;
+			Summary(record, msg, index, message, studio_images.system);
+			}
+		if (msg.node_values.form_data.document_rules.param3){
+			const event = msg.node_values.form_data.document_rules.param3 || "";
+			const message = `${event}`;
+			Summary(record, msg, index, message, studio_images.system);
+			}
+	}
+	catch{
+	}
+	}
+	if (msg.node_values.json_response) {
+	  try {
+		  function loop_responses(value) {
+			  var parsedInput = JSON.parse(value)
+				  var image = studio_images.prompt_recorder;
+			  if ("input_mode" in parsedInput) {
+				  if (parsedInput.input_mode == "dtmf") {
+					  image = studio_images.webrtc;
+				  }
+			  }
+			  Summary(record, msg, index, parsedInput.input, image);
+		  }
+		  
+		  if (Array.isArray(msg.node_values.json_response)) {
+			  msg.node_values.json_response.forEach(loop_responses);
+		  } 
+		  else 
+		  {
+			  var image = studio_images.prompt_recorder;
+			  if ("input_mode" in msg.node_values.json_response) {
+				  if (msg.node_values.json_response.input_mode == "dtmf") {
+					  image = studio_images.webrtc;
+				  }
+			  }
+			  if ("input" in msg.node_values.json_response) {
+				  Summary(record, msg, index, msg.node_values.json_response.input, image);
+			  } else {
+				  Summary(record, msg, index, msg.node_values.json_response.data.raw_transcribe, image);
+			  }
+		  }
+	  } 
+	  catch (ex) {
+		  console.error('Wrong JSON Format: ' + ex);
+	  }
+	}
 	if (msg.node_values.nlp_response) {
 		if (msg.node_values.nlp_response["0/0/intent/displayName"]) {
 			try {
 				const user_response = msg.node_values.nlp_response["0/0/intent/displayName"] || "";
 				const message = `${user_response}`;
 				Summary(record, msg, index, message, studio_images.prompt_recorder);
-				}
+			}
 			catch{
 				
-				}
+			}
 		}
 	}
 	if (msg.node_values.open_form) {
@@ -471,10 +489,10 @@ function loopLogItem(msg) {
 				const user_response = msg.node_values.open_form["user_response"] || "";
 				const message = `${user_response}`;
 				Summary(record, msg, index, message, studio_images.webrtc);
-				}
+			}
 			catch{
 				
-				}
+			}
 		}
 	}
 }
@@ -574,7 +592,8 @@ function defectOrRetest() {
         submissionModal.div_defectDetails.show();
     }
 }
-var missingFields = [];
+
+
 function createDefect(uniqueID) {
 
 	missingFields.forEach(function(field) {
@@ -620,7 +639,7 @@ function createDefect(uniqueID) {
             subitem: records[uniqueID].info.UUID,
             callid: records[uniqueID].info.callID,
             timestamp: dateTimeConverter(records[uniqueID].info.timestamp),
-            ani: ANI.value,
+            ani: ELEMENTS.ANI.value,
             notes: submissionModal.text_notes.value,
             status: submissionModal.select_result.value,
             calllog: JSON.stringify(records[uniqueID].raw, null, '\t')
@@ -639,7 +658,7 @@ function createDefect(uniqueID) {
                 expected: submissionModal.text_expected.value,
                 actual: submissionModal.text_actual.value,
                 timestamp: dateTimeConverter(records[uniqueID].info.timestamp),
-                ani: ANI.value,
+                ani: ELEMENTS.ANI.value,
                 notes: submissionModal.text_notes.value,
                 status: submissionModal.select_result.value,
                 calllog: JSON.stringify(records[uniqueID].raw, null, '\t')
@@ -796,7 +815,7 @@ function Info(callID, uuid, timestamp) {
     HeaderRow.appendChild(HeaderCell4);
     var SummaryTableBody = SummaryTable.createTBody();
     this.summaryTableBody = SummaryTableBody;
-    calltable.appendChild(this.callItem);
+    ELEMENTS.calltable.appendChild(this.callItem);
 }
 function updateOffCanvas(record, index) {
 
@@ -871,8 +890,8 @@ socket.on('defect submitted', function (msg) {
 socket.on('connect', function () {
     console.log("Connected to websocket");
     if (oldvalue != "") {
-        console.log("Rejoining: " + ANI.value);
-        socket.emit('join', ANI.value);
+        console.log("Rejoining: " + ELEMENTS.ANI.value);
+        socket.emit('join', ELEMENTS.ANI.value);
     }
     // Connect to board data if board id is not null
     if (board.id !== "null") {
@@ -881,7 +900,7 @@ socket.on('connect', function () {
 });
 
 socket.on('boardNotFound', function (msg) {
-    boardmenu.hide();
+    ELEMENTS.boardmenu.hide();
     board.exists = false;
     console.log("Board Found");
 });
@@ -925,7 +944,7 @@ socket.on('boardFound', function (msg) {
     }
   }
 
-  boardmenu.show();
+  ELEMENTS.boardmenu.show();
 });
 socket.on('defect_created', function (msg) {});
 
@@ -951,7 +970,7 @@ socket.on('get_items_response', function (msg) {
 
 
 function assignANI() {
-	if (ANI.value == "") {
+	if (ELEMENTS.ANI.value == "") {
       if (board.id !== "null") {
         listen(board.id);
       }else{
@@ -960,16 +979,16 @@ function assignANI() {
     }
 	else
 	{
-		  listen(ANI.value);
+		  listen(ELEMENTS.ANI.value);
 	}
    
 }
 
 function listen(listenvalue)
 {
-  listening.innerHTML = "Listening to: " + listenvalue;
-  listening.classList.add("bg-success");
-  listening.classList.remove("bg-danger");
+  ELEMENTS.listening.innerHTML = "Listening to: " + listenvalue;
+  ELEMENTS.listening.classList.add("bg-success");
+  ELEMENTS.listening.classList.remove("bg-danger");
   socket.emit('leave', oldvalue);
   socket.emit('join', listenvalue);
   oldvalue = listenvalue;
