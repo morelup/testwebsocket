@@ -620,7 +620,7 @@ function createDefect(uniqueID) {
             subitem: records[uniqueID].info.UUID,
             callid: records[uniqueID].info.callID,
             timestamp: dateTimeConverter(records[uniqueID].info.timestamp),
-            ani: _ani.value,
+            ani: ANI.value,
             notes: submissionModal.text_notes.value,
             status: submissionModal.select_result.value,
             calllog: JSON.stringify(records[uniqueID].raw, null, '\t')
@@ -639,7 +639,7 @@ function createDefect(uniqueID) {
                 expected: submissionModal.text_expected.value,
                 actual: submissionModal.text_actual.value,
                 timestamp: dateTimeConverter(records[uniqueID].info.timestamp),
-                ani: _ani.value,
+                ani: ANI.value,
                 notes: submissionModal.text_notes.value,
                 status: submissionModal.select_result.value,
                 calllog: JSON.stringify(records[uniqueID].raw, null, '\t')
@@ -951,7 +951,7 @@ socket.on('get_items_response', function (msg) {
 
 
 function assignANI() {
-	if (_ani.value == "") {
+	if (ANI.value == "") {
       if (board.id !== "null") {
         listen(board.id);
       }else{
@@ -960,7 +960,7 @@ function assignANI() {
     }
 	else
 	{
-		  listen(_ani.value);
+		  listen(ANI.value);
 	}
    
 }
