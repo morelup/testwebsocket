@@ -1,8 +1,6 @@
 {
   "private": true,
-  "engines": {
-    "node": "16.x.x"
-  },
+ 
   "scripts": {
     "deploy": "gcloud app deploy",
     "start": "node app.js",
