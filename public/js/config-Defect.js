@@ -7,4 +7,4 @@ const studio_images = {
 	"webrtc":"https://us7.studioportal.io/img/icon-webrtc.d78a159a.svg"
 	
 	
-}
+};
