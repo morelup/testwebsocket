@@ -1,4 +1,4 @@
-const studio_images{
+const studio_images = {
 	"prompt":"https://us7.studioportal.io/icons/prompt.svg",
 	"hangup":"https://us7.studioportal.io/icons/hangup.svg",
 	"integration":"https://us7.studioportal.io/icons/integration.svg",
