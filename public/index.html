@@ -809,7 +809,12 @@ function Info(callID, uuid, timestamp) {
     this.summaryTableBody = SummaryTableBody;
 
 	// Add newItem as the top child of calltable
+	this.callItem.classList.add("slideIn");
 	calltable.insertBefore(this.callItem, calltable.firstChild);
+	setTimeout(function() {
+	  this.callItem.style.opacity = "1";
+	  this.callItem.style.transform = "translateY(0)";
+	}, 10); // You can adjust the delay as needed
 }
 function updateOffCanvas(record, index) {
 
