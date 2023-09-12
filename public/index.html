@@ -519,7 +519,7 @@ function getJson() {
     }
 }
 function showRawLog(uniqueID) {
-    jsonObject = records[uniqueID].raw;
+    jsonObject = JSON.parse(JSON.stringify(records[uniqueID].raw));
     editor.load(getJson());
     myModal.show();
     return;
@@ -807,7 +807,9 @@ function Info(callID, uuid, timestamp) {
     HeaderRow.appendChild(HeaderCell4);
     var SummaryTableBody = SummaryTable.createTBody();
     this.summaryTableBody = SummaryTableBody;
-    calltable.appendChild(this.callItem);
+
+	// Add newItem as the top child of calltable
+	calltable.insertBefore(this.callItem, calltable.firstChild);
 }
 function updateOffCanvas(record, index) {
 
