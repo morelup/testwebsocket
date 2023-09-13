@@ -2,7 +2,6 @@
 
 const express = require('express');
 const app = express();
-const cors = require('cors')
 const server = require('http').Server(app);
 const url = require('url');
 const fetch = require('node-fetch');
@@ -11,17 +10,6 @@ const client = new SecretManagerServiceClient();
 const monday = require('./monday.js');
 const boards = {};
 accessSecret("MondayAuthKey").then(result => {monday.authKeySet(result)});
-var whitelist = ['http://us7.studioportal.io']
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
-app.use(cors(corsOptions));
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 const io = require('socket.io')(server, {
