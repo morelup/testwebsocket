@@ -14,7 +14,8 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 const io = require('socket.io')(server, {
   cors: {
-    origin: "https://www.orelup.org",
+    origin: ["https://www.orelup.org",
+	"https://us7.studioportal.io"],
     methods: ["GET", "POST"]
   }
 });
