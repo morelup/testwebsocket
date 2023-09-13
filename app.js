@@ -51,6 +51,9 @@ app.post('/', (req, res) => {
 			if (io.sockets.adapter.rooms.has(queryObject.boardId)) {
 			  io.to(queryObject.boardId).emit('us7 message', req.body);
 			}
+			if (io.sockets.adapter.rooms.has(req.body[0].group_id)) {
+			  io.to(req.body[0].group_id).emit('us7 message', req.body);
+			}
 		}
 	}
   } catch (error) {
