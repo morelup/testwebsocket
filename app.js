@@ -11,9 +11,9 @@ const monday = require('./monday.js');
 const boards = {};
 accessSecret("MondayAuthKey").then(result => {monday.authKeySet(result)});
 app.use(express.static(__dirname + '/public'));
-app.use(bodyParser.json({ limit: '300kb' }));
-app.use(bodyParser.urlencoded({ limit: '300kb' }));
-app.use(express.json());
+
+app.use(express.json({limit:'10mb'}));
+express.json({limit:'10mb'})
 const io = require('socket.io')(server, {
   cors: {
     origin: "https://us7.studioportal.io",
