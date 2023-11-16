@@ -11,6 +11,8 @@ const monday = require('./monday.js');
 const boards = {};
 accessSecret("MondayAuthKey").then(result => {monday.authKeySet(result)});
 app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.json({ limit: '300kb' }));
+app.use(bodyParser.urlencoded({ limit: '300kb' }));
 app.use(express.json());
 const io = require('socket.io')(server, {
   cors: {
@@ -18,6 +20,8 @@ const io = require('socket.io')(server, {
     methods: ["GET", "POST"]
   }
 });
+
+
 
 app.post('/', (req, res) => {
   const queryObject = url.parse(req.url, true).query;
