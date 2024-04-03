@@ -952,7 +952,7 @@ socket.on('create_defect_failure', function (msg) {
 });
 
 socket.on('get_items_response', function (msg) {
-    var items = msg.data.boards[0].items.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+    var items = msg.data.boards[0].items_page.items.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
   
     for (var i = 0; i < items.length; i++) {
         var el = document.createElement("option");
