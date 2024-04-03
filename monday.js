@@ -75,10 +75,12 @@ function getItems(msg){
 		var body = JSON.stringify({
 			query: `query {
 				boards (ids: [${msg}]) {
-					items {
-						id
-						name 
-					} 
+					items_page{
+						items {
+							id
+							name 
+						} 
+					}
 				}
 			}`
 		});
