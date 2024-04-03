@@ -162,7 +162,7 @@ function createDefect(board,msg) {
 		}
 		
 		const body = JSON.stringify({
-		query: `mutation ($board_id: Int!, $group_id: String, $name: String, $column_values: JSON) {
+		query: `mutation ($board_id: Int!, $group_id: String, $name: String!, $column_values: JSON) {
 		create_item (
 				board_id: $board_id, 
 				group_id: $group_id, 
@@ -179,6 +179,7 @@ function createDefect(board,msg) {
 			 name: msg.item
 			},
 		  });
+		  console.log(body);
 		return fetch('https://api.monday.com/v2', {
 		  method: 'POST',
 		  headers: {

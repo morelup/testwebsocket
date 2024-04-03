@@ -94,6 +94,7 @@ function get_items(socket,msg) {
 
 function create_defect(socket,msg) {
   monday.createDefect(boards[msg.board].parentBoard,msg).then(result => {
+	  console.log("DefectCreated" + result);
     create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);    
   }).catch(error => {
     console.log(error);
