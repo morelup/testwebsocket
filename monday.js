@@ -211,7 +211,7 @@ function createSubItem(board,msg,item) {
 			};
 		
 		const body = JSON.stringify({
-		query: `mutation ($parent_item_id: Int!, $name: String!, $column_values: JSON) {
+		query: `mutation ($parent_item_id: ID!, $name: String!, $column_values: JSON) {
 		create_subitem  (
 				parent_item_id: $parent_item_id, 
 				item_name: $name, 
