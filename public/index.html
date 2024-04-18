@@ -134,7 +134,9 @@
 			<h5 class="modal-title" id="exampleModalLabel">Submit Defect</h5>
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		  </div>
+		  <tr>
 			<div class="modal-body">
+				
 				<h5 >New defect or retest</h5>
 				
 				  
@@ -768,6 +770,13 @@ function Info(callID, uuid, timestamp) {
 	ManualSubmitLog.type = "button";
 	ManualSubmitLog.classList.add("btn", "btn-primary", "col-auto");
 	Row.appendChild(ManualSubmitLog);
+	
+	var CopyCallLogButton = document.createElement("button"); //call log button
+	CopyCallLogButton.setAttribute("onclick", "copyCallLog('" + this.uniqueID + "')");
+	CopyCallLogButton.innerHTML = "Copy Call Log To Clipboard";
+	CopyCallLogButton.type = "button";
+	CopyCallLogButton.classList.add("btn", "btn-primary", "col-auto", "me-2");
+	Row.appendChild(CopyCallLogButton);
 	
 	var DeleteButton = document.createElement("button"); //delete button
 	DeleteButton.innerHTML = "Delete";
