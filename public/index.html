@@ -547,6 +547,28 @@ function copyCallLog(uniqueID) {
 function copyTimestamp(uniqueID) {
     navigator.clipboard.writeText(dateTimeConverter(records[uniqueID].info.timestamp));
 }
+function downloadCallLog(uniqueID) {
+	// Retrieve the raw JSON payload for the specified uniqueID
+    const jsonPayload = JSON.stringify(records[uniqueID].raw);
+
+    // Create a Blob object from the JSON data
+    const blob = new Blob([jsonPayload], { type: 'application/json' });
+
+    // Create a link element, set its download attribute and href
+    const a = document.createElement('a');
+    a.download = `${uniqueID}.json`;
+    a.href = URL.createObjectURL(blob);
+
+    // Append the link to the body
+    document.body.appendChild(a);
+
+    // Trigger the download by simulating a click
+    a.click();
+
+    // Clean up: remove the link and revoke the URL object
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+}
 function showManualMondaySubmission(uniqueID) {
     const info = records[uniqueID].info;
     manualSubmissionModal.manualSubitemUUID.textContent = info.UUID;
@@ -755,7 +777,7 @@ function Info(callID, uuid, timestamp) {
 	CallJSONButton.setAttribute("onclick", "showRawLog('" + this.uniqueID + "')");
 	CallJSONButton.innerHTML = "See Log";
 	CallJSONButton.type = "button";
-	CallJSONButton.classList.add("btn", "btn-primary", "col-auto", "me-2");
+	CallJSONButton.classList.add("btn", "btn-primary", "col-auto", "me-4");
 	Row.appendChild(CallJSONButton);
 
 	var ManualSubmitLog = document.createElement("button"); //submit monday
@@ -775,8 +797,15 @@ function Info(callID, uuid, timestamp) {
 	CopyCallLogButton.setAttribute("onclick", "copyCallLog('" + this.uniqueID + "')");
 	CopyCallLogButton.innerHTML = "Copy Call Log To Clipboard";
 	CopyCallLogButton.type = "button";
-	CopyCallLogButton.classList.add("btn", "btn-primary", "col-auto", "me-2");
+	CopyCallLogButton.classList.add("btn", "btn-primary", "col-auto");
 	Row.appendChild(CopyCallLogButton);
+	
+	var DownloadCallLogButton = document.createElement("button"); //call log button
+	DownloadCallLogButton.setAttribute("onclick", "downloadCallLog('" + this.uniqueID + "')");
+	DownloadCallLogButton.innerHTML = "Download Call Log";
+	DownloadCallLogButton.type = "button";
+	DownloadCallLogButton.classList.add("btn", "btn-primary", "col-auto");
+	Row.appendChild(DownloadCallLogButton);
 	
 	var DeleteButton = document.createElement("button"); //delete button
 	DeleteButton.innerHTML = "Delete";
