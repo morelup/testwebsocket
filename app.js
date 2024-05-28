@@ -27,8 +27,7 @@ app.post('/', (req, res) => {
   const queryObject = url.parse(req.url, true).query;
   const ifDebug = "debug" in queryObject;
   
-  const ANI = req.body[0].node_values.XSIP_x_five9ani || "ERROR";
-
+  let ANI = req.body[0].node_values.XSIP_x_five9ani.replace("+1","") || "ERROR";
   try {
     if (ANI != "ERROR")
 	{
@@ -65,10 +64,10 @@ io.on('connection', socket => {
     bRunFirstSocket = false;
   }
   socket.on('join', msg => {
-    socket.join(msg);
+    socket.join(msg.replace("+1",""));
   });
   socket.on('leave', msg => {
-    socket.leave(msg);
+    socket.leave(msg.replace("+1",""));
   });
   socket.on('create_defect', msg => {
     create_defect(socket,msg);
