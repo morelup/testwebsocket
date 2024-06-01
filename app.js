@@ -28,11 +28,11 @@ app.post('/', (req, res) => {
   const ifDebug = "debug" in queryObject;
   
   let ANI = req.body[0].node_values.XSIP_x_five9ani || "ERROR";
-  ANI.replace("+1","");
+  
   try {
     if (ANI != "ERROR")
 	{
-		if (io.sockets.adapter.rooms.has(ANI)) {
+		if (io.sockets.adapter.rooms.has(ANI.toString().replace("+1",""))) {
 		  io.to(ANI).emit('us7 message', req.body);
 		}
 	}
@@ -65,11 +65,11 @@ io.on('connection', socket => {
     bRunFirstSocket = false;
   }
   socket.on('join', msg => {
-	msg = msg.replace("+1","");
+	msg = msg.toString().replace("+1","");
     socket.join(msg);
   });
   socket.on('leave', msg => {'
-    msg = msg.replace("+1","");
+    msg = msg.toString().replace("+1","");
     socket.leave(msg);
   });
   socket.on('create_defect', msg => {
