@@ -68,7 +68,7 @@ io.on('connection', socket => {
 	msg = msg.toString().replace("+1","");
     socket.join(msg);
   });
-  socket.on('leave', msg => {'
+  socket.on('leave', msg => {
     msg = msg.toString().replace("+1","");
     socket.leave(msg);
   });
