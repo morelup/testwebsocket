@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 
 
 let bRunFirstSocket = true;
-io.on('connection', socket => {
+io.on('connection', socket => { 
   if (bRunFirstSocket) {
     bRunFirstSocket = false;
   }
