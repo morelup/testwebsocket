@@ -15,10 +15,10 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.json({limit:'10mb'}));
 express.json({limit:'10mb'})
 const io = require('socket.io')(server, {
+  maxHttpBufferSize: 1e8,
   cors: {
     origin: "https://us7.studioportal.io",
-    methods: ["GET", "POST"],
-	maxHttpBufferSize: 1e8
+    methods: ["GET", "POST"]
   }
 });
 
@@ -117,6 +117,7 @@ function create_subItem(socket,board,msg,item) {
 
 
 async function connect_boarddata(socket, msg) {
+	console.log("newconnection");
     try {
         const parentBoard = JSON.parse(await monday.boardInfo(msg));
         if (parentBoard.data.boards.length == 0 || !(monday.confirmParentColumns(parentBoard))) {
