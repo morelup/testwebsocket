@@ -99,7 +99,8 @@ function create_defect(socket,msg) {
 	  console.log("DefectCreated" + result);
     create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);    
   }).catch(error => {
-    console.log(error);
+	console.error("FAILED TO CREATE DEFECT!!");
+    console.error(error);
   });
 }
 

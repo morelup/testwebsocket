@@ -294,6 +294,7 @@ const debugmenu = document.getElementById('debugmenu');
 if (urlParams.has("debug")) new bootstrap.Collapse(debugmenu);
 const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'), { toggle: false });
 const ANI = document.getElementById('ani');
+let runBoardOnce = true;
 ANI.addEventListener("keypress", function (event) {
     // If the user presses the "Enter" key on the keyboard
     if (event.key === "Enter") {
@@ -943,11 +944,16 @@ socket.on('boardNotFound', function (msg) {
 });
 
 socket.on('boardFound', function (msg) {
+
+	if(runBoardOnce)
+	{
+		runBoardOnce = false;
+		return;
+	}
   // Set board information
   board.exists = true;
   board.parentBoard = msg.parentBoard;
   board.subitemBoard = msg.subitemBoard;
-
   // Add subscribers to reported by dropdown
   var subscribers = msg.parentBoard.data.boards[0].subscribers;
   subscribers.sort(function(a, b) {
