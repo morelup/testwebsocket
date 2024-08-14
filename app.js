@@ -17,7 +17,8 @@ express.json({limit:'10mb'})
 const io = require('socket.io')(server, {
   cors: {
     origin: "https://us7.studioportal.io",
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
+	maxHttpBufferSize: 1e8
   }
 });
 
