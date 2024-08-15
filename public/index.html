@@ -998,7 +998,7 @@ socket.on('create_defect_failure', function (msg) {
   alert("There was an error when submitting the defect report to Monday.com, your report has not been logged.  Please reach out to your Professional Services Engineer to inform them of the defect result.");
 });
 
-socket.on('get_items_response', function (msg) {'
+socket.on('get_items_response', function (msg) {
 console.log("get_items_response");
     var items = msg.data.boards[0].items_page.items.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
   
