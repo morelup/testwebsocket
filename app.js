@@ -34,7 +34,7 @@ app.post('/', (req, res) => {
     if (ANI != "ERROR")
 	{
 		if (io.sockets.adapter.rooms.has(ANI.toString().replace("+1",""))) {
-		  io.to(ANI).emit('us7 message', req.body);
+		  io.to(ANI.toString().replace("+1","")).emit('us7 message', req.body);
 		}
 	}
 	else
