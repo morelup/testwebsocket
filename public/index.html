@@ -294,7 +294,7 @@ const debugmenu = document.getElementById('debugmenu');
 if (urlParams.has("debug")) new bootstrap.Collapse(debugmenu);
 const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'), { toggle: false });
 const ANI = document.getElementById('ani');
-let runBoardOnce = true;
+let runBoardOnce = false;
 ANI.addEventListener("keypress", function (event) {
     // If the user presses the "Enter" key on the keyboard
     if (event.key === "Enter") {
@@ -497,6 +497,7 @@ function loopLogItem(msg) {
 
 
 function logMessage(msg) {
+console.log("log message:" + msg);
     const callID = msg[0]?.node_values?.XSIP_x_five9callid || "";
 	const uuid = msg[0]?.uuid || "";
     if (callID == "" && uuid == "") {
@@ -938,18 +939,19 @@ socket.on('connect', function () {
 });
 
 socket.on('boardNotFound', function (msg) {
+console.log("boardNotFound");
     boardmenu.hide();
     board.exists = false;
     console.log("Board Found");
 });
 
 socket.on('boardFound', function (msg) {
-
+console.log("boardFound");
 	if(runBoardOnce)
 	{
-		runBoardOnce = false;
 		return;
 	}
+	runBoardOnce = true;
   // Set board information
   board.exists = true;
   board.parentBoard = msg.parentBoard;
@@ -989,13 +991,15 @@ socket.on('boardFound', function (msg) {
 
   boardmenu.show();
 });
-socket.on('defect_created', function (msg) {});
+socket.on('defect_created', function (msg) {console.log("defect_created");});
 
 socket.on('create_defect_failure', function (msg) {
+
   alert("There was an error when submitting the defect report to Monday.com, your report has not been logged.  Please reach out to your Professional Services Engineer to inform them of the defect result.");
 });
 
-socket.on('get_items_response', function (msg) {
+socket.on('get_items_response', function (msg) {'
+console.log("get_items_response");
     var items = msg.data.boards[0].items_page.items.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
   
     for (var i = 0; i < items.length; i++) {
