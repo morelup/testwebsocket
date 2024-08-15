@@ -66,23 +66,29 @@ io.on('connection', socket => {
     bRunFirstSocket = false;
   }
   socket.on('join', msg => {
+	console.log("socket: join:"+ msg);
 	msg = msg.toString().replace("+1","");
     socket.join(msg);
   });
   socket.on('leave', msg => {
+	console.log("socket: leave:"+ msg);
     msg = msg.toString().replace("+1","");
     socket.leave(msg);
   });
   socket.on('create_defect', msg => {
+	console.log("socket: create_defect:");
     create_defect(socket,msg);
   });
   socket.on('create_defect_subitem', msg => {
+	console.log("socket: create_defect_subitem:");
     create_subItem(socket,boards[msg.board].subitemBoard,msg,msg.item);
   });
   socket.on('connect_boarddata', msg => {
+	console.log("socket: connect_boarddata:msg");
     connect_boarddata(socket,msg);
   });
   socket.on('get_items', msg => {
+	console.log("socket: get_items:");
     get_items(socket,msg);
   });
   socket.on('test', msg => {
