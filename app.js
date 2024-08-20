@@ -18,7 +18,8 @@ const io = require('socket.io')(server, {
   maxHttpBufferSize: 1e8,
   cors: {
     origin: ["https://us7.studioportal.io", "https://test-orelup-aia.ue.r.appspot.com"],
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
+	transports: ['websocket'] 
   }
 });
 
