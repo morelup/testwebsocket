@@ -42,7 +42,7 @@ function boardInfo(msg){
 	try {
 		var body = JSON.stringify({
 			query: `query {
-				boards (ids: [${msg}]) {
+				boards (ids: [${msg}],limit:5000) {
 					name
 					state
 					board_folder_id
@@ -74,7 +74,7 @@ function getItems(msg){
 	try {
 		var body = JSON.stringify({
 			query: `query {
-				boards (ids: [${msg}]) {
+				boards (ids: [${msg}],limit:5000) {
 					items_page{
 						items {
 							id
