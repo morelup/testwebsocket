@@ -76,7 +76,7 @@ function getItems(msg){
 			query: `query {
 				boards (ids: [${msg}]) {
 					items_page{
-						items (limit:5000){
+						items (limit: 500){
 							id
 							name 
 						} 
