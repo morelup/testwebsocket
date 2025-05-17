@@ -53,7 +53,7 @@ function boardInfo(msg){
 						id
 						settings_str 
 					}  
-					subscribers (limit:50){
+					subscribers{
 						id
 						name
 					}
