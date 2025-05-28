@@ -37,6 +37,15 @@ app.post('/', (req, res) => {
 		if (io.sockets.adapter.rooms.has(ANI.toString().replace("+1",""))) {
 		  io.to(ANI.toString().replace("+1","")).emit('us7 message', req.body);
 		}
+		if(queryObject.boardId && queryObject.openListen)
+		{
+			if(queryObject.openListen=="yes")
+			{
+				if (io.sockets.adapter.rooms.has(queryObject.boardId)) {
+				  io.to(queryObject.boardId).emit('us7 message', req.body);
+				}
+			}
+		}
 	}
 	else
 	{
