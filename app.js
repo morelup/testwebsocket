@@ -29,8 +29,15 @@ app.post('/', (req, res) => {
   const queryObject = url.parse(req.url, true).query;
   const ifDebug = "debug" in queryObject;
   
-  let ANI = req.body[0].node_values.XSIP_x_five9ani || "ERROR";
-  
+  let ANI = req.body[0].node_values.XSIP_x_five9ani;
+  if (!ANI) {
+  	const from = req.body[0].XSIP_from || "";
+  	// Extract digits from something like <sip:8166741800@...>
+  	const match = from.match(/<sip:(\d+)@/);
+  	ANI = match ? match[1] : "ERROR";
+	}
+
+
   try {
     if (ANI != "ERROR")
 	{
