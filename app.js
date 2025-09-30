@@ -31,11 +31,17 @@ app.post('/', (req, res) => {
   
   let ANI = req.body[0].node_values.XSIP_x_five9ani;
   if (!ANI) {
-  	const from = req.body[0].XSIP_from || "";
-  	// Extract digits from something like <sip:8166741800@...>
-  	const match = from.match(/<sip:(\d+)@/);
-  	ANI = match ? match[1] : "ERROR";
-	}
+  const from = req.body[0].XSIP_from || "";
+  // Look for digits (possibly with +) between sip: and @
+  const match = from.match(/<sip:(\+?\d+)@/);
+  if (match) {
+    ANI = match[1];
+    // Remove leading +1 if present
+    ANI = ANI.replace(/^\+1/, "");
+  } else {
+    ANI = "ERROR";
+  }
+}
 
 
   try {
