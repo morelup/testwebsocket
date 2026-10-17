@@ -9,13 +9,17 @@ const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
 const client = new SecretManagerServiceClient();
 const monday = require('./monday.js');
 const boards = {};
-accessSecret("MondayAuthKey").then(result => {monday.authKeySet(result)});
+accessSecret("MondayAuthKey").then(result => {monday.authKeySet(result)}).catch(error => console.error("Could not load MondayAuthKey", error));
 app.use(express.static(__dirname + '/public'));
 
-app.use(express.json({limit:'10mb'}));
-express.json({limit:'10mb'})
+// The Five9 webhook sends one node log at a time, so it never needs a big body
+app.use(express.json({limit:'1mb'}));
+
+// Keep one bad request from taking the whole server down
+process.on('unhandledRejection', error => console.error('Unhandled rejection:', error));
+
 const io = require('socket.io')(server, {
-  maxHttpBufferSize: 1e8,
+  maxHttpBufferSize: 5e7, // 50MB, the biggest call log a tester can submit
   cors: {
     origin: ["https://us7.studioportal.io", "https://test-orelup-aia.ue.r.appspot.com"],
     methods: ["GET", "POST"],
@@ -25,10 +29,56 @@ const io = require('socket.io')(server, {
 
 
 
+// Simple in-memory rate limiter: each key gets `max` hits per `windowMs`.
+// Returns true while the key is still under the limit.
+function rateLimiter(max, windowMs) {
+  const hits = new Map();
+  setInterval(() => hits.clear(), windowMs).unref();
+  return key => {
+    const count = (hits.get(key) || 0) + 1;
+    hits.set(key, count);
+    return count <= max;
+  };
+}
+const eventLimit = rateLimiter(300, 60 * 1000);           // any socket event, per IP per minute
+const submitLimit = rateLimiter(60, 10 * 60 * 1000);      // defect submissions, per IP per 10 minutes
+const submitLimitAll = rateLimiter(600, 60 * 60 * 1000);  // defect submissions, everyone, per hour
+const submitEvents = ['create_defect', 'create_defect_subitem'];
+
+// The address Google passes along; a determined attacker can fake it, which is
+// why submitLimitAll caps everyone together as a backstop
+function clientIp(socket) {
+  const forwarded = socket.handshake.headers['x-forwarded-for'];
+  return forwarded ? forwarded.split(',')[0].trim() : socket.handshake.address;
+}
+
+// Room names are phone numbers, board ids or group ids
+function cleanRoom(msg) {
+  if (msg === undefined || msg === null) return null;
+  msg = msg.toString().replace("+1","");
+  return /^[\w-]{1,64}$/.test(msg) ? msg : null;
+}
+
+// A submission must be for a board we loaded, and every field must be plain text of a sane size
+function validSubmission(msg) {
+  if (!msg || typeof msg !== 'object' || !Object.hasOwn(boards, msg.board)) return false;
+  const maxLengths = {
+    board: 30, reportedby: 30, item: 255, subitem: 255, callid: 100, timestamp: 100,
+    ani: 30, notes: 10000, status: 100, expected: 10000, actual: 10000,
+    calllog: 5e7
+  };
+  return Object.keys(maxLengths).every(field =>
+    msg[field] === undefined || (typeof msg[field] === 'string' && msg[field].length <= maxLengths[field]));
+}
+
 app.post('/', (req, res) => {
   const queryObject = url.parse(req.url, true).query;
   const ifDebug = "debug" in queryObject;
-  
+
+  if (!Array.isArray(req.body) || !req.body[0] || typeof req.body[0].node_values !== 'object' || req.body[0].node_values === null) {
+    return res.status(400).send("Unexpected payload");
+  }
+
   let ANI = req.body[0].node_values.XSIP_x_five9ani;
   if (!ANI) {
   	const from = req.body[0].node_values.XSIP_from || "";
@@ -81,54 +131,85 @@ app.get('/', (req, res) => {
 });
 
 
+// Run a socket handler so that a bad message from a client is logged instead of crashing the server
+function safe(handler) {
+  return msg => {
+    try {
+      handler(msg);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+}
+
 let bRunFirstSocket = true;
-io.on('connection', socket => { 
+io.on('connection', socket => {
   if (bRunFirstSocket) {
     bRunFirstSocket = false;
   }
-  socket.on('join', msg => {
+
+  // Runs before every event below: stops floods and bulk submissions
+  const ip = clientIp(socket);
+  socket.use(([event], next) => {
+    if (!eventLimit(ip)) return;
+    if (submitEvents.includes(event) && !(submitLimit(ip) && submitLimitAll("all"))) {
+      console.error("Submission limit reached for " + ip);
+      socket.emit('create_defect_failure');
+      return;
+    }
+    next();
+  });
+
+  socket.on('join', safe(msg => {
 	console.log("socket: join:"+ msg);
-	msg = msg.toString().replace("+1","");
-    socket.join(msg);
-  });
-  socket.on('leave', msg => {
+	const room = cleanRoom(msg);
+	if (room) socket.join(room);
+  }));
+  socket.on('leave', safe(msg => {
 	console.log("socket: leave:"+ msg);
-    msg = msg.toString().replace("+1","");
-    socket.leave(msg);
-  });
-  socket.on('create_defect', msg => {
+	const room = cleanRoom(msg);
+	if (room) socket.leave(room);
+  }));
+  socket.on('create_defect', safe(msg => {
 	console.log("socket: create_defect:");
+	if (!validSubmission(msg)) return socket.emit('create_defect_failure');
     create_defect(socket,msg);
-  });
-  socket.on('create_defect_subitem', msg => {
+  }));
+  socket.on('create_defect_subitem', safe(msg => {
 	console.log("socket: create_defect_subitem:");
+	if (!validSubmission(msg) || !/^\d+$/.test(msg.item)) return socket.emit('create_defect_failure');
     create_subItem(socket,boards[msg.board].subitemBoard,msg,msg.item);
-  });
-  socket.on('connect_boarddata', msg => {
+  }));
+  socket.on('connect_boarddata', safe(msg => {
 	console.log("socket: connect_boarddata:msg");
     connect_boarddata(socket,msg);
-  });
-  socket.on('get_items', msg => {
+  }));
+  socket.on('get_items', safe(msg => {
 	console.log("socket: get_items:");
     get_items(socket,msg);
-  });
+  }));
   socket.on('test', msg => {
   });
 });
 
+// Only boards that connect_boarddata already checked (right columns) can be listed
 function get_items(socket,msg) {
+  if (msg === undefined || msg === null || !Object.hasOwn(boards, msg)) return;
   monday.getItems(msg).then(result => {
     socket.emit('get_items_response',JSON.parse(result));
+  }).catch(error => {
+    console.error(error);
   });
 }
 
 function create_defect(socket,msg) {
   monday.createDefect(boards[msg.board].parentBoard,msg).then(result => {
 	  console.log("DefectCreated" + result);
-    create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);    
+    create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);
   }).catch(error => {
 	console.error("FAILED TO CREATE DEFECT!!");
     console.error(error);
+	socket.emit('create_defect_failure');
   });
 }
 
@@ -138,7 +219,8 @@ function create_subItem(socket,board,msg,item) {
     monday.uploadFile(msg,JSON.parse(result).data.create_subitem.id);
   }).catch(error => {
     console.error(error);
-	console.error(JSON.stringify(msg));
+	console.error(JSON.stringify({...msg, calllog: undefined}));
+	socket.emit('create_defect_failure');
   });
 }
 

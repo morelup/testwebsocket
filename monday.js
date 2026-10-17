@@ -3,10 +3,23 @@ var authKey = "";
 function authKeySet(value){authKey = value}
 var https = require('follow-redirects').https;
 var fs = require('fs');
+var crypto = require('crypto');
 const fetch = require('node-fetch');
+
+// Board ids come from the browser, so only allow plain numbers (one id or a list of ids)
+function toBoardIds(ids){
+	var list = [].concat(ids).map(id => String(id));
+	if (list.length == 0 || !list.every(id => /^\d{1,20}$/.test(id))) {
+		throw new Error("Invalid board id");
+	}
+	return list;
+}
 
 function uploadFile(msg,item){
 	try{
+		// Random boundary so the call log can never contain it and add extra form parts
+		var boundary = "----" + crypto.randomBytes(16).toString("hex");
+		var filename = String(msg.subitem).replace(/[^\w.-]/g, "_");
 		var options = {
 		  'method': 'POST',
 		  'hostname': 'api.monday.com',
@@ -28,8 +41,8 @@ function uploadFile(msg,item){
 			console.error(error);
 		  });
 		});
-		var postData = "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"query\"\r\n\r\nmutation add_file($file: File!) {add_file_to_column (item_id: "+item+", column_id:\"doc\" file: $file) {id}}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"map\"\r\n\r\n{\"image\":\"variables.file\"}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"image\"; filename=\""+msg.subitem+".json\"\r\nContent-Type: \"text/json\"\r\n\r\n"+msg.calllog+"\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--";
-		req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
+		var postData = "--"+boundary+"\r\nContent-Disposition: form-data; name=\"query\"\r\n\r\nmutation add_file($file: File!) {add_file_to_column (item_id: "+parseInt(item)+", column_id:\"doc\" file: $file) {id}}\r\n--"+boundary+"\r\nContent-Disposition: form-data; name=\"map\"\r\n\r\n{\"image\":\"variables.file\"}\r\n--"+boundary+"\r\nContent-Disposition: form-data; name=\"image\"; filename=\""+filename+".json\"\r\nContent-Type: \"text/json\"\r\n\r\n"+String(msg.calllog)+"\r\n--"+boundary+"--";
+		req.setHeader('content-type', 'multipart/form-data; boundary='+boundary);
 		req.write(postData);
 		req.end();
 	} catch (error) {
@@ -41,8 +54,8 @@ function uploadFile(msg,item){
 function boardInfo(msg){
 	try {
 		var body = JSON.stringify({
-			query: `query {
-				boards (ids: [${msg}]) {
+			query: `query ($ids: [ID!]) {
+				boards (ids: $ids) {
 					name
 					state
 					board_folder_id
@@ -51,8 +64,8 @@ function boardInfo(msg){
 						title
 						type
 						id
-						settings_str 
-					}  
+						settings_str
+					}
 					subscribers{
 						id
 						name
@@ -62,32 +75,36 @@ function boardInfo(msg){
 						id
 					}
 				}
-			}`
+			}`,
+			variables: { ids: toBoardIds(msg) }
 		});
 		return callApi(body);
 	} catch (error) {
 		console.log(error);
-	}	
+		return Promise.reject(error);
+	}
 }
 
 function getItems(msg){
 	try {
 		var body = JSON.stringify({
-			query: `query {
-				boards (ids: [${msg}]) {
+			query: `query ($ids: [ID!]) {
+				boards (ids: $ids) {
 					items_page (limit: 500){
 						items {
 							id
-							name 
-						} 
+							name
+						}
 					}
 				}
-			}`
+			}`,
+			variables: { ids: toBoardIds(msg) }
 		});
 		return callApi(body);
 	} catch (error) {
 		console.log(error);
-	}	
+		return Promise.reject(error);
+	}
 }
 
 
