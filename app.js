@@ -53,19 +53,9 @@ function clientIp(socket) {
 }
 
 // Test harness: a tester can spoof the ANI/DNIS the IVA should use for their call.
-// Stored by the tester's real ANI (the one in "Assign ANI"); the IVA looks it up with GET /spoof?ani=...
-// In memory only, like everything else here, so entries are lost on restart and expire after 8 hours.
-const spoofs = new Map();
-const SPOOF_TTL = 8 * 60 * 60 * 1000;
-const SPOOF_MAX = 1000;
+// Kept on the tester's own socket (socket.data.spoof) under their real ANI (the one in "Assign ANI"), so it
+// only lasts while their page is connected. The IVA looks it up with GET /spoof?ani=... by checking the open sockets.
 const lookupLimit = rateLimiter(600, 60 * 1000);          // spoof lookups, per IP per minute
-
-function purgeSpoofs() {
-  const now = Date.now();
-  for (const [key, entry] of spoofs) {
-    if (now - entry.setAt > SPOOF_TTL) spoofs.delete(key);
-  }
-}
 
 // A phone number as typed by a tester: optional +, digits only once spaces/dashes/brackets are removed.
 // Returns "" for blank (meaning "don't spoof this one") and null when it isn't a phone number.
@@ -171,11 +161,13 @@ app.get('/spoof', (req, res) => {
   let raw = String(req.query.ani ?? '');
   if (raw.startsWith(' ')) raw = '+' + raw.trim();
   const key = cleanRoom(raw.trim());
-  const entry = key && spoofs.get(key);
-  if (!entry || Date.now() - entry.setAt > SPOOF_TTL) {
-    if (entry) spoofs.delete(key);
-    return res.json({ found: false });
+  // If the same number is open in two tabs, the most recently set one wins
+  let entry = null;
+  for (const tester of io.sockets.sockets.values()) {
+    const spoof = tester.data.spoof;
+    if (key && spoof && spoof.callerAni === key && (!entry || spoof.setAt > entry.setAt)) entry = spoof;
   }
+  if (!entry) return res.json({ found: false });
   res.json({ found: true, ani: entry.ani, dnis: entry.dnis });
 });
 
@@ -235,11 +227,9 @@ io.on('connection', socket => {
 	const ani = msg && cleanPhone(msg.ani);
 	const dnis = msg && cleanPhone(msg.dnis);
 	if (!key || ani === null || dnis === null) return socket.emit('spoof_failure');
-	purgeSpoofs();
-	if (!spoofs.has(key) && spoofs.size >= SPOOF_MAX) return socket.emit('spoof_failure');
 	// Setting both blank clears whatever this tester had set
-	if (!ani && !dnis) spoofs.delete(key);
-	else spoofs.set(key, { ani, dnis, setAt: Date.now() });
+	if (!ani && !dnis) delete socket.data.spoof;
+	else socket.data.spoof = { callerAni: key, ani, dnis, setAt: Date.now() };
 	socket.emit('spoof_set', { callerAni: key, ani, dnis });
   }));
   socket.on('connect_boarddata', safe(msg => {

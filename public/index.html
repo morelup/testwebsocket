@@ -960,6 +960,8 @@ socket.on('connect', function () {
     if (board.id !== "null") {
 	  socket.emit('connect_boarddata', board.id);
 	  }
+    // The server keeps the spoof on the socket, so set it again after a dropped connection
+    if (activeSpoof) socket.emit('set_spoof', activeSpoof);
 });
 
 socket.on('boardNotFound', function (msg) {
@@ -1067,11 +1069,14 @@ function setSpoof() {
 }
 
 // The server echoes back exactly what it stored, so this text is what the IVA will receive
+let activeSpoof = null;
 socket.on('spoof_set', function (msg) {
   if (!msg.ani && !msg.dnis) {
+    activeSpoof = null;
     spoofStatus.textContent = "Cleared for " + msg.callerAni;
     return;
   }
+  activeSpoof = msg;
   spoofStatus.textContent = "Set for calls from " + msg.callerAni + " - ANI: " + (msg.ani || "(not spoofed)") + ", DNIS: " + (msg.dnis || "(not spoofed)");
 });
 
