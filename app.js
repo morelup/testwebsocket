@@ -52,6 +52,31 @@ function clientIp(socket) {
   return forwarded ? forwarded.split(',')[0].trim() : socket.handshake.address;
 }
 
+// Test harness: a tester can spoof the ANI/DNIS the IVA should use for their call.
+// Stored by the tester's real ANI (the one in "Assign ANI"); the IVA looks it up with GET /spoof?ani=...
+// In memory only, like everything else here, so entries are lost on restart and expire after 8 hours.
+const spoofs = new Map();
+const SPOOF_TTL = 8 * 60 * 60 * 1000;
+const SPOOF_MAX = 1000;
+const lookupLimit = rateLimiter(600, 60 * 1000);          // spoof lookups, per IP per minute
+
+function purgeSpoofs() {
+  const now = Date.now();
+  for (const [key, entry] of spoofs) {
+    if (now - entry.setAt > SPOOF_TTL) spoofs.delete(key);
+  }
+}
+
+// A phone number as typed by a tester: optional +, digits only once spaces/dashes/brackets are removed.
+// Returns "" for blank (meaning "don't spoof this one") and null when it isn't a phone number.
+function cleanPhone(value) {
+  if (value === undefined || value === null || value === '') return '';
+  if (typeof value !== 'string') return null;
+  const phone = value.replace(/[\s().-]/g, '');
+  if (phone === '') return '';
+  return /^\+?\d{1,20}$/.test(phone) ? phone : null;
+}
+
 // Room names are phone numbers, board ids or group ids
 function cleanRoom(msg) {
   if (msg === undefined || msg === null) return null;
@@ -59,16 +84,20 @@ function cleanRoom(msg) {
   return /^[\w-]{1,64}$/.test(msg) ? msg : null;
 }
 
-// A submission must be for a board we loaded, and every field must be plain text of a sane size
-function validSubmission(msg) {
-  if (!msg || typeof msg !== 'object' || !Object.hasOwn(boards, msg.board)) return false;
+// A submission needs a board this socket is locked to, every field must be plain text of a sane size,
+// and "reported by" must be "null" or someone subscribed to that board
+function validSubmission(socket, msg) {
+  if (!socket.data.boardId || !msg || typeof msg !== 'object') return false;
   const maxLengths = {
-    board: 30, reportedby: 30, item: 255, subitem: 255, callid: 100, timestamp: 100,
+    reportedby: 30, item: 255, subitem: 255, callid: 100, timestamp: 100,
     ani: 30, notes: 10000, status: 100, expected: 10000, actual: 10000,
     calllog: 5e7
   };
-  return Object.keys(maxLengths).every(field =>
+  const textOk = Object.keys(maxLengths).every(field =>
     msg[field] === undefined || (typeof msg[field] === 'string' && msg[field].length <= maxLengths[field]));
+  const subscribers = boards[socket.data.boardId].parentBoard.data.boards[0].subscribers.map(person => String(person.id));
+  const reportedbyOk = msg.reportedby === undefined || msg.reportedby === "null" || subscribers.includes(msg.reportedby);
+  return textOk && reportedbyOk;
 }
 
 app.post('/', (req, res) => {
@@ -130,6 +159,26 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+// The IVA calls this with the real caller's ANI to find out whether the tester set an ANI/DNIS to spoof.
+// Always answers 200 so the IVA can branch on "found" instead of handling an error.
+app.get('/spoof', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip = forwarded ? forwarded.split(',')[0].trim() : req.socket.remoteAddress;
+  if (!lookupLimit(ip)) return res.status(429).json({ found: false, error: 'Too many requests' });
+
+  // An unencoded "+" in a query string arrives as a space, so turn a leading space back into the +
+  let raw = String(req.query.ani ?? '');
+  if (raw.startsWith(' ')) raw = '+' + raw.trim();
+  const key = cleanRoom(raw.trim());
+  const entry = key && spoofs.get(key);
+  if (!entry || Date.now() - entry.setAt > SPOOF_TTL) {
+    if (entry) spoofs.delete(key);
+    return res.json({ found: false });
+  }
+  res.json({ found: true, ani: entry.ani, dnis: entry.dnis });
+});
+
 
 // Run a socket handler so that a bad message from a client is logged instead of crashing the server
 function safe(handler) {
@@ -172,13 +221,26 @@ io.on('connection', socket => {
   }));
   socket.on('create_defect', safe(msg => {
 	console.log("socket: create_defect:");
-	if (!validSubmission(msg)) return socket.emit('create_defect_failure');
+	if (!validSubmission(socket,msg)) return socket.emit('create_defect_failure');
     create_defect(socket,msg);
   }));
   socket.on('create_defect_subitem', safe(msg => {
 	console.log("socket: create_defect_subitem:");
-	if (!validSubmission(msg) || !/^\d+$/.test(msg.item)) return socket.emit('create_defect_failure');
-    create_subItem(socket,boards[msg.board].subitemBoard,msg,msg.item);
+	if (!validSubmission(socket,msg) || !/^\d+$/.test(msg.item)) return socket.emit('create_defect_failure');
+    create_retest(socket,msg);
+  }));
+  socket.on('set_spoof', safe(msg => {
+	console.log("socket: set_spoof:");
+	const key = msg && cleanRoom(msg.callerAni);
+	const ani = msg && cleanPhone(msg.ani);
+	const dnis = msg && cleanPhone(msg.dnis);
+	if (!key || ani === null || dnis === null) return socket.emit('spoof_failure');
+	purgeSpoofs();
+	if (!spoofs.has(key) && spoofs.size >= SPOOF_MAX) return socket.emit('spoof_failure');
+	// Setting both blank clears whatever this tester had set
+	if (!ani && !dnis) spoofs.delete(key);
+	else spoofs.set(key, { ani, dnis, setAt: Date.now() });
+	socket.emit('spoof_set', { callerAni: key, ani, dnis });
   }));
   socket.on('connect_boarddata', safe(msg => {
 	console.log("socket: connect_boarddata:msg");
@@ -186,16 +248,16 @@ io.on('connection', socket => {
   }));
   socket.on('get_items', safe(msg => {
 	console.log("socket: get_items:");
-    get_items(socket,msg);
+    get_items(socket);
   }));
   socket.on('test', msg => {
   });
 });
 
-// Only boards that connect_boarddata already checked (right columns) can be listed
-function get_items(socket,msg) {
-  if (msg === undefined || msg === null || !Object.hasOwn(boards, msg)) return;
-  monday.getItems(msg).then(result => {
+// Only the board this socket is locked to (checked by connect_boarddata) can be listed
+function get_items(socket) {
+  if (!socket.data.boardId) return;
+  monday.getItems(socket.data.boardId).then(result => {
     socket.emit('get_items_response',JSON.parse(result));
   }).catch(error => {
     console.error(error);
@@ -203,11 +265,26 @@ function get_items(socket,msg) {
 }
 
 function create_defect(socket,msg) {
-  monday.createDefect(boards[msg.board].parentBoard,msg).then(result => {
+  monday.createDefect(boards[socket.data.boardId].parentBoard,msg).then(result => {
 	  console.log("DefectCreated" + result);
-    create_subItem(socket,boards[msg.board].subitemBoard,msg,JSON.parse(result).data.create_item.id);
+    create_subItem(socket,boards[socket.data.boardId].subitemBoard,msg,JSON.parse(result).data.create_item.id);
   }).catch(error => {
 	console.error("FAILED TO CREATE DEFECT!!");
+    console.error(error);
+	socket.emit('create_defect_failure');
+  });
+}
+
+// A retest adds a subitem to an existing defect, which must be an item on this socket's board
+function create_retest(socket,msg) {
+  monday.getItemBoard(msg.item).then(result => {
+    const items = JSON.parse(result).data.items;
+    if (items.length != 1 || items[0].board.id != socket.data.boardId) {
+      console.error("Retest item " + msg.item + " is not on board " + socket.data.boardId);
+      return socket.emit('create_defect_failure');
+    }
+    create_subItem(socket,boards[socket.data.boardId].subitemBoard,msg,msg.item);
+  }).catch(error => {
     console.error(error);
 	socket.emit('create_defect_failure');
   });
@@ -226,8 +303,13 @@ function create_subItem(socket,board,msg,item) {
 
 
 async function connect_boarddata(socket, msg) {
+	if (socket.data.boardId) return; // this socket is already locked to a board
+	socket.data.boardAttempts = (socket.data.boardAttempts || 0) + 1;
+	if (socket.data.boardAttempts > 5) return; // slows down guessing board ids
 	console.log("newconnection");
     try {
+        // One plain board id only, a list would send back other boards' details too
+        if (typeof msg !== 'string' && typeof msg !== 'number') throw new Error("Invalid board id");
         const parentBoard = JSON.parse(await monday.boardInfo(msg));
         if (parentBoard.data.boards.length == 0 || !(monday.confirmParentColumns(parentBoard))) {
             socket.emit('boardNotFound', parentBoard.data.boards.length == 0 ? "No Parent Board Found" : "Parent columns not correct");
@@ -242,7 +324,9 @@ async function connect_boarddata(socket, msg) {
             parentBoard: parentBoard,
             subitemBoard: subitemBoard
         };
-        boards[parentBoard.data.boards[0].id] = response;
+        if (socket.data.boardId) return; // another request locked this socket while we waited on Monday
+        socket.data.boardId = parentBoard.data.boards[0].id;
+        boards[socket.data.boardId] = response;
         socket.emit('boardFound', response);
     } catch (error) {
         socket.emit('boardNotFound', error);

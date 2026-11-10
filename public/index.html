@@ -229,8 +229,20 @@
             </select>
           </div>
         </div>
+        <div id = "testharnessmenu" class = "collapse">
+          <h6>Test Harness</h6>
+          <div class="form-group">
+            <label for="spoofAni" class="form-label">Spoofed ANI</label>
+            <input class="form-control" id="spoofAni" type="text" placeholder="ANI the IVA should see">
+            <label for="spoofDnis" class="form-label mt-2">Spoofed DNIS</label>
+            <input class="form-control" id="spoofDnis" type="text" placeholder="DNIS the IVA should see">
+            <button class="btn btn-dark mt-2" onclick="setSpoof()">Set</button>
+            <small id="spoofStatus" class="form-text text-muted d-block mt-2">Nothing set.</small>
+            <small class="form-text text-muted d-block">Uses the number in "Your phone number" above as the number you call from. Leave both blank and press Set to clear.</small>
+          </div>
+        </div>
       </div>
-      
+
       <!--main table-->
       <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4 pt-4">
         <div >
@@ -293,6 +305,11 @@ const board = { id: urlParams.get("boardId") ?? "null", exists: false };
 const debugmenu = document.getElementById('debugmenu');
 if (urlParams.has("debug")) new bootstrap.Collapse(debugmenu);
 const boardmenu = new bootstrap.Collapse(document.getElementById('boardmenu'), { toggle: false });
+// Test harness (?testharness=true): lets a tester spoof the ANI/DNIS the IVA looks up
+const spoofAni = document.getElementById('spoofAni');
+const spoofDnis = document.getElementById('spoofDnis');
+const spoofStatus = document.getElementById('spoofStatus');
+if (urlParams.get("testharness") === "true") new bootstrap.Collapse(document.getElementById('testharnessmenu'));
 const ANI = document.getElementById('ani');
 let runBoardOnce = false;
 ANI.addEventListener("keypress", function (event) {
@@ -1037,6 +1054,30 @@ function assignANI() {
 	}
    
 }
+
+// The number in the top bar is the real calling number the IVA will look this tester up by
+function setSpoof() {
+  const callerAni = ANI.value.trim();
+  if (callerAni == "") {
+    alert("Enter your phone number at the top first - the IVA finds your spoofed values by the number you call from");
+    return;
+  }
+  spoofStatus.textContent = "Setting...";
+  socket.emit('set_spoof', { callerAni: callerAni, ani: spoofAni.value, dnis: spoofDnis.value });
+}
+
+// The server echoes back exactly what it stored, so this text is what the IVA will receive
+socket.on('spoof_set', function (msg) {
+  if (!msg.ani && !msg.dnis) {
+    spoofStatus.textContent = "Cleared for " + msg.callerAni;
+    return;
+  }
+  spoofStatus.textContent = "Set for calls from " + msg.callerAni + " - ANI: " + (msg.ani || "(not spoofed)") + ", DNIS: " + (msg.dnis || "(not spoofed)");
+});
+
+socket.on('spoof_failure', function () {
+  spoofStatus.textContent = "Not set - use digits only (an optional leading +), up to 20 digits.";
+});
 
 function listen(listenvalue)
 {
