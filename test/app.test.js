@@ -27,15 +27,19 @@ function socketSession(port) {
       }
     });
   });
+  // Resolves with the next event the server sends, whether or not we asked for it
+  const next = () => new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('timed out')), 3000);
+    waiting = reply => { clearTimeout(timer); resolve(reply); };
+  });
   const session = {
     close: () => ws.close(),
+    next,
     call: async (event, data) => {
       await ready;
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error('timed out')), 3000);
-        waiting = reply => { clearTimeout(timer); resolve(reply); };
-        ws.send('42' + JSON.stringify([event, data]));
-      });
+      const reply = next();
+      ws.send('42' + JSON.stringify([event, data]));
+      return reply;
     }
   };
   openSessions.push(session);
@@ -91,6 +95,50 @@ describe('test harness spoofing', () => {
     tester.close();
     await new Promise(resolve => setTimeout(resolve, 300));
     assert.deepStrictEqual((await supertest(app).get('/spoof?ani=5550000006').expect(200)).body, { found: false });
+  });
+
+  it('a new spoof for the same number replaces the one in another tab, and that tab is told', async () => {
+    const oldTab = socketSession(port);
+    await oldTab.call('set_spoof', { callerAni: '5550000007', ani: '5551111111', dnis: '' });
+    const told = oldTab.next();
+    const newTab = socketSession(port);
+    const reply = await newTab.call('set_spoof', { callerAni: '5550000007', ani: '5552222222', dnis: '' });
+    assert.deepStrictEqual(reply, ['spoof_set', { callerAni: '5550000007', ani: '5552222222', dnis: '' }]);
+    assert.deepStrictEqual(await told, ['spoof_replaced', { callerAni: '5550000007' }]);
+    const res = await supertest(app).get('/spoof?ani=5550000007').expect(200);
+    assert.deepStrictEqual(res.body, { found: true, ani: '5552222222', dnis: '' });
+  });
+
+  it('closing the replaced tab later leaves the new spoof alone', async () => {
+    const oldTab = socketSession(port);
+    await oldTab.call('set_spoof', { callerAni: '5550000008', ani: '5551111111', dnis: '' });
+    const told = oldTab.next();
+    await socketSession(port).call('set_spoof', { callerAni: '5550000008', ani: '5552222222', dnis: '' });
+    await told;
+    const res = await supertest(app).get('/spoof?ani=5550000008').expect(200);
+    assert.deepStrictEqual(res.body, { found: true, ani: '5552222222', dnis: '' });
+    oldTab.close();
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const after = await supertest(app).get('/spoof?ani=5550000008').expect(200);
+    assert.deepStrictEqual(after.body, { found: true, ani: '5552222222', dnis: '' });
+  });
+
+  it('clearing in one tab also removes the spoof another tab had', async () => {
+    const oldTab = socketSession(port);
+    await oldTab.call('set_spoof', { callerAni: '5550000009', ani: '5551111111', dnis: '' });
+    const told = oldTab.next();
+    await socketSession(port).call('set_spoof', { callerAni: '5550000009', ani: '', dnis: '' });
+    assert.deepStrictEqual(await told, ['spoof_replaced', { callerAni: '5550000009' }]);
+    const res = await supertest(app).get('/spoof?ani=5550000009').expect(200);
+    assert.deepStrictEqual(res.body, { found: false });
+  });
+
+  it('get_spoof shows what another tab already has for a number', async () => {
+    await socketSession(port).call('set_spoof', { callerAni: '5550000010', ani: '5551111111', dnis: '+18005551212' });
+    const reply = await socketSession(port).call('get_spoof', '+15550000010');
+    assert.deepStrictEqual(reply, ['spoof_current', { callerAni: '5550000010', ani: '5551111111', dnis: '+18005551212' }]);
+    const none = await socketSession(port).call('get_spoof', '5550000011');
+    assert.deepStrictEqual(none, ['spoof_current', { callerAni: '5550000011', ani: '', dnis: '' }]);
   });
 
   it('rejects values that are not phone numbers', async () => {

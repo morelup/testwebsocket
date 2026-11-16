@@ -57,6 +57,17 @@ function clientIp(socket) {
 // only lasts while their page is connected. The IVA looks it up with GET /spoof?ani=... by checking the open sockets.
 const lookupLimit = rateLimiter(600, 60 * 1000);          // spoof lookups, per IP per minute
 
+// The spoof in effect for a real ANI. A new spoof replaces any other tab's for the same number,
+// so there is normally only one; if two ever exist, the most recently set one wins.
+function findSpoof(key) {
+  let entry = null;
+  for (const tester of io.sockets.sockets.values()) {
+    const spoof = tester.data.spoof;
+    if (key && spoof && spoof.callerAni === key && (!entry || spoof.setAt > entry.setAt)) entry = spoof;
+  }
+  return entry;
+}
+
 // A phone number as typed by a tester: optional +, digits only once spaces/dashes/brackets are removed.
 // Returns "" for blank (meaning "don't spoof this one") and null when it isn't a phone number.
 function cleanPhone(value) {
@@ -161,12 +172,7 @@ app.get('/spoof', (req, res) => {
   let raw = String(req.query.ani ?? '');
   if (raw.startsWith(' ')) raw = '+' + raw.trim();
   const key = cleanRoom(raw.trim());
-  // If the same number is open in two tabs, the most recently set one wins
-  let entry = null;
-  for (const tester of io.sockets.sockets.values()) {
-    const spoof = tester.data.spoof;
-    if (key && spoof && spoof.callerAni === key && (!entry || spoof.setAt > entry.setAt)) entry = spoof;
-  }
+  const entry = findSpoof(key);
   if (!entry) return res.json({ found: false });
   res.json({ found: true, ani: entry.ani, dnis: entry.dnis });
 });
@@ -227,10 +233,25 @@ io.on('connection', socket => {
 	const ani = msg && cleanPhone(msg.ani);
 	const dnis = msg && cleanPhone(msg.dnis);
 	if (!key || ani === null || dnis === null) return socket.emit('spoof_failure');
+	// Setting (or clearing) a spoof for this number replaces any other open tab's, and that tab is told
+	for (const tester of io.sockets.sockets.values()) {
+		if (tester !== socket && tester.data.spoof && tester.data.spoof.callerAni === key) {
+			delete tester.data.spoof;
+			tester.emit('spoof_replaced', { callerAni: key });
+		}
+	}
 	// Setting both blank clears whatever this tester had set
 	if (!ani && !dnis) delete socket.data.spoof;
 	else socket.data.spoof = { callerAni: key, ani, dnis, setAt: Date.now() };
 	socket.emit('spoof_set', { callerAni: key, ani, dnis });
+  }));
+  // Lets a tab see a spoof another tab already has for this number (blank ani and dnis when there is none)
+  socket.on('get_spoof', safe(msg => {
+	console.log("socket: get_spoof:");
+	const key = cleanRoom(msg);
+	if (!key) return;
+	const entry = findSpoof(key);
+	socket.emit('spoof_current', { callerAni: key, ani: entry ? entry.ani : '', dnis: entry ? entry.dnis : '' });
   }));
   socket.on('connect_boarddata', safe(msg => {
 	console.log("socket: connect_boarddata:msg");

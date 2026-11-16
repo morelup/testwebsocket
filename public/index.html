@@ -1053,6 +1053,7 @@ function assignANI() {
 	else
 	{
 		  listen(ANI.value);
+		  socket.emit('get_spoof', ANI.value);
 	}
    
 }
@@ -1073,25 +1074,61 @@ let activeSpoof = null;
 socket.on('spoof_set', function (msg) {
   if (!msg.ani && !msg.dnis) {
     activeSpoof = null;
+    setSpoofRoom("");
     spoofStatus.textContent = "Cleared for " + msg.callerAni;
     return;
   }
   activeSpoof = msg;
+  setSpoofRoom(msg.ani);
   spoofStatus.textContent = "Set for calls from " + msg.callerAni + " - ANI: " + (msg.ani || "(not spoofed)") + ", DNIS: " + (msg.dnis || "(not spoofed)");
+});
+
+// Another tab set (or cleared) a spoof for this number, so the one set in this tab is no longer in effect
+socket.on('spoof_replaced', function (msg) {
+  activeSpoof = null;
+  setSpoofRoom("");
+  spoofStatus.textContent = "Another tab set a spoof for " + msg.callerAni + ", so the one set here is no longer in effect.";
+});
+
+// Answer to get_spoof: warn if another tab already has a spoof for this number
+socket.on('spoof_current', function (msg) {
+  if (activeSpoof || (!msg.ani && !msg.dnis)) return;
+  spoofStatus.textContent = "Another open tab already has a spoof for " + msg.callerAni + " - ANI: " + (msg.ani || "(not spoofed)") + ", DNIS: " + (msg.dnis || "(not spoofed)") + ". Setting one here replaces it.";
 });
 
 socket.on('spoof_failure', function () {
   spoofStatus.textContent = "Not set - use digits only (an optional leading +), up to 20 digits.";
 });
 
+// The IVA sees the spoofed ANI, so its log messages arrive under that number instead of the real one.
+// While a spoofed ANI is set we listen to both. Same "+1" handling as the server uses for room names.
+let spoofRoom = "";
+function roomName(value) {
+  return String(value).replace("+1","");
+}
+function setSpoofRoom(ani) {
+  const newRoom = ani ? roomName(ani) : "";
+  if (oldvalue != "") { // only listen to the spoofed ANI once we are listening to the real one
+    if (spoofRoom != "" && spoofRoom != newRoom && spoofRoom != roomName(oldvalue)) socket.emit('leave', spoofRoom);
+    if (newRoom != "") socket.emit('join', newRoom);
+  }
+  spoofRoom = newRoom;
+  showListening();
+}
+function showListening() {
+  if (oldvalue == "") return;
+  listening.textContent = "Listening to: " + oldvalue + (spoofRoom != "" ? " and spoofed ANI " + spoofRoom : "");
+}
+
 function listen(listenvalue)
 {
-  listening.textContent = "Listening to: " + listenvalue;
   listening.classList.add("bg-success");
   listening.classList.remove("bg-danger");
   socket.emit('leave', oldvalue);
   socket.emit('join', listenvalue);
   oldvalue = listenvalue;
+  if (spoofRoom != "") socket.emit('join', spoofRoom); // leaving the old number must not drop the spoofed one
+  showListening();
 }
 	</script>  
   </body>
