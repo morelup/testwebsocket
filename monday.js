@@ -6,11 +6,11 @@ var fs = require('fs');
 var crypto = require('crypto');
 const fetch = require('node-fetch');
 
-// Board ids come from the browser, so only allow plain numbers (one id or a list of ids)
-function toBoardIds(ids){
+// Ids come from the browser, so only allow plain numbers (one id or a list of ids)
+function toIds(ids){
 	var list = [].concat(ids).map(id => String(id));
 	if (list.length == 0 || !list.every(id => /^\d{1,20}$/.test(id))) {
-		throw new Error("Invalid board id");
+		throw new Error("Invalid id");
 	}
 	return list;
 }
@@ -76,7 +76,7 @@ function boardInfo(msg){
 					}
 				}
 			}`,
-			variables: { ids: toBoardIds(msg) }
+			variables: { ids: toIds(msg) }
 		});
 		return callApi(body);
 	} catch (error) {
@@ -98,7 +98,28 @@ function getItems(msg){
 					}
 				}
 			}`,
-			variables: { ids: toBoardIds(msg) }
+			variables: { ids: toIds(msg) }
+		});
+		return callApi(body);
+	} catch (error) {
+		console.log(error);
+		return Promise.reject(error);
+	}
+}
+
+
+// Which board an item lives on, so a retest can only be added to an item on the right board
+function getItemBoard(item){
+	try {
+		var body = JSON.stringify({
+			query: `query ($ids: [ID!]) {
+				items (ids: $ids) {
+					board {
+						id
+					}
+				}
+			}`,
+			variables: { ids: toIds(item) }
 		});
 		return callApi(body);
 	} catch (error) {
@@ -116,6 +137,7 @@ function callApi(body) {
       'Authorization': authKey
     },
     body: body,
+timeout: 30000, // give up and report an error instead of waiting forever on Monday
   }).then(res => res.text());
 }
 
@@ -204,6 +226,7 @@ function createDefect(board,msg) {
 			'Authorization': authKey
 		  },
 		  body: body,
+timeout: 30000, // give up and report an error instead of waiting forever on Monday
 		})
 	  .then((res) => res.text())
 	} catch (error) {
@@ -247,10 +270,12 @@ function createSubItem(board,msg,item) {
 			'Authorization': authKey
 		  },
 		  body: body,
+timeout: 30000, // give up and report an error instead of waiting forever on Monday
 		}).then((res) => res.text())
 	} catch (error) {
 		console.log(error);
+		return Promise.reject(error);
 	}
 	
 }
-module.exports = { uploadFile,getItems,boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect,createSubItem};
+module.exports = { uploadFile,getItems,getItemBoard,boardInfo,authKeySet,confirmParentColumns,confirmSubitemColumns,createDefect,createSubItem};

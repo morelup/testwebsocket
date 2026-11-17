@@ -307,6 +307,7 @@ function create_defect(socket,msg) {
 
 // A retest adds a subitem to an existing defect, which must be an item on this socket's board
 function create_retest(socket,msg) {
+  console.log("Retest: checking that item " + msg.item + " is on board " + socket.data.boardId);
   monday.getItemBoard(msg.item).then(result => {
     const data = JSON.parse(result).data;
     const items = data && data.items;
@@ -314,6 +315,7 @@ function create_retest(socket,msg) {
       console.error("Retest refused: item " + msg.item + " is not on board " + socket.data.boardId + ". Monday said: " + result);
       return socket.emit('create_defect_failure');
     }
+    console.log("Retest: item " + msg.item + " is on the board, adding the subitem");
     create_subItem(socket,boards[socket.data.boardId].subitemBoard,msg,msg.item);
   }).catch(error => {
     console.error("FAILED RETEST for item " + msg.item);
@@ -329,6 +331,7 @@ function create_subItem(socket,board,msg,item) {
       console.error("Monday did not create the subitem under item " + item + ": " + result);
       return socket.emit('create_defect_failure');
     }
+    console.log("Subitem " + data.create_subitem.id + " created under item " + item);
     socket.emit('defect_created',"");
     monday.uploadFile(msg,data.create_subitem.id);
   }).catch(error => {
