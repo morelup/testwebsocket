@@ -78,27 +78,34 @@ function cleanPhone(value) {
   return /^\+?\d{1,20}$/.test(phone) ? phone : null;
 }
 
-// Room names are phone numbers, board ids or group ids
+// Room names are phone numbers, board ids or group ids. A US number can arrive as +13173811823,
+// 13173811823 or 3173811823, so all three become the 10 digit form and land in the same room.
 function cleanRoom(msg) {
   if (msg === undefined || msg === null) return null;
   msg = msg.toString().replace("+1","");
+  if (/^1\d{10}$/.test(msg)) msg = msg.slice(1);
   return /^[\w-]{1,64}$/.test(msg) ? msg : null;
 }
 
 // A submission needs a board this socket is locked to, every field must be plain text of a sane size,
-// and "reported by" must be "null" or someone subscribed to that board
-function validSubmission(socket, msg) {
-  if (!socket.data.boardId || !msg || typeof msg !== 'object') return false;
+// and "reported by" must be "null" or someone subscribed to that board.
+// Returns "" when the submission is fine, otherwise the reason it was refused (written to the log).
+function submissionProblem(socket, msg) {
+  if (!socket.data.boardId) return "this connection has no board (connect_boarddata did not succeed)";
+  if (!msg || typeof msg !== 'object') return "the message is not an object";
   const maxLengths = {
     reportedby: 30, item: 255, subitem: 255, callid: 100, timestamp: 100,
     ani: 30, notes: 10000, status: 100, expected: 10000, actual: 10000,
     calllog: 5e7
   };
-  const textOk = Object.keys(maxLengths).every(field =>
-    msg[field] === undefined || (typeof msg[field] === 'string' && msg[field].length <= maxLengths[field]));
+  const badField = Object.keys(maxLengths).find(field =>
+    msg[field] !== undefined && (typeof msg[field] !== 'string' || msg[field].length > maxLengths[field]));
+  if (badField) return "field " + badField + " is not text or is too long";
   const subscribers = boards[socket.data.boardId].parentBoard.data.boards[0].subscribers.map(person => String(person.id));
-  const reportedbyOk = msg.reportedby === undefined || msg.reportedby === "null" || subscribers.includes(msg.reportedby);
-  return textOk && reportedbyOk;
+  if (msg.reportedby !== undefined && msg.reportedby !== "null" && !subscribers.includes(msg.reportedby)) {
+    return "reportedby " + String(msg.reportedby).slice(0, 30) + " is not subscribed to board " + socket.data.boardId;
+  }
+  return "";
 }
 
 app.post('/', (req, res) => {
@@ -122,31 +129,35 @@ app.post('/', (req, res) => {
 	}
 
 
+  // Same cleaning as join uses, so the rooms match whichever form the number or id arrives in
+  const aniRoom = cleanRoom(ANI);
+  const boardRoom = cleanRoom(queryObject.boardId);
+  const groupRoom = cleanRoom(req.body[0].group_id);
   try {
     if (ANI != "ERROR")
 	{
-		if (io.sockets.adapter.rooms.has(ANI.toString().replace("+1",""))) {
-		  io.to(ANI.toString().replace("+1","")).emit('us7 message', req.body);
+		if (aniRoom && io.sockets.adapter.rooms.has(aniRoom)) {
+		  io.to(aniRoom).emit('us7 message', req.body);
 		}
-		if(queryObject.boardId && queryObject.openListen)
+		if(boardRoom && queryObject.openListen)
 		{
 			if(queryObject.openListen=="yes")
 			{
-				if (io.sockets.adapter.rooms.has(queryObject.boardId)) {
-				  io.to(queryObject.boardId).emit('us7 message', req.body);
+				if (io.sockets.adapter.rooms.has(boardRoom)) {
+				  io.to(boardRoom).emit('us7 message', req.body);
 				}
 			}
 		}
 	}
 	else
 	{
-		if(queryObject.boardId)
+		if(boardRoom)
 		{
-			if (io.sockets.adapter.rooms.has(queryObject.boardId)) {
-			  io.to(queryObject.boardId).emit('us7 message', req.body);
+			if (io.sockets.adapter.rooms.has(boardRoom)) {
+			  io.to(boardRoom).emit('us7 message', req.body);
 			}
-			if (io.sockets.adapter.rooms.has(req.body[0].group_id)) {
-			  io.to(req.body[0].group_id).emit('us7 message', req.body);
+			if (groupRoom && io.sockets.adapter.rooms.has(groupRoom)) {
+			  io.to(groupRoom).emit('us7 message', req.body);
 			}
 		}
 	}
@@ -219,12 +230,20 @@ io.on('connection', socket => {
   }));
   socket.on('create_defect', safe(msg => {
 	console.log("socket: create_defect:");
-	if (!validSubmission(socket,msg)) return socket.emit('create_defect_failure');
+	const problem = submissionProblem(socket,msg);
+	if (problem) {
+	  console.error("create_defect refused: " + problem);
+	  return socket.emit('create_defect_failure');
+	}
     create_defect(socket,msg);
   }));
   socket.on('create_defect_subitem', safe(msg => {
 	console.log("socket: create_defect_subitem:");
-	if (!validSubmission(socket,msg) || !/^\d+$/.test(msg.item)) return socket.emit('create_defect_failure');
+	const problem = submissionProblem(socket,msg) || (/^\d+$/.test(msg.item) ? "" : "item is not a Monday item id: " + String(msg.item).slice(0, 50));
+	if (problem) {
+	  console.error("create_defect_subitem refused: " + problem);
+	  return socket.emit('create_defect_failure');
+	}
     create_retest(socket,msg);
   }));
   socket.on('set_spoof', safe(msg => {
@@ -289,13 +308,15 @@ function create_defect(socket,msg) {
 // A retest adds a subitem to an existing defect, which must be an item on this socket's board
 function create_retest(socket,msg) {
   monday.getItemBoard(msg.item).then(result => {
-    const items = JSON.parse(result).data.items;
-    if (items.length != 1 || items[0].board.id != socket.data.boardId) {
-      console.error("Retest item " + msg.item + " is not on board " + socket.data.boardId);
+    const data = JSON.parse(result).data;
+    const items = data && data.items;
+    if (!items || items.length != 1 || !items[0].board || items[0].board.id != socket.data.boardId) {
+      console.error("Retest refused: item " + msg.item + " is not on board " + socket.data.boardId + ". Monday said: " + result);
       return socket.emit('create_defect_failure');
     }
     create_subItem(socket,boards[socket.data.boardId].subitemBoard,msg,msg.item);
   }).catch(error => {
+    console.error("FAILED RETEST for item " + msg.item);
     console.error(error);
 	socket.emit('create_defect_failure');
   });
@@ -303,8 +324,13 @@ function create_retest(socket,msg) {
 
 function create_subItem(socket,board,msg,item) {
   monday.createSubItem(board,msg,item).then(result => {
+    const data = JSON.parse(result).data;
+    if (!data || !data.create_subitem) { // Monday refused it, so log why
+      console.error("Monday did not create the subitem under item " + item + ": " + result);
+      return socket.emit('create_defect_failure');
+    }
     socket.emit('defect_created',"");
-    monday.uploadFile(msg,JSON.parse(result).data.create_subitem.id);
+    monday.uploadFile(msg,data.create_subitem.id);
   }).catch(error => {
     console.error(error);
 	console.error(JSON.stringify({...msg, calllog: undefined}));
